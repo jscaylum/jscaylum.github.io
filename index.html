@@ -14,7 +14,12 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="jscaylum">
 <meta name="twitter:image" content="https://jscaylum.github.io/jscaylum/pfp.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=VT323&family=Special+Elite&family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=VT323&family=Special+Elite&family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap');
+</style>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   :root {
@@ -503,19 +508,19 @@ footer { flex-direction: column; gap: 12px; text-align: center; }
 ───────────────────────────────────────────────── */
 const TRACKS = [
   {
-    id: '3KrDiDPZKAYmmqPF4rDGWg',
     name: 'isolation',
     spotifyUrl: 'https://open.spotify.com/track/3KrDiDPZKAYmmqPF4rDGWg',
     desc: "Trapped inside your own head, wanting someone you can't reach. A song about feeling unsafe in your own skin and wondering if any of it even matters.",
-    cover: null,
+    // HOW TO GET COVER: open the track on open.spotify.com, right-click album art, Open image in new tab, copy that URL (starts with i.scdn.co), paste it here
+    cover: '',
+    // HOW TO ADD PREVIEW: upload an .mp3 to your repo (e.g. previews/isolation.mp3) and set the path here
     preview: null
   },
   {
-    id: '3XSadYNj1am4Hf4wX8tPG1',
     name: 'trust issues',
     spotifyUrl: 'https://open.spotify.com/track/3XSadYNj1am4Hf4wX8tPG1',
     desc: 'You knew it was coming, and it still broke you. A song about being left for someone else and having to carry that doubt into everything that comes after.',
-    cover: null,
+    cover: '',
     preview: null
   }
 ];
@@ -780,10 +785,13 @@ function loadTape(index) {
     // reveal playing screen
     document.getElementById('screenPlaying').style.display = 'block';
     document.getElementById('screenTitle').textContent = track.name;
+    const coverEl = document.getElementById('screenCover');
     if (track.cover) {
-      document.getElementById('screenCover').src = track.cover;
+      coverEl.src = track.cover;
+      coverEl.style.display = 'block';
     } else {
-      document.getElementById('screenCover').src = '';
+      coverEl.src = '';
+      coverEl.style.display = 'none';
     }
 
     currentTrack = track;
@@ -924,64 +932,27 @@ setInterval(() => {
   setTimeout(() => { r.style.filter = 'blur(4px)'; r.style.color = ''; }, 80);
 }, 2200);
 
-/* ─────────────────────────────────────────────────
-   FETCH TRACK DATA (covers + preview)
-───────────────────────────────────────────────── */
-async function fetchTrackData(track, index) {
-  try {
-    const res = await fetch('https://open.spotify.com/oembed?url=' + track.spotifyUrl);
-    const data = await res.json();
-    if (data.thumbnail_url) {
-      track.cover = data.thumbnail_url;
-      const placeholder = document.getElementById('tapeCover' + index);
+// Populate tape labels and cover images from TRACKS data
+function init() {
+  TRACKS.forEach((track, i) => {
+    // Set tape title
+    const titleEl = document.getElementById('tapeTitle' + i);
+    if (titleEl) titleEl.textContent = track.name;
+
+    // Set cover image if a URL is provided
+    if (track.cover) {
+      const placeholder = document.getElementById('tapeCover' + i);
       if (placeholder && placeholder.tagName !== 'IMG') {
         const img = document.createElement('img');
         img.className = 'tape-cover';
         img.src = track.cover;
         img.alt = track.name;
+        // Fallback: if image fails to load, show placeholder
+        img.onerror = () => img.replaceWith(placeholder);
         placeholder.replaceWith(img);
       }
     }
-  } catch(e) {}
-
-  try {
-    const res2 = await fetch('https://api.spotify.com/v1/tracks/' + track.id, {
-      headers: { 'Authorization': 'Bearer ' + await getSpotifyToken() }
-    });
-    const data2 = await res2.json();
-    if (data2.preview_url) track.preview = data2.preview_url;
-    if (data2.album && data2.album.images && data2.album.images[0]) {
-      track.cover = data2.album.images[0].url;
-      const placeholder = document.getElementById('tapeCover' + index);
-      if (placeholder && placeholder.tagName !== 'IMG') {
-        const img = document.createElement('img');
-        img.className = 'tape-cover';
-        img.src = track.cover;
-        img.alt = track.name;
-        placeholder.replaceWith(img);
-      }
-    }
-  } catch(e) {}
-
-  document.getElementById('tapeTitle' + index).textContent = track.name;
-}
-
-async function getSpotifyToken() {
-  try {
-    const r = await fetch('https://accounts.spotify.com/api/token', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: 'grant_type=client_credentials&client_id=&client_secret='
-    });
-    const d = await r.json();
-    return d.access_token || '';
-  } catch(e) { return ''; }
-}
-
-async function init() {
-  for (let i = 0; i < TRACKS.length; i++) {
-    await fetchTrackData(TRACKS[i], i);
-  }
+  });
 }
 
 init();
