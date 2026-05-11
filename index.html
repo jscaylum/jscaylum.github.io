@@ -1,18 +1,19 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>jscaylum</title>
-
-<meta name="description" content="jscaylum is an independent artist from England whose music dives deep into the raw and unfiltered corners of the human experience. Diary entries set to sound.">
+<meta name="description" content="jscaylum is an independent artist from England whose music dives deep into the raw and unfiltered corners of the human experience.">
 <meta property="og:title" content="jscaylum">
 <meta property="og:description" content="Independent artist from England. Music for the ones who feel everything a little too deeply. Debut album coming soon.">
 <meta property="og:type" content="music.musician">
+<meta property="og:url" content="https://jscaylum.github.io/jscaylum">
+<meta property="og:image" content="https://jscaylum.github.io/jscaylum/pfp.jpg">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="jscaylum">
-<meta name="twitter:description" content="Independent artist from England. Music for the ones who feel everything a little too deeply. Debut album coming soon.">
-
+<meta name="twitter:image" content="https://jscaylum.github.io/jscaylum/pfp.jpg">
 <link href="https://fonts.googleapis.com/css2?family=VT323&family=Special+Elite&family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -33,260 +34,372 @@
   }
   @keyframes drift { 0%{transform:translate(0,0)} 100%{transform:translate(10px,10px)} }
 
-  /* ──────────── BUTTERFLY ──────────── */
-  #butterfly {
-    position: fixed;
-    width: 36px;
-    height: 36px;
-    z-index: 10000;
-    pointer-events: auto;
-    cursor: pointer;
-    display: none;
-    filter: drop-shadow(0 0 6px rgba(192,57,43,0.5));
-    transform-origin: center;
-  }
-  #butterfly svg { width: 100%; height: 100%; }
+.rec { position: fixed; top: 20px; right: 24px; display: flex; align-items: center; gap: 8px; font-family: ‘VT323’, monospace; font-size: 18px; color: var(–red-glow); z-index: 1000; letter-spacing: 2px; }
+.rec-dot { width: 10px; height: 10px; border-radius: 50%; background: var(–red-glow); animation: blink 1.2s step-end infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+.counter { position: fixed; top: 20px; left: 24px; font-family: ‘VT323’, monospace; font-size: 18px; color: var(–muted); z-index: 1000; letter-spacing: 3px; }
 
-  /* wing flap */
-  @keyframes flapLeft {
-    0%,100% { transform: scaleX(1) skewY(0deg); }
-    50% { transform: scaleX(0.15) skewY(6deg); }
-  }
-  @keyframes flapRight {
-    0%,100% { transform: scaleX(1) skewY(0deg); }
-    50% { transform: scaleX(0.15) skewY(-6deg); }
-  }
-  #wing-left  { transform-origin: right center; animation: flapLeft  0.32s ease-in-out infinite; }
-  #wing-right { transform-origin: left center;  animation: flapRight 0.32s ease-in-out infinite; }
+/* HERO */
+.hero { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; padding: 0 8vw; position: relative; border-bottom: 1px solid #2a2520; }
+.hero-sub { font-family: ‘VT323’, monospace; font-size: 16px; color: var(–muted); letter-spacing: 6px; text-transform: uppercase; margin-bottom: 24px; opacity: 0; animation: fadeUp 1s ease 0.3s forwards; }
+.hero-name { font-family: ‘Special Elite’, cursive; font-size: clamp(64px, 14vw, 140px); color: var(–cream); line-height: 0.9; letter-spacing: -2px; opacity: 0; animation: fadeUp 1s ease 0.6s forwards; position: relative; }
+.hero-name::after { content: ‘jscaylum’; position: absolute; left: 3px; top: 3px; color: var(–red); z-index: -1; opacity: 0.6; }
+.hero-tagline { margin-top: 32px; font-size: 13px; color: var(–muted); letter-spacing: 3px; text-transform: uppercase; max-width: 400px; line-height: 2; opacity: 0; animation: fadeUp 1s ease 0.9s forwards; }
+.hero-socials { margin-top: 36px; display: flex; gap: 12px; flex-wrap: wrap; opacity: 0; animation: fadeUp 1s ease 1.1s forwards; }
+.social-link { font-family: ‘VT323’, monospace; font-size: 15px; letter-spacing: 4px; color: var(–muted); text-decoration: none; border: 1px solid #2a2520; padding: 6px 14px; transition: all 0.2s; text-transform: uppercase; }
+.social-link:hover { color: var(–cream); border-color: var(–muted); background: rgba(255,255,255,0.03); }
+.hero-scroll { position: absolute; bottom: 32px; left: 8vw; font-family: ‘VT323’, monospace; font-size: 14px; color: var(–muted); letter-spacing: 4px; animation: pulse 2s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{opacity:0.4} 50%{opacity:1} }
+@keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
 
-  /* slow down when landing */
-  #butterfly.landing #wing-left  { animation-duration: 0.9s; }
-  #butterfly.landing #wing-right { animation-duration: 0.9s; }
-  #butterfly.landed #wing-left,
-  #butterfly.landed #wing-right  { animation: none; }
+/* SINGLES / VHS SECTION */
+.singles-section { padding: 100px 8vw; border-bottom: 1px solid #2a2520; }
+.section-label { font-family: ‘VT323’, monospace; font-size: 13px; letter-spacing: 6px; color: var(–red-glow); text-transform: uppercase; margin-bottom: 40px; }
 
-  /* gentle hover bob when landed */
-  @keyframes gentleBob {
-    0%,100% { transform: translateY(0px) rotate(-5deg); }
-    50% { transform: translateY(-4px) rotate(-5deg); }
-  }
-  #butterfly.landed { animation: gentleBob 2.5s ease-in-out infinite; }
+.vhs-layout { display: flex; flex-direction: column; align-items: center; gap: 48px; }
 
-  /* shimmer hint — very subtle glow pulse before butterfly appears */
-  @keyframes glowPulse {
-    0%,100%{filter:drop-shadow(0 0 4px rgba(192,57,43,0.3))}
-    50%{filter:drop-shadow(0 0 12px rgba(192,57,43,0.9))}
-  }
-  #butterfly.active { animation: glowPulse 2s ease-in-out infinite; }
-  #butterfly.landed { animation: gentleBob 2.5s ease-in-out infinite; filter: drop-shadow(0 0 8px rgba(192,57,43,0.7)); }
+/* VHS PLAYER */
+.vhs-player {
+width: 100%; max-width: 600px;
+background: #111008;
+border: 2px solid #3a3530;
+border-radius: 4px;
+padding: 20px;
+position: relative;
+box-shadow: 0 0 40px rgba(0,0,0,0.8), inset 0 0 20px rgba(0,0,0,0.5);
+}
+.vhs-player::before {
+content: ‘VHS · jscaylum’;
+position: absolute; top: 8px; left: 16px;
+font-family: ‘VT323’, monospace; font-size: 12px;
+color: #3a3530; letter-spacing: 4px;
+}
+.vhs-brand {
+position: absolute; top: 8px; right: 16px;
+font-family: ‘VT323’, monospace; font-size: 12px;
+color: var(–red-glow); letter-spacing: 3px;
+animation: blink 3s step-end infinite;
+}
 
-  /* ──────────── TRACK 01 REVEAL ──────────── */
-  .track-name-hidden {
-    color: var(--muted);
-    filter: blur(12px) brightness(0.7);
-    -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;
-    transition: filter 0.3s;
-    letter-spacing: 3px;
-    pointer-events: none;
-    text-shadow: 0 0 12px rgba(192,57,43,0.4);
-  }
-  .track-name-hidden::before { content: attr(data-name); }
+/* VHS SCREEN */
+.vhs-screen {
+width: 100%; aspect-ratio: 4/3;
+background: #050402;
+border: 2px solid #2a2520;
+position: relative;
+overflow: hidden;
+margin-bottom: 16px;
+}
+.vhs-screen::before {
+content: ‘’;
+position: absolute; inset: 0;
+background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.2) 3px, rgba(0,0,0,0.2) 4px);
+pointer-events: none; z-index: 10;
+}
+/* chromatic aberration overlay */
+.vhs-screen::after {
+content: ‘’;
+position: absolute; inset: 0;
+background: linear-gradient(transparent 0%, rgba(192,57,43,0.03) 50%, transparent 100%);
+pointer-events: none; z-index: 11;
+animation: scanline 4s linear infinite;
+}
+@keyframes scanline { 0%{transform:translateY(-100%)} 100%{transform:translateY(100%)} }
 
-  .track-name-hidden.revealed {
-    filter: none;
-    color: var(--cream);
-    text-shadow: 0 0 8px rgba(192,57,43,0.4);
-    pointer-events: auto;
-    animation: revealPop 0.5s ease forwards;
-  }
-  @keyframes revealPop {
-    0%   { letter-spacing: 8px; opacity: 0; filter: blur(6px); }
-    60%  { letter-spacing: 2px; opacity: 1; filter: blur(1px); }
-    100% { letter-spacing: 3px; opacity: 1; filter: none; }
-  }
+.screen-idle {
+width: 100%; height: 100%;
+display: flex; flex-direction: column; align-items: center; justify-content: center;
+gap: 12px;
+}
+.screen-idle-text { font-family: ‘VT323’, monospace; font-size: 28px; color: #2a2520; letter-spacing: 8px; animation: idleGlitch 5s step-end infinite; }
+@keyframes idleGlitch { 0%,85%,100%{color:#2a2520;text-shadow:none} 87%{color:#3a3530;text-shadow:2px 0 var(–red)} 89%{color:#2a2520;text-shadow:none} 91%{color:var(–muted);text-shadow:-2px 0 var(–red-glow)} 93%{color:#2a2520} }
+.screen-idle-sub { font-family: ‘VT323’, monospace; font-size: 13px; color: #1a1810; letter-spacing: 4px; animation: blink 2s step-end infinite; }
 
-  .track-row.butterfly-here {
-    background: rgba(192,57,43,0.06);
-    border-color: rgba(192,57,43,0.2);
-    transition: background 0.5s, border-color 0.5s;
-  }
+.screen-playing { width: 100%; height: 100%; display: none; position: relative; }
+.screen-cover {
+width: 100%; height: 100%; object-fit: cover;
+filter: saturate(0.6) contrast(1.15) brightness(0.85);
+animation: coverLoad 0.5s steps(4) forwards;
+}
+@keyframes coverLoad {
+0%{filter:saturate(0) contrast(2) brightness(4) blur(6px);transform:scale(1.05)}
+40%{filter:saturate(0.1) contrast(1.8) brightness(2) blur(2px);transform:scale(1.02)}
+70%{filter:saturate(0.4) contrast(1.3) brightness(1.1) blur(0px);transform:scale(1.01)}
+100%{filter:saturate(0.6) contrast(1.15) brightness(0.85);transform:scale(1)}
+}
+.screen-overlay {
+position: absolute; inset: 0;
+background: linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.85) 100%);
+display: flex; flex-direction: column; justify-content: flex-end; padding: 16px;
+}
+.screen-track-name {
+font-family: ‘VT323’, monospace; font-size: 32px; color: var(–cream);
+letter-spacing: 4px; line-height: 1;
+animation: textFlicker 0.6s steps(4) forwards;
+}
+@keyframes textFlicker {
+0%{opacity:0;transform:translateX(-6px) skewX(-4deg);filter:blur(4px)}
+25%{opacity:0.4;transform:translateX(4px) skewX(2deg);filter:blur(2px)}
+50%{opacity:0.7;transform:translateX(-2px) skewX(-1deg);filter:blur(1px)}
+75%{opacity:0.9;transform:translateX(1px);filter:blur(0)}
+100%{opacity:1;transform:translateX(0) skewX(0)}
+}
+.screen-artist {
+font-family: ‘VT323’, monospace; font-size: 16px; color: var(–muted);
+letter-spacing: 5px; margin-top: 4px;
+animation: textFlicker 0.6s steps(4) 0.15s forwards; opacity: 0;
+}
+.screen-timer { font-family: ‘VT323’, monospace; font-size: 14px; color: var(–red-glow); letter-spacing: 3px; margin-top: 6px; }
 
-  /* ──────────── REST OF STYLES ──────────── */
-  .rec { position: fixed; top: 20px; right: 24px; display: flex; align-items: center; gap: 8px; font-family: 'VT323', monospace; font-size: 18px; color: var(--red-glow); z-index: 1000; letter-spacing: 2px; }
-  .rec-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--red-glow); animation: blink 1.2s step-end infinite; }
-  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
-  .counter { position: fixed; top: 20px; left: 24px; font-family: 'VT323', monospace; font-size: 18px; color: var(--muted); z-index: 1000; letter-spacing: 3px; }
-  .hero { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; padding: 0 8vw; position: relative; border-bottom: 1px solid #2a2520; }
-  .hero-sub { font-family: 'VT323', monospace; font-size: 16px; color: var(--muted); letter-spacing: 6px; text-transform: uppercase; margin-bottom: 24px; opacity: 0; animation: fadeUp 1s ease 0.3s forwards; }
-  .hero-name { font-family: 'Special Elite', cursive; font-size: clamp(64px, 14vw, 140px); color: var(--cream); line-height: 0.9; letter-spacing: -2px; opacity: 0; animation: fadeUp 1s ease 0.6s forwards; position: relative; }
-  .hero-name::after { content: 'jscaylum'; position: absolute; left: 3px; top: 3px; color: var(--red); z-index: -1; opacity: 0.6; }
-  .hero-tagline { margin-top: 32px; font-size: 13px; color: var(--muted); letter-spacing: 3px; text-transform: uppercase; max-width: 400px; line-height: 2; opacity: 0; animation: fadeUp 1s ease 0.9s forwards; }
-  .hero-socials { margin-top: 36px; display: flex; gap: 12px; flex-wrap: wrap; opacity: 0; animation: fadeUp 1s ease 1.1s forwards; }
-  .social-link { font-family: 'VT323', monospace; font-size: 15px; letter-spacing: 4px; color: var(--muted); text-decoration: none; border: 1px solid #2a2520; padding: 6px 14px; transition: all 0.2s; text-transform: uppercase; }
-  .social-link:hover { color: var(--cream); border-color: var(--muted); background: rgba(255,255,255,0.03); }
-  .hero-scroll { position: absolute; bottom: 32px; left: 8vw; font-family: 'VT323', monospace; font-size: 14px; color: var(--muted); letter-spacing: 4px; animation: pulse 2s ease-in-out infinite; }
-  @keyframes pulse { 0%,100%{opacity:0.4} 50%{opacity:1} }
-  @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
-  .track-section { padding: 100px 8vw; border-bottom: 1px solid #2a2520; display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
-  .section-label { font-family: 'VT323', monospace; font-size: 13px; letter-spacing: 6px; color: var(--red-glow); text-transform: uppercase; margin-bottom: 20px; }
-  .track-title { font-family: 'Special Elite', cursive; font-size: clamp(36px, 5vw, 60px); color: var(--cream); line-height: 1.1; margin-bottom: 20px; }
-  .track-desc { font-size: 14px; line-height: 2; color: var(--muted); max-width: 400px; }
-  .stream-links { margin-top: 36px; display: flex; flex-direction: column; gap: 10px; }
-  .stream-btn { display: flex; align-items: center; gap: 14px; font-family: 'VT323', monospace; font-size: 16px; letter-spacing: 4px; color: var(--muted); text-decoration: none; border: 1px solid #2a2520; padding: 10px 18px; transition: all 0.2s; text-transform: uppercase; max-width: 260px; }
-  .stream-btn:hover { color: var(--cream); border-color: var(--muted); background: rgba(255,255,255,0.03); transform: translateX(4px); }
-  .stream-icon { width: 16px; height: 16px; opacity: 0.6; flex-shrink: 0; }
-  .cassette { aspect-ratio: 1; max-width: 360px; background: var(--tape); border: 1px solid #3a3530; position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-  .cassette::before { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(45deg, transparent, transparent 20px, rgba(255,255,255,0.01) 20px, rgba(255,255,255,0.01) 40px); }
-  .cassette-inner { width: 80%; height: 80%; border: 1px solid #3a3530; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; background: #111008; }
-  .cassette-label { font-family: 'VT323', monospace; font-size: 28px; color: var(--cream); letter-spacing: 4px; }
-  .cassette-sublabel { font-family: 'VT323', monospace; font-size: 14px; color: var(--red-glow); letter-spacing: 6px; }
-  .reels { display: flex; gap: 40px; margin-top: 8px; }
-  .reel { width: 40px; height: 40px; border-radius: 50%; border: 2px solid #3a3530; position: relative; animation: spin 4s linear infinite; }
-  .reel::before { content: ''; position: absolute; inset: 6px; border-radius: 50%; border: 1px solid #5a5040; }
-  .reel::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 8px; height: 8px; border-radius: 50%; background: #3a3530; }
-  @keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
-  .bio-section { padding: 100px 8vw; border-bottom: 1px solid #2a2520; max-width: 800px; }
-  .bio-text { font-size: 15px; line-height: 2.2; color: var(--text); }
-  .bio-text em { font-style: italic; color: var(--cream); }
-  .album-section { padding: 120px 8vw; text-align: center; position: relative; overflow: hidden; border-bottom: 1px solid #2a2520; }
-  .album-section::before { content: '//////////////////////////////////////////'; position: absolute; top: 40px; left: 0; right: 0; font-family: 'VT323', monospace; font-size: 18px; color: #2a2520; letter-spacing: 4px; white-space: nowrap; overflow: hidden; }
-  .album-mystery { font-family: 'VT323', monospace; font-size: clamp(60px, 12vw, 120px); color: #2a2520; letter-spacing: 12px; display: block; margin-bottom: 32px; animation: glitch 6s step-end infinite; }
-  @keyframes glitch { 0%,90%,100%{text-shadow:none;color:#2a2520} 92%{color:var(--red);text-shadow:2px 0 var(--cream),-2px 0 var(--red-glow)} 94%{color:#2a2520} 96%{color:var(--muted);text-shadow:-2px 0 var(--red)} 98%{color:#2a2520} }
-  .album-coming { font-family: 'VT323', monospace; font-size: 20px; color: var(--red-glow); letter-spacing: 8px; text-transform: uppercase; animation: blink 2s step-end infinite; }
-  .album-tagline-text { margin-top: 20px; font-size: 12px; color: var(--muted); letter-spacing: 4px; text-transform: uppercase; }
-  .tracklist { margin: 48px auto 0; display: inline-flex; flex-direction: column; text-align: left; border: 1px solid #2a2520; min-width: 340px; }
-  .track-row { display: flex; align-items: center; gap: 16px; padding: 11px 20px; border-bottom: 1px solid #1a1810; font-family: 'VT323', monospace; font-size: 18px; letter-spacing: 3px; position: relative; overflow: hidden; }
-  .track-row:last-child { border-bottom: none; }
-  .track-num { color: #3a3530; min-width: 24px; flex-shrink: 0; }
-  .track-row::after { content: ''; position: absolute; left: 0; top: 0; right: 0; bottom: 0; background: linear-gradient(90deg, transparent 0%, rgba(192,57,43,0.04) 50%, transparent 100%); opacity: 0; transition: opacity 0.2s; }
-  .track-row:hover::after { opacity: 1; }
-  .links-section { padding: 80px 8vw; border-bottom: 1px solid #2a2520; }
-  .links-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-top: 32px; }
-  .link-card { display: flex; align-items: center; gap: 12px; font-family: 'VT323', monospace; font-size: 17px; letter-spacing: 3px; color: var(--muted); text-decoration: none; border: 1px solid #2a2520; padding: 14px 18px; transition: all 0.2s; text-transform: uppercase; }
-  .link-card:hover { color: var(--cream); border-color: var(--muted); background: rgba(255,255,255,0.03); transform: translateY(-2px); }
-  .link-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--red-glow); flex-shrink: 0; }
-  footer { padding: 40px 8vw; display: flex; justify-content: space-between; align-items: center; }
-  .footer-name { font-family: 'Special Elite', cursive; font-size: 20px; color: var(--muted); }
-  .footer-info { font-family: 'VT323', monospace; font-size: 14px; color: #3a3530; letter-spacing: 3px; }
-  .static-flash { position: fixed; inset: 0; background: var(--cream); z-index: 99999; animation: staticFade 0.4s ease forwards; pointer-events: none; }
-  @keyframes staticFade { 0%{opacity:1} 60%{opacity:0.3} 100%{opacity:0} }
+/* glitch on load */
+.screen-glitch {
+position: absolute; inset: 0; z-index: 20;
+display: none;
+animation: glitchFlash 0.6s step-end forwards;
+}
+@keyframes glitchFlash {
+0%{opacity:1;background:var(–cream)}
+15%{opacity:0.8;background:var(–red);transform:translateX(4px)}
+30%{opacity:1;background:#050402;transform:translateX(-3px)}
+45%{opacity:0.6;background:var(–cream);transform:translateX(2px)}
+60%{opacity:0.9;background:var(–red-glow);transform:translateX(0)}
+75%{opacity:0.4;background:#050402}
+100%{opacity:0}
+}
 
-  /* butterfly hint tooltip */
-  #butterfly-hint {
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
-    font-family: 'VT323', monospace;
-    font-size: 13px;
-    color: var(--muted);
-    letter-spacing: 3px;
-    opacity: 0;
-    transition: opacity 1s;
-    pointer-events: none;
-    z-index: 10001;
-  }
-  #butterfly-hint.show { opacity: 1; }
+/* TAPE SLOT */
+.tape-slot {
+height: 14px; background: #050402; border: 1px solid #2a2520;
+border-radius: 2px; margin-bottom: 16px; position: relative; overflow: hidden;
+}
+.tape-insert {
+position: absolute; left: 50%; top: 0; bottom: 0; width: 80px;
+background: linear-gradient(90deg, transparent, #1a1710 30%, #1a1710 70%, transparent);
+transform: translateX(-50%) translateY(-100%);
+transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.tape-insert.inserted { transform: translateX(-50%) translateY(0); }
 
-  @media (max-width: 700px) {
-    .track-section { grid-template-columns: 1fr; gap: 40px; }
-    .cassette { max-width: 100%; }
-    footer { flex-direction: column; gap: 12px; text-align: center; }
-    .tracklist { min-width: unset; width: 100%; }
-  }
+/* VHS CONTROLS */
+.vhs-controls { display: flex; align-items: center; justify-content: space-between; }
+.vhs-controls-left { display: flex; gap: 10px; align-items: center; }
+.vhs-btn {
+width: 36px; height: 24px; background: #0d0b08; border: 1px solid #3a3530;
+display: flex; align-items: center; justify-content: center;
+cursor: pointer; transition: all 0.15s; color: var(–muted); font-size: 10px;
+}
+.vhs-btn:hover { border-color: var(–muted); color: var(–cream); background: #1a1710; }
+.vhs-btn.active { border-color: var(–red-glow); color: var(–red-glow); }
+.vhs-display { font-family: ‘VT323’, monospace; font-size: 16px; color: var(–red-glow); letter-spacing: 3px; background: #050402; padding: 2px 10px; border: 1px solid #1a1810; }
+
+/* PROGRESS BAR */
+.vhs-progress { width: 100%; height: 4px; background: #0d0b08; margin-top: 14px; cursor: pointer; border: 1px solid #1a1810; transition: height 0.15s, margin-top 0.15s; }
+.vhs-progress:hover { height: 7px; margin-top: 11px; }
+.vhs-progress-fill { height: 100%; background: linear-gradient(90deg, var(–red) 0%, var(–red-glow) 100%); width: 0%; transition: width 0.5s linear; box-shadow: 0 0 8px rgba(192,57,43,0.6); }
+
+/* SONG INFO BELOW PLAYER */
+.song-info { display: none; text-align: center; max-width: 600px; width: 100%; }
+.song-info.visible { display: block; animation: fadeUp 0.5s ease forwards; }
+.song-info-title { font-family: ‘Special Elite’, cursive; font-size: clamp(28px, 4vw, 48px); color: var(–cream); margin-bottom: 8px; animation: titleReveal 0.8s steps(20) forwards; overflow: hidden; white-space: nowrap; }
+@keyframes titleReveal { from{clip-path:inset(0 100% 0 0)} to{clip-path:inset(0 0% 0 0)} }
+.song-info-meta { font-family: ‘VT323’, monospace; font-size: 14px; color: var(–muted); letter-spacing: 4px; text-transform: uppercase; margin-bottom: 24px; animation: fadeUp 0.5s ease 0.4s forwards; opacity: 0; }
+.song-info-desc { font-size: 14px; line-height: 2; color: var(–muted); margin-bottom: 28px; animation: fadeUp 0.5s ease 0.6s forwards; opacity: 0; }
+.spotify-btn {
+display: inline-flex; align-items: center; gap: 12px;
+font-family: ‘VT323’, monospace; font-size: 18px; letter-spacing: 4px;
+color: var(–muted); text-decoration: none; border: 1px solid #2a2520;
+padding: 12px 24px; transition: all 0.2s; text-transform: uppercase;
+animation: fadeUp 0.5s ease 0.8s forwards; opacity: 0;
+}
+.spotify-btn:hover { color: var(–cream); border-color: var(–muted); background: rgba(255,255,255,0.03); transform: translateY(-2px); box-shadow: 0 4px 20px rgba(0,0,0,0.4); }
+
+/* TAPE SHELF */
+.tape-shelf { width: 100%; max-width: 600px; }
+.tape-shelf-label { font-family: ‘VT323’, monospace; font-size: 13px; letter-spacing: 6px; color: #3a3530; text-transform: uppercase; margin-bottom: 16px; text-align: center; }
+.tapes { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
+
+.tape {
+width: 100px; cursor: pointer;
+transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.25s;
+position: relative; user-select: none;
+}
+.tape:hover { transform: translateY(-10px) rotate(-1deg); filter: brightness(1.3); }
+.tape:active { transform: translateY(-4px) scale(0.97); }
+.tape.loading { pointer-events: none; opacity: 0.6; }
+
+.tape-body {
+width: 100%; aspect-ratio: 2/3;
+background: var(–tape); border: 1px solid #3a3530;
+display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+padding: 8px 6px; position: relative; overflow: hidden;
+}
+.tape-body::before {
+content: ‘’; position: absolute; inset: 0;
+background: repeating-linear-gradient(45deg, transparent, transparent 8px, rgba(255,255,255,0.01) 8px, rgba(255,255,255,0.01) 16px);
+}
+.tape-cover { width: 100%; aspect-ratio: 1; object-fit: cover; filter: saturate(0.6); border: 1px solid #2a2520; }
+.tape-cover-placeholder { width: 100%; aspect-ratio: 1; background: #111008; border: 1px solid #2a2520; display: flex; align-items: center; justify-content: center; }
+.tape-title { font-family: ‘VT323’, monospace; font-size: 11px; color: var(–muted); letter-spacing: 2px; text-transform: uppercase; text-align: center; line-height: 1.3; margin-top: 4px; }
+.tape-reels { display: flex; gap: 14px; justify-content: center; margin-top: 4px; }
+.tape-reel { width: 16px; height: 16px; border-radius: 50%; border: 1px solid #3a3530; position: relative; }
+.tape-reel::after { content: ‘’; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 5px; height: 5px; border-radius: 50%; background: #2a2520; }
+.tape.active .tape-reel { animation: spin 2s linear infinite; }
+.tape.active .tape-body { border-color: var(–red-glow); box-shadow: 0 0 10px rgba(192,57,43,0.3); }
+@keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+
+.tape-spine { height: 10px; background: var(–red); display: flex; align-items: center; justify-content: center; }
+.tape-spine-text { font-family: ‘VT323’, monospace; font-size: 8px; color: rgba(255,255,255,0.5); letter-spacing: 2px; text-transform: uppercase; }
+
+/* BIO */
+.bio-section { padding: 100px 8vw; border-bottom: 1px solid #2a2520; max-width: 800px; }
+.bio-text { font-size: 15px; line-height: 2.2; color: var(–text); }
+.bio-text em { font-style: italic; color: var(–cream); }
+
+/* ALBUM */
+.album-section { padding: 120px 8vw; text-align: center; position: relative; overflow: hidden; border-bottom: 1px solid #2a2520; }
+.album-section::before { content: ‘//////////////////////////////////////////’; position: absolute; top: 40px; left: 0; right: 0; font-family: ‘VT323’, monospace; font-size: 18px; color: #2a2520; letter-spacing: 4px; white-space: nowrap; overflow: hidden; }
+.album-mystery { font-family: ‘VT323’, monospace; font-size: clamp(60px, 12vw, 120px); color: #2a2520; letter-spacing: 12px; display: block; margin-bottom: 32px; animation: glitch 6s step-end infinite; }
+@keyframes glitch { 0%,90%,100%{text-shadow:none;color:#2a2520} 92%{color:var(–red);text-shadow:2px 0 var(–cream),-2px 0 var(–red-glow)} 94%{color:#2a2520} 96%{color:var(–muted);text-shadow:-2px 0 var(–red)} 98%{color:#2a2520} }
+.album-coming { font-family: ‘VT323’, monospace; font-size: 20px; color: var(–red-glow); letter-spacing: 8px; text-transform: uppercase; animation: blink 2s step-end infinite; }
+.album-tagline-text { margin-top: 20px; font-size: 12px; color: var(–muted); letter-spacing: 4px; text-transform: uppercase; }
+.tracklist { margin: 48px auto 0; display: inline-flex; flex-direction: column; text-align: left; border: 1px solid #2a2520; min-width: 340px; }
+.track-row { display: flex; align-items: center; gap: 16px; padding: 11px 20px; border-bottom: 1px solid #1a1810; font-family: ‘VT323’, monospace; font-size: 18px; letter-spacing: 3px; position: relative; overflow: hidden; }
+.track-row:last-child { border-bottom: none; }
+.track-num { color: #3a3530; min-width: 24px; flex-shrink: 0; }
+.track-name-hidden { color: var(–muted); filter: blur(4px); user-select: none; transition: filter 0.3s; letter-spacing: 3px; }
+.track-row:hover .track-name-hidden { filter: blur(3px); animation: textGlitch 0.3s step-end; }
+@keyframes textGlitch { 0%{transform:translateX(0);color:var(–muted)} 20%{transform:translateX(-2px);color:var(–red-glow)} 40%{transform:translateX(2px);color:var(–cream)} 60%{transform:translateX(-1px);color:var(–red-glow)} 80%{transform:translateX(1px);color:var(–muted)} 100%{transform:translateX(0)} }
+.track-row::after { content: ‘’; position: absolute; left: 0; top: 0; right: 0; bottom: 0; background: linear-gradient(90deg, transparent 0%, rgba(192,57,43,0.04) 50%, transparent 100%); opacity: 0; transition: opacity 0.2s; }
+.track-row:hover::after { opacity: 1; }
+
+/* LINKS */
+.links-section { padding: 80px 8vw; border-bottom: 1px solid #2a2520; }
+.links-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-top: 32px; }
+.link-card { display: flex; align-items: center; gap: 12px; font-family: ‘VT323’, monospace; font-size: 17px; letter-spacing: 3px; color: var(–muted); text-decoration: none; border: 1px solid #2a2520; padding: 14px 18px; transition: all 0.2s; text-transform: uppercase; }
+.link-card:hover { color: var(–cream); border-color: var(–muted); background: rgba(255,255,255,0.03); transform: translateY(-2px); }
+.link-dot { width: 6px; height: 6px; border-radius: 50%; background: var(–red-glow); flex-shrink: 0; }
+.links-group { margin-bottom: 40px; }
+.links-group:last-child { margin-bottom: 0; }
+.links-group-label { font-family: ‘VT323’, monospace; font-size: 13px; letter-spacing: 6px; color: #3a3530; text-transform: uppercase; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid #1a1810; }
+
+footer { padding: 40px 8vw; display: flex; justify-content: space-between; align-items: center; }
+.footer-name { font-family: ‘Special Elite’, cursive; font-size: 20px; color: var(–muted); }
+.footer-info { font-family: ‘VT323’, monospace; font-size: 14px; color: #3a3530; letter-spacing: 3px; }
+.static-flash { position: fixed; inset: 0; background: var(–cream); z-index: 99999; animation: staticFade 0.4s ease forwards; pointer-events: none; }
+@keyframes staticFade { 0%{opacity:1} 60%{opacity:0.3} 100%{opacity:0} }
+
+@media (max-width: 700px) {
+footer { flex-direction: column; gap: 12px; text-align: center; }
+.tracklist { min-width: unset; width: 100%; }
+.tapes { gap: 16px; }
+.tape { width: 80px; }
+}
 </style>
+
 </head>
 <body>
 <div class="static-flash"></div>
 <div class="rec"><div class="rec-dot"></div>REC</div>
 <div class="counter" id="counter">00:00:00</div>
 
-<!-- BUTTERFLY -->
-<div id="butterfly" title="catch it">
-  <svg viewBox="0 0 60 50" xmlns="http://www.w3.org/2000/svg">
-    <!-- left wings -->
-    <g id="wing-left">
-      <!-- upper left -->
-      <path d="M28 22 C18 10, 2 8, 4 20 C6 28, 20 30, 28 26 Z"
-            fill="#8b1a1a" opacity="0.85" stroke="#c0392b" stroke-width="0.5"/>
-      <!-- lower left -->
-      <path d="M28 26 C18 30, 8 36, 10 42 C13 46, 24 40, 28 32 Z"
-            fill="#6b1414" opacity="0.8" stroke="#c0392b" stroke-width="0.5"/>
-      <!-- markings -->
-      <circle cx="14" cy="18" r="2.5" fill="#d4c9b0" opacity="0.25"/>
-      <circle cx="16" cy="38" r="1.8" fill="#d4c9b0" opacity="0.2"/>
-    </g>
-    <!-- right wings -->
-    <g id="wing-right">
-      <!-- upper right -->
-      <path d="M32 22 C42 10, 58 8, 56 20 C54 28, 40 30, 32 26 Z"
-            fill="#8b1a1a" opacity="0.85" stroke="#c0392b" stroke-width="0.5"/>
-      <!-- lower right -->
-      <path d="M32 26 C42 30, 52 36, 50 42 C47 46, 36 40, 32 32 Z"
-            fill="#6b1414" opacity="0.8" stroke="#c0392b" stroke-width="0.5"/>
-      <!-- markings -->
-      <circle cx="46" cy="18" r="2.5" fill="#d4c9b0" opacity="0.25"/>
-      <circle cx="44" cy="38" r="1.8" fill="#d4c9b0" opacity="0.2"/>
-    </g>
-    <!-- body -->
-    <ellipse cx="30" cy="28" rx="2" ry="10" fill="#1a1710" stroke="#3a3530" stroke-width="0.5"/>
-    <!-- antennae -->
-    <line x1="29" y1="20" x2="22" y2="12" stroke="#3a3530" stroke-width="0.8"/>
-    <circle cx="22" cy="12" r="1.2" fill="#c0392b"/>
-    <line x1="31" y1="20" x2="38" y2="12" stroke="#3a3530" stroke-width="0.8"/>
-    <circle cx="38" cy="12" r="1.2" fill="#c0392b"/>
-  </svg>
-</div>
-
-<div id="butterfly-hint">// something is fluttering nearby</div>
-
 <section class="hero">
   <div class="hero-sub">England &nbsp;·&nbsp; Independent Artist</div>
   <h1 class="hero-name">jscaylum</h1>
   <p class="hero-tagline">music for the ones who feel everything a little too deeply</p>
   <div class="hero-socials">
-    <a class="social-link" href="https://www.tiktok.com/@jscaylum" target="_blank">TikTok</a>
+    <a class="social-link" href="https://www.tiktok.com/@jscaylum" target="_blank">TikTok (artist)</a>
+    <a class="social-link" href="https://www.tiktok.com/@xxcat_tokxx" target="_blank">TikTok (main)</a>
     <a class="social-link" href="https://www.youtube.com/@jscaylum" target="_blank">YouTube</a>
   </div>
   <div class="hero-scroll">▼ &nbsp; scroll</div>
 </section>
 
-<section class="track-section">
-  <div>
-    <div class="section-label">// latest track</div>
-    <h2 class="track-title">isolation</h2>
-    <p class="track-desc">Unfiltered. A study in what it means to be completely alone inside yourself — even when the world is still turning outside your window.</p>
-    <div class="stream-links">
-      <a class="stream-btn" href="https://open.spotify.com/track/3KrDiDPZKAYmmqPF4rDGWg" target="_blank">
-        <svg class="stream-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
-        Spotify
-      </a>
-      <a class="stream-btn" href="https://music.apple.com/us/song/isolation/1877639390" target="_blank">
-        <svg class="stream-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
-        Apple Music
-      </a>
-      <a class="stream-btn" href="https://soundcloud.com/user-671417489/isolation-1" target="_blank">
-        <svg class="stream-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M11.56 8.87V17h8.76c1.41 0 2.55-1.15 2.55-2.56 0-1.41-1.14-2.56-2.55-2.56-.1 0-.2.01-.3.02C19.7 9.95 18 8.5 16 8.5c-.78 0-1.5.22-2.12.59C13.5 8.75 13 8.5 12.44 8.5c-.3 0-.6.07-.88.19v.18zM0 15c0 1.1.9 2 2 2s2-.9 2-2-.9-2-2-2-2 .9-2 2zm4.56 0c0-.86.58-1.59 1.37-1.82V11.5C3.74 11.74 2.5 13.22 2.5 15s1.24 3.26 3.43 3.5v-1.68C5.14 16.59 4.56 15.86 4.56 15z"/></svg>
-        SoundCloud
-      </a>
+<!-- SINGLES / VHS SECTION -->
+
+<section class="singles-section">
+  <div class="section-label">// singles</div>
+  <div class="vhs-layout">
+
+```
+<!-- VHS PLAYER -->
+<div class="vhs-player">
+  <div class="vhs-brand">● PLAY</div>
+  <div class="vhs-screen" id="vhsScreen">
+    <div class="vhs-noise"></div>
+    <div class="screen-idle" id="screenIdle">
+      <div class="screen-idle-text">INSERT TAPE</div>
+      <div class="screen-idle-sub">▼ select a single below</div>
     </div>
-  </div>
-  <div class="cassette">
-    <div class="cassette-inner">
-      <div class="cassette-label">ISOLATION</div>
-      <div class="cassette-sublabel">jscaylum</div>
-      <div class="reels">
-        <div class="reel"></div>
-        <div class="reel" style="animation-direction:reverse;animation-duration:3s;"></div>
+    <div class="screen-playing" id="screenPlaying">
+      <img class="screen-cover" id="screenCover" src="" alt="">
+      <div class="screen-overlay">
+        <div class="screen-track-name" id="screenTitle"></div>
+        <div class="screen-artist" id="screenArtist">jscaylum</div>
+        <div class="screen-timer" id="screenTimer">00:00</div>
       </div>
     </div>
+    <div class="screen-glitch" id="screenGlitch"></div>
+  </div>
+  <div class="tape-slot"><div class="tape-insert" id="tapeInsert"></div></div>
+  <div class="vhs-controls">
+    <div class="vhs-controls-left">
+      <div class="vhs-btn" id="btnPlay" onclick="togglePlay()">▶</div>
+      <div class="vhs-btn" onclick="stopTape()">■</div>
+    </div>
+    <div class="vhs-display" id="vhsDisplay">-- : --</div>
+  </div>
+  <div class="vhs-progress" onclick="seekAudio(event)">
+    <div class="vhs-progress-fill" id="progressFill"></div>
+  </div>
+</div>
+
+<!-- SONG INFO -->
+<div class="song-info" id="songInfo">
+  <div class="song-info-title" id="infoTitle"></div>
+  <div class="song-info-meta" id="infoMeta"></div>
+  <div class="song-info-desc" id="infoDesc"></div>
+  <a class="spotify-btn" id="spotifyBtn" href="#" target="_blank">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
+    Stream on Spotify
+  </a>
+</div>
+
+<!-- TAPE SHELF -->
+<div class="tape-shelf">
+  <div class="tape-shelf-label">// select a tape</div>
+  <div class="tapes" id="tapesContainer">
+    <div class="tape" id="tape-0" onclick="loadTape(0)">
+      <div class="tape-spine"><span class="tape-spine-text">jscaylum</span></div>
+      <div class="tape-body">
+        <div class="tape-cover-placeholder" id="tapeCover0">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="#2a2520"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+        </div>
+        <div class="tape-reels"><div class="tape-reel"></div><div class="tape-reel"></div></div>
+        <div class="tape-title" id="tapeTitle0">loading...</div>
+      </div>
+    </div>
+    <div class="tape" id="tape-1" onclick="loadTape(1)">
+      <div class="tape-spine"><span class="tape-spine-text">jscaylum</span></div>
+      <div class="tape-body">
+        <div class="tape-cover-placeholder" id="tapeCover1">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="#2a2520"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+        </div>
+        <div class="tape-reels"><div class="tape-reel"></div><div class="tape-reel"></div></div>
+        <div class="tape-title" id="tapeTitle1">loading...</div>
+      </div>
+    </div>
+  </div>
+</div>
+```
+
   </div>
 </section>
 
 <section class="bio-section">
   <div class="section-label">// about</div>
   <p class="bio-text">
-    jscaylum is an independent artist from <em>England</em> whose music dives deep into the deep and emotional corners that people (such as himself) may face from time to time. Drawing from personal struggles with isolation, identity, and emotional pain, jscaylum crafts songs that feel like <em>diary entries set to sound</em> — honest, vulnerable, and impossible to ignore.<br><br>
-    Thoughts are hell, huh? For anyone who has ever gone through anything ever, even during happy moments, his music expresses what's been held on deep inside.
+    jscaylum is an independent artist from <em>England</em> writing music about the things most people don't say out loud. Heartbreak, self-doubt, the kind of trust that gets broken and never quite heals the same way. Honest to the point of uncomfortable — and that's exactly the point.<br><br>
+    For anyone whose <em>thoughts are hell</em> and feels it all a little too deeply.
   </p>
 </section>
 
@@ -294,29 +407,42 @@
   <div class="section-label" style="text-align:center;margin-bottom:40px;">// debut album</div>
   <span class="album-mystery">? ? ? ? ? ?</span>
   <div class="album-coming">coming soon</div>
-  <p class="album-tagline-text">something is being made in the dark &nbsp;·&nbsp; 10 tracks confirmed - SUBJECT TO CHANGE</p>
-  <div class="tracklist" id="tracklist">
-    <div class="track-row" id="track-01"><span class="track-num">01</span><span class="track-name-hidden" data-name="butterfly"></span></div>
-    <div class="track-row"><span class="track-num">02</span><span class="track-name-hidden" data-name="lonely"></span></div>
-    <div class="track-row"><span class="track-num">03</span><span class="track-name-hidden" data-name="incapable"></span></div>
-    <div class="track-row"><span class="track-num">04</span><span class="track-name-hidden" data-name="distancing"></span></div>
-    <div class="track-row"><span class="track-num">05</span><span class="track-name-hidden" data-name="realisation"></span></div>
-    <div class="track-row"><span class="track-num">06</span><span class="track-name-hidden" data-name="separation"></span></div>
-    <div class="track-row"><span class="track-num">07</span><span class="track-name-hidden" data-name="healing"></span></div>
-    <div class="track-row"><span class="track-num">08</span><span class="track-name-hidden" data-name="end of my story"></span></div>
-    <div class="track-row"><span class="track-num">09</span><span class="track-name-hidden" data-name="wish you could help"></span></div>
-    <div class="track-row"><span class="track-num">10</span><span class="track-name-hidden" data-name="imagine a good ending"></span></div>
+  <p class="album-tagline-text">something is being made in the dark &nbsp;·&nbsp; 10 tracks confirmed</p>
+  <div class="tracklist">
+    <div class="track-row"><span class="track-num">01</span><span class="track-name-hidden">butterfly</span></div>
+    <div class="track-row"><span class="track-num">02</span><span class="track-name-hidden">lonely</span></div>
+    <div class="track-row"><span class="track-num">03</span><span class="track-name-hidden">incapable</span></div>
+    <div class="track-row"><span class="track-num">04</span><span class="track-name-hidden">distancing</span></div>
+    <div class="track-row"><span class="track-num">05</span><span class="track-name-hidden">realisation</span></div>
+    <div class="track-row"><span class="track-num">06</span><span class="track-name-hidden">separation</span></div>
+    <div class="track-row"><span class="track-num">07</span><span class="track-name-hidden">healing</span></div>
+    <div class="track-row"><span class="track-num">08</span><span class="track-name-hidden">end of my story</span></div>
+    <div class="track-row"><span class="track-num">09</span><span class="track-name-hidden">wish you could help</span></div>
+    <div class="track-row"><span class="track-num">10</span><span class="track-name-hidden">imagine a good ending</span></div>
   </div>
 </section>
 
 <section class="links-section">
   <div class="section-label">// find me</div>
-  <div class="links-grid">
-    <a class="link-card" href="https://open.spotify.com/track/3KrDiDPZKAYmmqPF4rDGWg" target="_blank"><div class="link-dot"></div>Spotify</a>
-    <a class="link-card" href="https://music.apple.com/us/song/isolation/1877639390" target="_blank"><div class="link-dot"></div>Apple Music</a>
-    <a class="link-card" href="https://soundcloud.com/user-671417489/isolation-1" target="_blank"><div class="link-dot"></div>SoundCloud</a>
-    <a class="link-card" href="https://www.tiktok.com/@jscaylum" target="_blank"><div class="link-dot"></div>TikTok</a>
-    <a class="link-card" href="https://www.youtube.com/@jscaylum" target="_blank"><div class="link-dot"></div>YouTube</a>
+
+  <div class="links-group">
+    <div class="links-group-label">stream</div>
+    <div class="links-grid">
+      <a class="link-card" href="https://open.spotify.com/artist/2kHjMhwByukNuZ6H170BGP?si=eW_DXsVMR7SVoWCuGoH2ig" target="_blank"><div class="link-dot"></div>Spotify</a>
+      <a class="link-card" href="https://music.apple.com/us/song/isolation/1877639390" target="_blank"><div class="link-dot"></div>Apple Music</a>
+      <a class="link-card" href="https://soundcloud.com/user-671417489/isolation-1" target="_blank"><div class="link-dot"></div>SoundCloud</a>
+    </div>
+  </div>
+
+  <div class="links-group">
+    <div class="links-group-label">socials</div>
+    <div class="links-grid">
+      <a class="link-card" href="https://www.instagram.com/jscaylum" target="_blank"><div class="link-dot"></div>Instagram</a>
+      <a class="link-card" href="https://www.tiktok.com/@jscaylum" target="_blank"><div class="link-dot"></div>TikTok (artist)</a>
+      <a class="link-card" href="https://www.tiktok.com/@xxcat_tokxx" target="_blank"><div class="link-dot"></div>TikTok (main)</a>
+      <a class="link-card" href="https://www.youtube.com/@jscaylum" target="_blank"><div class="link-dot"></div>YouTube</a>
+      <a class="link-card" href="https://genius.com/jscaylum" target="_blank"><div class="link-dot"></div>Genius</a>
+    </div>
   </div>
 </section>
 
@@ -326,230 +452,251 @@
 </footer>
 
 <script>
-  /* ── COUNTER ── */
-  let secs = 0;
-  setInterval(() => {
-    secs++;
-    const h = String(Math.floor(secs/3600)).padStart(2,'0');
-    const m = String(Math.floor((secs%3600)/60)).padStart(2,'0');
-    const s = String(secs%60).padStart(2,'0');
-    document.getElementById('counter').textContent = h+':'+m+':'+s;
-  }, 1000);
-
-  /* ── STATIC FLASH ── */
-  setTimeout(() => { const f = document.querySelector('.static-flash'); if(f) f.remove(); }, 500);
-
-  /* ── BUTTERFLY ENGINE ── */
-  const bfly     = document.getElementById('butterfly');
-  const hint     = document.getElementById('butterfly-hint');
-  const track01  = document.getElementById('track-01');
-  const track01name = track01.querySelector('.track-name-hidden');
-
-  let bx = 100, by = 200;          // current position
-  let vx = 1.4, vy = 0.9;          // velocity
-  let tx = 100, ty = 200;          // target (wander point)
-  let animFrame = null;
-  let isFlying = false;
-  let isLanded = false;
-  let landingInProgress = false;
-  let sessionRevealed = false;     // once caught, stays revealed this session
-
-  /* Rarity: butterfly appears every 45–90 seconds, stays for 20 seconds */
-  const MIN_WAIT = 45000;
-  const MAX_WAIT = 90000;
-  const VISIBLE_DURATION = 20000;
-
-  function randBetween(a, b) { return a + Math.random() * (b - a); }
-
-  function scheduleNext() {
-    if (isLanded) return; // don't reschedule if it's permanently landed
-    const delay = randBetween(MIN_WAIT, MAX_WAIT);
-    setTimeout(spawnButterfly, delay);
+// Track data — fetched from Spotify oEmbed + open API
+const TRACKS = [
+  {
+    id: '3KrDiDPZKAYmmqPF4rDGWg',
+    name: 'isolation',
+    spotifyUrl: 'https://open.spotify.com/track/3KrDiDPZKAYmmqPF4rDGWg',
+    desc: 'Trapped inside your own head, wanting someone you can\'t reach. A song about feeling unsafe in your own skin and wondering if any of it even matters.',
+    cover: null,
+    preview: null
+  },
+  {
+    id: '3XSadYNj1am4Hf4wX8tPG1',
+    name: 'trust issues',
+    spotifyUrl: 'https://open.spotify.com/track/3XSadYNj1am4Hf4wX8tPG1',
+    desc: 'You knew it was coming, and it still broke you. A song about being left for someone else and having to carry that doubt into everything that comes after.',
+    cover: null,
+    preview: null
   }
+];
 
-  function spawnButterfly() {
-    if (isLanded) return;
+let currentTrack = null;
+let audio = null;
+let timerInterval = null;
+let isPlaying = false;
 
-    // Start from a random edge
-    const edge = Math.floor(Math.random() * 4);
-    const W = window.innerWidth, H = document.documentElement.scrollHeight;
-    const viewTop = window.scrollY, viewBot = viewTop + window.innerHeight;
-
-    if (edge === 0) { bx = randBetween(0, W); by = viewTop + 10; }
-    else if (edge === 1) { bx = W - 10; by = randBetween(viewTop, viewBot); }
-    else if (edge === 2) { bx = randBetween(0, W); by = viewBot - 10; }
-    else { bx = 10; by = randBetween(viewTop, viewBot); }
-
-    bfly.style.left = bx + 'px';
-    bfly.style.top  = by + 'px';
-    bfly.style.display = 'block';
-    bfly.classList.add('active');
-    bfly.classList.remove('landing', 'landed');
-
-    isFlying = true;
-    pickNewTarget();
-    fly();
-
-    // Show hint after 3s
-    setTimeout(() => {
-      if (isFlying && !isLanded) {
-        hint.classList.add('show');
-        setTimeout(() => hint.classList.remove('show'), 4000);
-      }
-    }, 3000);
-
-    // Disappear after VISIBLE_DURATION if not caught
-    setTimeout(() => {
-      if (isFlying && !isLanded) {
-        vanish();
-        scheduleNext();
-      }
-    }, VISIBLE_DURATION);
-  }
-
-  function pickNewTarget() {
-    const W = window.innerWidth;
-    const H = document.documentElement.scrollHeight;
-    // wander within viewport ± some slack
-    const vTop = window.scrollY;
-    const vBot = vTop + window.innerHeight;
-    tx = randBetween(40, W - 40);
-    ty = randBetween(vTop + 40, vBot - 40);
-  }
-
-  function fly() {
-    if (!isFlying) return;
-
-    // Organic wandering: steer toward target, add gentle sine drift
-    const t = Date.now() / 1000;
-    const dx = tx - bx, dy = ty - by;
-    const dist = Math.sqrt(dx*dx + dy*dy);
-
-    // Ease toward target
-    const speed = 1.8;
-    if (dist > 4) {
-      vx += (dx / dist) * 0.18;
-      vy += (dy / dist) * 0.18;
-    }
-
-    // Add slight organic noise
-    vx += (Math.random() - 0.5) * 0.3;
-    vy += (Math.random() - 0.5) * 0.3;
-
-    // Clamp speed
-    const spd = Math.sqrt(vx*vx + vy*vy);
-    if (spd > speed) { vx = (vx/spd)*speed; vy = (vy/spd)*speed; }
-
-    bx += vx;
-    by += vy;
-
-    // Bounce off viewport edges horizontally; let vertical scroll naturally
-    const W = window.innerWidth;
-    if (bx < 10)    { bx = 10;    vx = Math.abs(vx); }
-    if (bx > W-46)  { bx = W-46;  vx = -Math.abs(vx); }
-
-    // Pick new target when close
-    if (dist < 30) pickNewTarget();
-
-    // Rotate butterfly to face direction of travel
-    const angle = Math.atan2(vy, vx) * 180 / Math.PI;
-    bfly.style.left = bx + 'px';
-    bfly.style.top  = by + 'px';
-    bfly.style.transform = `rotate(${angle * 0.3}deg)`;
-
-    animFrame = requestAnimationFrame(fly);
-  }
-
-  function vanish() {
-    isFlying = false;
-    if (animFrame) cancelAnimationFrame(animFrame);
-    bfly.style.display = 'none';
-    bfly.classList.remove('active');
-  }
-
-  function landOnTrack01() {
-    if (isLanded || landingInProgress) return;
-    landingInProgress = true;
-
-    // Stop free flight
-    isFlying = false;
-    if (animFrame) cancelAnimationFrame(animFrame);
-    bfly.classList.remove('active');
-    bfly.classList.add('landing');
-
-    // Get track 01 position
-    const rect = track01.getBoundingClientRect();
-    const targetX = rect.left + rect.width * 0.52;
-    const targetY = rect.top + window.scrollY + rect.height / 2 - 18;
-
-    // Smooth fly-to animation
-    const startX = bx, startY = by;
-    const duration = 800;
-    const startTime = Date.now();
-
-    function flyTo() {
-      const elapsed = Date.now() - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-      // ease out cubic
-      const ease = 1 - Math.pow(1 - progress, 3);
-
-      const cx = startX + (targetX - startX) * ease;
-      const cy = startY + (targetY - startY) * ease;
-
-      bfly.style.left = cx + 'px';
-      bfly.style.top  = cy + 'px';
-      bfly.style.transform = 'rotate(-5deg) scale(' + (0.9 + ease * 0.2) + ')';
-
-      if (progress < 1) {
-        requestAnimationFrame(flyTo);
-      } else {
-        // Landed!
-        isLanded = true;
-        landingInProgress = false;
-        bfly.classList.remove('landing');
-        bfly.classList.add('landed');
-        bfly.style.transform = 'rotate(-5deg)';
-
-        // Mark track row
-        track01.classList.add('butterfly-here');
-
-        // Reveal track name after brief pause
-        setTimeout(() => {
-          track01name.classList.add('revealed');
-          sessionRevealed = true;
-
-          // Scroll album section into view if needed
-          track01.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }, 400);
+// Fetch track data from Spotify open API
+async function fetchTrackData(track, index) {
+  try {
+    // Use Spotify's open/embed endpoint to get cover + preview
+    const res = await fetch(`https://open.spotify.com/oembed?url=${track.spotifyUrl}`);
+    const data = await res.json();
+    if (data.thumbnail_url) {
+      track.cover = data.thumbnail_url;
+      // Update tape cover image
+      const placeholder = document.getElementById(`tapeCover${index}`);
+      if (placeholder) {
+        const img = document.createElement('img');
+        img.className = 'tape-cover';
+        img.src = track.cover;
+        img.alt = track.name;
+        placeholder.replaceWith(img);
       }
     }
-    requestAnimationFrame(flyTo);
+  } catch(e) {
+    console.log('Cover fetch failed, using placeholder');
   }
 
-  /* Click butterfly */
-  bfly.addEventListener('click', (e) => {
-    e.stopPropagation();
-    if (!isLanded && !landingInProgress) {
-      hint.classList.remove('show');
-      landOnTrack01();
+  // Try to get preview URL via open track API
+  try {
+    const res2 = await fetch(`https://api.spotify.com/v1/tracks/${track.id}`, {
+      headers: { 'Authorization': 'Bearer ' + await getSpotifyToken() }
+    });
+    const data2 = await res2.json();
+    if (data2.preview_url) track.preview = data2.preview_url;
+    if (data2.album && data2.album.images && data2.album.images[0]) {
+      track.cover = data2.album.images[0].url;
+      const placeholder = document.getElementById(`tapeCover${index}`);
+      if (placeholder && placeholder.tagName !== 'IMG') {
+        const img = document.createElement('img');
+        img.className = 'tape-cover';
+        img.src = track.cover;
+        img.alt = track.name;
+        placeholder.replaceWith(img);
+      }
     }
+  } catch(e) {}
+
+  document.getElementById(`tapeTitle${index}`).textContent = track.name;
+}
+
+async function getSpotifyToken() {
+  try {
+    const r = await fetch('https://accounts.spotify.com/api/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: 'grant_type=client_credentials&client_id=&client_secret='
+    });
+    const d = await r.json();
+    return d.access_token || '';
+  } catch(e) { return ''; }
+}
+
+// Init — fetch all track data
+async function init() {
+  for (let i = 0; i < TRACKS.length; i++) {
+    await fetchTrackData(TRACKS[i], i);
+  }
+}
+
+function loadTape(index) {
+  const track = TRACKS[index];
+
+  // Stop current audio
+  stopAudio();
+
+  // Remove active from all tapes
+  document.querySelectorAll('.tape').forEach(t => t.classList.remove('active'));
+  document.getElementById(`tape-${index}`).classList.add('active');
+
+  // Tape insert animation
+  const insert = document.getElementById('tapeInsert');
+  insert.classList.remove('inserted');
+  setTimeout(() => insert.classList.add('inserted'), 50);
+
+  // Glitch flash
+  const glitch = document.getElementById('screenGlitch');
+  glitch.style.display = 'block';
+  setTimeout(() => { glitch.style.display = 'none'; }, 350);
+
+  // Show playing screen
+  setTimeout(() => {
+    document.getElementById('screenIdle').style.display = 'none';
+    document.getElementById('screenPlaying').style.display = 'block';
+
+    document.getElementById('screenTitle').textContent = track.name;
+    if (track.cover) {
+      document.getElementById('screenCover').src = track.cover;
+    } else {
+      document.getElementById('screenCover').src = '';
+    }
+
+    currentTrack = track;
+
+    // Show song info
+    document.getElementById('infoTitle').textContent = track.name;
+    document.getElementById('infoMeta').textContent = 'jscaylum  ·  england  ·  single';
+    document.getElementById('infoDesc').textContent = track.desc;
+    document.getElementById('spotifyBtn').href = track.spotifyUrl;
+    document.getElementById('songInfo').classList.add('visible');
+
+    // Auto play if preview available
+    if (track.preview) {
+      playAudio(track.preview);
+    } else {
+      document.getElementById('vhsDisplay').textContent = 'NO PRV';
+    }
+  }, 400);
+}
+
+function playAudio(url) {
+  if (audio) { audio.pause(); audio.src = ''; }
+  audio = new Audio(url);
+  audio.crossOrigin = 'anonymous';
+  audio.play().then(() => {
+    isPlaying = true;
+    document.getElementById('btnPlay').textContent = '⏸';
+    document.getElementById('btnPlay').classList.add('active');
+    startTimer();
+  }).catch(() => {
+    document.getElementById('vhsDisplay').textContent = 'NO PRV';
   });
+  audio.addEventListener('ended', () => {
+    isPlaying = false;
+    document.getElementById('btnPlay').textContent = '▶';
+    document.getElementById('btnPlay').classList.remove('active');
+    document.getElementById('progressFill').style.width = '0%';
+    clearInterval(timerInterval);
+    document.getElementById('vhsDisplay').textContent = '00:00';
+    document.getElementById('screenTimer').textContent = '00:00';
+  });
+}
 
-  /* Touch support */
-  bfly.addEventListener('touchstart', (e) => {
-    e.preventDefault();
-    if (!isLanded && !landingInProgress) {
-      hint.classList.remove('show');
-      landOnTrack01();
-    }
-  }, { passive: false });
+function startTimer() {
+  clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    if (!audio) return;
+    const cur = audio.currentTime;
+    const dur = audio.duration || 30;
+    const pct = (cur / dur) * 100;
+    document.getElementById('progressFill').style.width = pct + '%';
+    const m = String(Math.floor(cur / 60)).padStart(2, '0');
+    const s = String(Math.floor(cur % 60)).padStart(2, '0');
+    const timeStr = m + ':' + s;
+    document.getElementById('vhsDisplay').textContent = timeStr;
+    document.getElementById('screenTimer').textContent = timeStr;
+  }, 250);
+}
 
-  /* First appearance: wait a shorter time initially (10–20s), then rare */
-  setTimeout(spawnButterfly, randBetween(10000, 20000));
+function togglePlay() {
+  if (!audio || !currentTrack) return;
+  if (isPlaying) {
+    audio.pause();
+    isPlaying = false;
+    document.getElementById('btnPlay').textContent = '▶';
+    document.getElementById('btnPlay').classList.remove('active');
+    clearInterval(timerInterval);
+  } else {
+    audio.play();
+    isPlaying = true;
+    document.getElementById('btnPlay').textContent = '⏸';
+    document.getElementById('btnPlay').classList.add('active');
+    startTimer();
+  }
+}
 
-  /* If track was already revealed on a previous visit, restore state
-     (won't persist across hard reloads, but feels nice within a session) */
+function stopAudio() {
+  if (audio) { audio.pause(); audio.src = ''; audio = null; }
+  isPlaying = false;
+  clearInterval(timerInterval);
+  document.getElementById('btnPlay').textContent = '▶';
+  document.getElementById('btnPlay').classList.remove('active');
+  document.getElementById('progressFill').style.width = '0%';
+  document.getElementById('vhsDisplay').textContent = '-- : --';
+}
 
+function stopTape() {
+  stopAudio();
+  document.getElementById('tapeInsert').classList.remove('inserted');
+  document.getElementById('screenIdle').style.display = 'flex';
+  document.getElementById('screenPlaying').style.display = 'none';
+  document.getElementById('songInfo').classList.remove('visible');
+  document.querySelectorAll('.tape').forEach(t => t.classList.remove('active'));
+  currentTrack = null;
+}
+
+function seekAudio(e) {
+  if (!audio || !audio.duration) return;
+  const bar = e.currentTarget;
+  const pct = e.offsetX / bar.offsetWidth;
+  audio.currentTime = pct * audio.duration;
+}
+
+// Tape counter
+let secs = 0;
+setInterval(() => {
+  secs++;
+  const h = String(Math.floor(secs/3600)).padStart(2,'0');
+  const m = String(Math.floor((secs%3600)/60)).padStart(2,'0');
+  const s = String(secs%60).padStart(2,'0');
+  document.getElementById('counter').textContent = h+':'+m+':'+s;
+}, 1000);
+
+setTimeout(() => { const f = document.querySelector('.static-flash'); if(f) f.remove(); }, 500);
+
+// Random glitch on tracklist
+const rows = document.querySelectorAll('.track-name-hidden');
+setInterval(() => {
+  if (!rows.length) return;
+  const r = rows[Math.floor(Math.random() * rows.length)];
+  r.style.filter = 'blur(0px)'; r.style.color = '#c0392b';
+  setTimeout(() => { r.style.filter = 'blur(4px)'; r.style.color = ''; }, 80);
+}, 2200);
+
+init();
 </script>
+
 </body>
 </html>
