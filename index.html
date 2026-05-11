@@ -96,7 +96,6 @@ position: absolute; inset: 0;
 background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.2) 3px, rgba(0,0,0,0.2) 4px);
 pointer-events: none; z-index: 10;
 }
-/* chromatic aberration overlay */
 .vhs-screen::after {
 content: ‘’;
 position: absolute; inset: 0;
@@ -106,26 +105,78 @@ animation: scanline 4s linear infinite;
 }
 @keyframes scanline { 0%{transform:translateY(-100%)} 100%{transform:translateY(100%)} }
 
+/* ── IDLE SCREEN ── */
 .screen-idle {
 width: 100%; height: 100%;
 display: flex; flex-direction: column; align-items: center; justify-content: center;
-gap: 12px;
+gap: 12px; position: relative;
 }
 .screen-idle-text { font-family: ‘VT323’, monospace; font-size: 28px; color: #2a2520; letter-spacing: 8px; animation: idleGlitch 5s step-end infinite; }
 @keyframes idleGlitch { 0%,85%,100%{color:#2a2520;text-shadow:none} 87%{color:#3a3530;text-shadow:2px 0 var(–red)} 89%{color:#2a2520;text-shadow:none} 91%{color:var(–muted);text-shadow:-2px 0 var(–red-glow)} 93%{color:#2a2520} }
 .screen-idle-sub { font-family: ‘VT323’, monospace; font-size: 13px; color: #1a1810; letter-spacing: 4px; animation: blink 2s step-end infinite; }
 
+/* ── TRANSITION OVERLAY ── */
+#transitionOverlay {
+position: absolute; inset: 0; z-index: 50;
+display: none; flex-direction: column;
+background: #050402;
+overflow: hidden;
+font-family: ‘VT323’, monospace;
+}
+#transitionOverlay.active { display: flex; }
+
+/* horizontal tracking lines that sweep across */
+.t-scanbar {
+position: absolute; left: 0; right: 0; height: 3px;
+background: var(–cream); opacity: 0;
+animation: scanbarSweep 0.55s steps(12) forwards;
+}
+@keyframes scanbarSweep {
+0%   { top: 0%;   opacity: 0.9; }
+40%  { top: 45%;  opacity: 0.7; }
+70%  { top: 75%;  opacity: 0.4; }
+100% { top: 100%; opacity: 0; }
+}
+.t-scanbar2 {
+position: absolute; left: 0; right: 0; height: 2px;
+background: var(–red-glow); opacity: 0;
+animation: scanbar2Sweep 0.55s steps(12) 0.06s forwards;
+}
+@keyframes scanbar2Sweep {
+0%   { top: 0%;   opacity: 0.8; }
+50%  { top: 55%;  opacity: 0.5; }
+100% { top: 100%; opacity: 0; }
+}
+
+/* static noise blocks */
+.t-static-block {
+position: absolute; left: 0; right: 0;
+background: repeating-linear-gradient(
+90deg,
+rgba(212,201,176,0.08) 0px, rgba(212,201,176,0.08) 2px,
+transparent 2px, transparent 6px
+);
+opacity: 0;
+}
+
+/* status text lines */
+.t-line {
+position: absolute; left: 16px;
+font-size: 15px; letter-spacing: 4px;
+opacity: 0; white-space: nowrap; overflow: hidden; max-width: calc(100% - 32px);
+}
+
+/* chromatic ghost */
+.t-ghost {
+position: absolute; inset: 0;
+opacity: 0; mix-blend-mode: screen;
+}
+
+/* ── PLAYING SCREEN ── */
 .screen-playing { width: 100%; height: 100%; display: none; position: relative; }
 .screen-cover {
 width: 100%; height: 100%; object-fit: cover;
 filter: saturate(0.6) contrast(1.15) brightness(0.85);
-animation: coverLoad 0.5s steps(4) forwards;
-}
-@keyframes coverLoad {
-0%{filter:saturate(0) contrast(2) brightness(4) blur(6px);transform:scale(1.05)}
-40%{filter:saturate(0.1) contrast(1.8) brightness(2) blur(2px);transform:scale(1.02)}
-70%{filter:saturate(0.4) contrast(1.3) brightness(1.1) blur(0px);transform:scale(1.01)}
-100%{filter:saturate(0.6) contrast(1.15) brightness(0.85);transform:scale(1)}
 }
 .screen-overlay {
 position: absolute; inset: 0;
@@ -135,37 +186,21 @@ display: flex; flex-direction: column; justify-content: flex-end; padding: 16px;
 .screen-track-name {
 font-family: ‘VT323’, monospace; font-size: 32px; color: var(–cream);
 letter-spacing: 4px; line-height: 1;
-animation: textFlicker 0.6s steps(4) forwards;
-}
-@keyframes textFlicker {
-0%{opacity:0;transform:translateX(-6px) skewX(-4deg);filter:blur(4px)}
-25%{opacity:0.4;transform:translateX(4px) skewX(2deg);filter:blur(2px)}
-50%{opacity:0.7;transform:translateX(-2px) skewX(-1deg);filter:blur(1px)}
-75%{opacity:0.9;transform:translateX(1px);filter:blur(0)}
-100%{opacity:1;transform:translateX(0) skewX(0)}
 }
 .screen-artist {
 font-family: ‘VT323’, monospace; font-size: 16px; color: var(–muted);
 letter-spacing: 5px; margin-top: 4px;
-animation: textFlicker 0.6s steps(4) 0.15s forwards; opacity: 0;
 }
 .screen-timer { font-family: ‘VT323’, monospace; font-size: 14px; color: var(–red-glow); letter-spacing: 3px; margin-top: 6px; }
 
-/* glitch on load */
-.screen-glitch {
-position: absolute; inset: 0; z-index: 20;
-display: none;
-animation: glitchFlash 0.6s step-end forwards;
+/* steady playback glitch on screen-track-name */
+@keyframes playGlitch {
+0%,92%,100% { text-shadow: none; transform: none; }
+93% { text-shadow: 2px 0 var(–red), -2px 0 var(–red-glow); transform: skewX(-1deg); }
+95% { text-shadow: none; transform: none; }
+97% { text-shadow: -2px 0 var(–red); transform: skewX(0.5deg); }
 }
-@keyframes glitchFlash {
-0%{opacity:1;background:var(–cream)}
-15%{opacity:0.8;background:var(–red);transform:translateX(4px)}
-30%{opacity:1;background:#050402;transform:translateX(-3px)}
-45%{opacity:0.6;background:var(–cream);transform:translateX(2px)}
-60%{opacity:0.9;background:var(–red-glow);transform:translateX(0)}
-75%{opacity:0.4;background:#050402}
-100%{opacity:0}
-}
+.screen-track-name { animation: playGlitch 6s step-end infinite; }
 
 /* TAPE SLOT */
 .tape-slot {
@@ -200,7 +235,11 @@ cursor: pointer; transition: all 0.15s; color: var(–muted); font-size: 10px;
 /* SONG INFO BELOW PLAYER */
 .song-info { display: none; text-align: center; max-width: 600px; width: 100%; }
 .song-info.visible { display: block; animation: fadeUp 0.5s ease forwards; }
-.song-info-title { font-family: ‘Special Elite’, cursive; font-size: clamp(28px, 4vw, 48px); color: var(–cream); margin-bottom: 8px; animation: titleReveal 0.8s steps(20) forwards; overflow: hidden; white-space: nowrap; }
+.song-info-title {
+font-family: ‘Special Elite’, cursive; font-size: clamp(28px, 4vw, 48px);
+color: var(–cream); margin-bottom: 8px;
+animation: titleReveal 0.8s steps(20) forwards; overflow: hidden; white-space: nowrap;
+}
 @keyframes titleReveal { from{clip-path:inset(0 100% 0 0)} to{clip-path:inset(0 0% 0 0)} }
 .song-info-meta { font-family: ‘VT323’, monospace; font-size: 14px; color: var(–muted); letter-spacing: 4px; text-transform: uppercase; margin-bottom: 24px; animation: fadeUp 0.5s ease 0.4s forwards; opacity: 0; }
 .song-info-desc { font-size: 14px; line-height: 2; color: var(–muted); margin-bottom: 28px; animation: fadeUp 0.5s ease 0.6s forwards; opacity: 0; }
@@ -285,6 +324,7 @@ background: repeating-linear-gradient(45deg, transparent, transparent 8px, rgba(
 footer { padding: 40px 8vw; display: flex; justify-content: space-between; align-items: center; }
 .footer-name { font-family: ‘Special Elite’, cursive; font-size: 20px; color: var(–muted); }
 .footer-info { font-family: ‘VT323’, monospace; font-size: 14px; color: #3a3530; letter-spacing: 3px; }
+
 .static-flash { position: fixed; inset: 0; background: var(–cream); z-index: 99999; animation: staticFade 0.4s ease forwards; pointer-events: none; }
 @keyframes staticFade { 0%{opacity:1} 60%{opacity:0.3} 100%{opacity:0} }
 
@@ -311,7 +351,7 @@ footer { flex-direction: column; gap: 12px; text-align: center; }
     <a class="social-link" href="https://www.tiktok.com/@xxcat_tokxx" target="_blank">TikTok (main)</a>
     <a class="social-link" href="https://www.youtube.com/@jscaylum" target="_blank">YouTube</a>
   </div>
-  <div class="hero-scroll">▼ &nbsp; scroll</div>
+  <div class="hero-scroll">&#9660; &nbsp; scroll</div>
 </section>
 
 <!-- SINGLES / VHS SECTION -->
@@ -323,13 +363,21 @@ footer { flex-direction: column; gap: 12px; text-align: center; }
 ```
 <!-- VHS PLAYER -->
 <div class="vhs-player">
-  <div class="vhs-brand">● PLAY</div>
+  <div class="vhs-brand">&#9679; PLAY</div>
   <div class="vhs-screen" id="vhsScreen">
-    <div class="vhs-noise"></div>
+
+    <!-- IDLE -->
     <div class="screen-idle" id="screenIdle">
       <div class="screen-idle-text">INSERT TAPE</div>
-      <div class="screen-idle-sub">▼ select a single below</div>
+      <div class="screen-idle-sub">&#9660; select a single below</div>
     </div>
+
+    <!-- TRANSITION OVERLAY -->
+    <div id="transitionOverlay">
+      <!-- populated by JS -->
+    </div>
+
+    <!-- PLAYING -->
     <div class="screen-playing" id="screenPlaying">
       <img class="screen-cover" id="screenCover" src="" alt="">
       <div class="screen-overlay">
@@ -338,13 +386,13 @@ footer { flex-direction: column; gap: 12px; text-align: center; }
         <div class="screen-timer" id="screenTimer">00:00</div>
       </div>
     </div>
-    <div class="screen-glitch" id="screenGlitch"></div>
+
   </div>
   <div class="tape-slot"><div class="tape-insert" id="tapeInsert"></div></div>
   <div class="vhs-controls">
     <div class="vhs-controls-left">
-      <div class="vhs-btn" id="btnPlay" onclick="togglePlay()">▶</div>
-      <div class="vhs-btn" onclick="stopTape()">■</div>
+      <div class="vhs-btn" id="btnPlay" onclick="togglePlay()">&#9654;</div>
+      <div class="vhs-btn" onclick="stopTape()">&#9632;</div>
     </div>
     <div class="vhs-display" id="vhsDisplay">-- : --</div>
   </div>
@@ -424,7 +472,6 @@ footer { flex-direction: column; gap: 12px; text-align: center; }
 
 <section class="links-section">
   <div class="section-label">// find me</div>
-
   <div class="links-group">
     <div class="links-group-label">stream</div>
     <div class="links-grid">
@@ -433,7 +480,6 @@ footer { flex-direction: column; gap: 12px; text-align: center; }
       <a class="link-card" href="https://soundcloud.com/user-671417489/isolation-1" target="_blank"><div class="link-dot"></div>SoundCloud</a>
     </div>
   </div>
-
   <div class="links-group">
     <div class="links-group-label">socials</div>
     <div class="links-grid">
@@ -448,17 +494,19 @@ footer { flex-direction: column; gap: 12px; text-align: center; }
 
 <footer>
   <div class="footer-name">jscaylum</div>
-  <div class="footer-info">ENGLAND &nbsp;·&nbsp; INDEPENDENT &nbsp;·&nbsp; ℗ 2026</div>
+  <div class="footer-info">ENGLAND &nbsp;&#183;&nbsp; INDEPENDENT &nbsp;&#183;&nbsp; &#8471; 2026</div>
 </footer>
 
 <script>
-// Track data — fetched from Spotify oEmbed + open API
+/* ─────────────────────────────────────────────────
+   TRACK DATA
+───────────────────────────────────────────────── */
 const TRACKS = [
   {
     id: '3KrDiDPZKAYmmqPF4rDGWg',
     name: 'isolation',
     spotifyUrl: 'https://open.spotify.com/track/3KrDiDPZKAYmmqPF4rDGWg',
-    desc: 'Trapped inside your own head, wanting someone you can\'t reach. A song about feeling unsafe in your own skin and wondering if any of it even matters.',
+    desc: "Trapped inside your own head, wanting someone you can't reach. A song about feeling unsafe in your own skin and wondering if any of it even matters.",
     cover: null,
     preview: null
   },
@@ -476,96 +524,261 @@ let currentTrack = null;
 let audio = null;
 let timerInterval = null;
 let isPlaying = false;
+let transitioning = false;
 
-// Fetch track data from Spotify open API
-async function fetchTrackData(track, index) {
-  try {
-    // Use Spotify's open/embed endpoint to get cover + preview
-    const res = await fetch(`https://open.spotify.com/oembed?url=${track.spotifyUrl}`);
-    const data = await res.json();
-    if (data.thumbnail_url) {
-      track.cover = data.thumbnail_url;
-      // Update tape cover image
-      const placeholder = document.getElementById(`tapeCover${index}`);
-      if (placeholder) {
-        const img = document.createElement('img');
-        img.className = 'tape-cover';
-        img.src = track.cover;
-        img.alt = track.name;
-        placeholder.replaceWith(img);
-      }
-    }
-  } catch(e) {
-    console.log('Cover fetch failed, using placeholder');
+/* ─────────────────────────────────────────────────
+   VHS TRANSITION
+   Full-screen animated sequence inside the screen.
+   Steps: static burst → boot lines → track reveal → fade to video
+───────────────────────────────────────────────── */
+function runVHSTransition(track, onDone) {
+  const overlay = document.getElementById('transitionOverlay');
+  overlay.innerHTML = '';
+  overlay.classList.add('active');
+  transitioning = true;
+
+  const W = overlay.offsetWidth || 560;
+  const H = overlay.offsetHeight || 420;
+
+  /* ── helper: create positioned element ── */
+  function el(tag, css, txt) {
+    const e = document.createElement(tag);
+    Object.assign(e.style, css);
+    if (txt !== undefined) e.textContent = txt;
+    overlay.appendChild(e);
+    return e;
   }
 
-  // Try to get preview URL via open track API
-  try {
-    const res2 = await fetch(`https://api.spotify.com/v1/tracks/${track.id}`, {
-      headers: { 'Authorization': 'Bearer ' + await getSpotifyToken() }
+  /* ── PHASE 0 (0ms): white static burst ── */
+  const burst = el('div', {
+    position: 'absolute', inset: '0',
+    background: '#d4c9b0',
+    opacity: '1',
+    transition: 'opacity 0.08s step-end'
+  });
+  setTimeout(() => burst.style.opacity = '0', 80);
+  setTimeout(() => burst.remove(), 200);
+
+  /* ── PHASE 1 (60–180ms): horizontal tracking stripes ── */
+  const stripeCount = 6;
+  for (let i = 0; i < stripeCount; i++) {
+    const delay = 60 + i * 22;
+    const top = Math.round((i / stripeCount) * 100);
+    const stripe = el('div', {
+      position: 'absolute', left: '0', right: '0',
+      top: top + '%', height: '2px',
+      background: i % 2 === 0 ? '#d4c9b0' : '#c0392b',
+      opacity: '0',
+      transition: `opacity 0s`
     });
-    const data2 = await res2.json();
-    if (data2.preview_url) track.preview = data2.preview_url;
-    if (data2.album && data2.album.images && data2.album.images[0]) {
-      track.cover = data2.album.images[0].url;
-      const placeholder = document.getElementById(`tapeCover${index}`);
-      if (placeholder && placeholder.tagName !== 'IMG') {
-        const img = document.createElement('img');
-        img.className = 'tape-cover';
-        img.src = track.cover;
-        img.alt = track.name;
-        placeholder.replaceWith(img);
-      }
-    }
-  } catch(e) {}
-
-  document.getElementById(`tapeTitle${index}`).textContent = track.name;
-}
-
-async function getSpotifyToken() {
-  try {
-    const r = await fetch('https://accounts.spotify.com/api/token', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: 'grant_type=client_credentials&client_id=&client_secret='
-    });
-    const d = await r.json();
-    return d.access_token || '';
-  } catch(e) { return ''; }
-}
-
-// Init — fetch all track data
-async function init() {
-  for (let i = 0; i < TRACKS.length; i++) {
-    await fetchTrackData(TRACKS[i], i);
+    setTimeout(() => {
+      stripe.style.opacity = '0.8';
+      setTimeout(() => {
+        stripe.style.transition = 'opacity 0.15s';
+        stripe.style.opacity = '0';
+        setTimeout(() => stripe.remove(), 200);
+      }, 60 + Math.random() * 40);
+    }, delay);
   }
+
+  /* ── PHASE 2 (200ms): noise/static texture block ── */
+  const noiseBlock = el('div', {
+    position: 'absolute', left: '0', right: '0',
+    top: '20%', height: '30%',
+    background: `repeating-linear-gradient(
+      90deg,
+      rgba(212,201,176,0.07) 0px, rgba(212,201,176,0.07) 1px,
+      transparent 1px, transparent 3px
+    ), repeating-linear-gradient(
+      0deg,
+      rgba(192,57,43,0.04) 0px, rgba(192,57,43,0.04) 1px,
+      transparent 1px, transparent 4px
+    )`,
+    opacity: '0',
+    transition: 'opacity 0.05s'
+  });
+  setTimeout(() => {
+    noiseBlock.style.opacity = '1';
+    setTimeout(() => {
+      noiseBlock.style.transition = 'opacity 0.25s';
+      noiseBlock.style.opacity = '0';
+      setTimeout(() => noiseBlock.remove(), 300);
+    }, 120);
+  }, 200);
+
+  /* ── PHASE 3 (280–700ms): boot text lines, typed in ── */
+  const bootLines = [
+    { t: 280,  color: '#3a3530', text: 'VHS-C  SP  CH-01' },
+    { t: 360,  color: '#7a7060', text: 'LOADING TAPE......' },
+    { t: 480,  color: '#c0392b', text: '>> ' + track.name.toUpperCase() },
+    { t: 590,  color: '#7a7060', text: 'JSCAYLUM  //  ENGLAND' },
+    { t: 680,  color: '#3a3530', text: 'T-00  TRACKING OK' },
+  ];
+
+  bootLines.forEach(({ t, color, text }) => {
+    // line container (clipping reveal)
+    const lineWrap = el('div', {
+      position: 'absolute',
+      left: '14px',
+      fontFamily: "'VT323', monospace",
+      fontSize: '15px',
+      letterSpacing: '4px',
+      color: color,
+      opacity: '0',
+      overflow: 'hidden',
+      whiteSpace: 'nowrap',
+      maxWidth: 'calc(100% - 28px)'
+    }, '');
+    // position lines from top, stacked
+    const lineIndex = bootLines.findIndex(l => l.t === t);
+    lineWrap.style.top = (14 + lineIndex * 24) + 'px';
+
+    setTimeout(() => {
+      lineWrap.style.opacity = '1';
+      // typewriter reveal via clip-path
+      lineWrap.textContent = text;
+      lineWrap.style.clipPath = 'inset(0 100% 0 0)';
+      lineWrap.style.transition = 'clip-path 0.18s steps(20)';
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          lineWrap.style.clipPath = 'inset(0 0% 0 0)';
+        }, 16);
+      });
+    }, t);
+  });
+
+  /* ── occasional glitch lines mid-sequence ── */
+  [420, 530].forEach(gt => {
+    setTimeout(() => {
+      const gline = el('div', {
+        position: 'absolute', left: '0', right: '0',
+        top: (15 + Math.random() * 70) + '%',
+        height: '1px',
+        background: '#c0392b',
+        opacity: '0.6',
+        transform: 'translateX(' + (Math.random() * 10 - 5) + 'px)'
+      });
+      setTimeout(() => gline.remove(), 60);
+    }, gt);
+  });
+
+  /* ── PHASE 4 (820ms): large track name splash with chromatic aberration ── */
+  setTimeout(() => {
+    const splash = el('div', {
+      position: 'absolute', inset: '0',
+      display: 'flex', flexDirection: 'column',
+      alignItems: 'center', justifyContent: 'center',
+      gap: '6px',
+      opacity: '0',
+      transition: 'opacity 0.12s'
+    });
+
+    // shadow layer (red offset)
+    const shadowName = document.createElement('div');
+    Object.assign(shadowName.style, {
+      position: 'absolute',
+      fontFamily: "'VT323', monospace",
+      fontSize: 'clamp(32px, 8vw, 52px)',
+      color: '#c0392b',
+      letterSpacing: '8px',
+      opacity: '0.5',
+      transform: 'translate(3px, 2px)',
+      pointerEvents: 'none',
+      whiteSpace: 'nowrap'
+    });
+    shadowName.textContent = track.name.toUpperCase();
+    splash.appendChild(shadowName);
+
+    // main name
+    const mainName = document.createElement('div');
+    Object.assign(mainName.style, {
+      fontFamily: "'VT323', monospace",
+      fontSize: 'clamp(32px, 8vw, 52px)',
+      color: '#d4c9b0',
+      letterSpacing: '8px',
+      position: 'relative',
+      whiteSpace: 'nowrap'
+    });
+    mainName.textContent = track.name.toUpperCase();
+    splash.appendChild(mainName);
+
+    // artist sub
+    const sub = document.createElement('div');
+    Object.assign(sub.style, {
+      fontFamily: "'VT323', monospace",
+      fontSize: '14px',
+      color: '#7a7060',
+      letterSpacing: '6px',
+      marginTop: '6px'
+    });
+    sub.textContent = 'jscaylum';
+    splash.appendChild(sub);
+
+    overlay.appendChild(splash);
+
+    requestAnimationFrame(() => {
+      setTimeout(() => { splash.style.opacity = '1'; }, 16);
+    });
+
+    /* animate slight horizontal shake on the text */
+    let shakeCount = 0;
+    const shakeInterval = setInterval(() => {
+      if (shakeCount++ > 4) { clearInterval(shakeInterval); return; }
+      const offset = (Math.random() - 0.5) * 6;
+      mainName.style.transform = `translateX(${offset}px)`;
+      shadowName.style.transform = `translate(${3 + offset * 0.5}px, 2px)`;
+      setTimeout(() => {
+        mainName.style.transform = 'translateX(0)';
+        shadowName.style.transform = 'translate(3px, 2px)';
+      }, 60);
+    }, 60);
+
+  }, 820);
+
+  /* ── PHASE 5 (1180ms): sweep down wipe revealing the video beneath ── */
+  setTimeout(() => {
+    // fade-out the whole overlay with a downward wipe
+    const wipe = el('div', {
+      position: 'absolute', left: '0', right: '0',
+      top: '0', height: '0%',
+      background: 'var(--dark)',
+      transition: 'height 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
+      zIndex: '60'
+    });
+    setTimeout(() => { wipe.style.height = '100%'; }, 16);
+
+    setTimeout(() => {
+      overlay.classList.remove('active');
+      overlay.innerHTML = '';
+      transitioning = false;
+      onDone();
+    }, 400);
+  }, 1180);
 }
 
+/* ─────────────────────────────────────────────────
+   LOAD TAPE
+───────────────────────────────────────────────── */
 function loadTape(index) {
+  if (transitioning) return;
   const track = TRACKS[index];
 
-  // Stop current audio
   stopAudio();
 
-  // Remove active from all tapes
   document.querySelectorAll('.tape').forEach(t => t.classList.remove('active'));
-  document.getElementById(`tape-${index}`).classList.add('active');
+  document.getElementById('tape-' + index).classList.add('active');
 
-  // Tape insert animation
   const insert = document.getElementById('tapeInsert');
   insert.classList.remove('inserted');
   setTimeout(() => insert.classList.add('inserted'), 50);
 
-  // Glitch flash
-  const glitch = document.getElementById('screenGlitch');
-  glitch.style.display = 'block';
-  setTimeout(() => { glitch.style.display = 'none'; }, 350);
+  // hide idle, hide playing, show transition
+  document.getElementById('screenIdle').style.display = 'none';
+  document.getElementById('screenPlaying').style.display = 'none';
 
-  // Show playing screen
-  setTimeout(() => {
-    document.getElementById('screenIdle').style.display = 'none';
+  runVHSTransition(track, () => {
+    // reveal playing screen
     document.getElementById('screenPlaying').style.display = 'block';
-
     document.getElementById('screenTitle').textContent = track.name;
     if (track.cover) {
       document.getElementById('screenCover').src = track.cover;
@@ -575,29 +788,34 @@ function loadTape(index) {
 
     currentTrack = track;
 
-    // Show song info
+    // song info panel
     document.getElementById('infoTitle').textContent = track.name;
     document.getElementById('infoMeta').textContent = 'jscaylum  ·  england  ·  single';
     document.getElementById('infoDesc').textContent = track.desc;
     document.getElementById('spotifyBtn').href = track.spotifyUrl;
-    document.getElementById('songInfo').classList.add('visible');
+    const si = document.getElementById('songInfo');
+    si.classList.remove('visible');
+    void si.offsetWidth; // reflow to retrigger animation
+    si.classList.add('visible');
 
-    // Auto play if preview available
     if (track.preview) {
       playAudio(track.preview);
     } else {
       document.getElementById('vhsDisplay').textContent = 'NO PRV';
     }
-  }, 400);
+  });
 }
 
+/* ─────────────────────────────────────────────────
+   AUDIO
+───────────────────────────────────────────────── */
 function playAudio(url) {
   if (audio) { audio.pause(); audio.src = ''; }
   audio = new Audio(url);
   audio.crossOrigin = 'anonymous';
   audio.play().then(() => {
     isPlaying = true;
-    document.getElementById('btnPlay').textContent = '⏸';
+    document.getElementById('btnPlay').textContent = '\u23F8';
     document.getElementById('btnPlay').classList.add('active');
     startTimer();
   }).catch(() => {
@@ -605,7 +823,7 @@ function playAudio(url) {
   });
   audio.addEventListener('ended', () => {
     isPlaying = false;
-    document.getElementById('btnPlay').textContent = '▶';
+    document.getElementById('btnPlay').textContent = '\u25B6';
     document.getElementById('btnPlay').classList.remove('active');
     document.getElementById('progressFill').style.width = '0%';
     clearInterval(timerInterval);
@@ -635,13 +853,13 @@ function togglePlay() {
   if (isPlaying) {
     audio.pause();
     isPlaying = false;
-    document.getElementById('btnPlay').textContent = '▶';
+    document.getElementById('btnPlay').textContent = '\u25B6';
     document.getElementById('btnPlay').classList.remove('active');
     clearInterval(timerInterval);
   } else {
     audio.play();
     isPlaying = true;
-    document.getElementById('btnPlay').textContent = '⏸';
+    document.getElementById('btnPlay').textContent = '\u23F8';
     document.getElementById('btnPlay').classList.add('active');
     startTimer();
   }
@@ -651,20 +869,24 @@ function stopAudio() {
   if (audio) { audio.pause(); audio.src = ''; audio = null; }
   isPlaying = false;
   clearInterval(timerInterval);
-  document.getElementById('btnPlay').textContent = '▶';
+  document.getElementById('btnPlay').textContent = '\u25B6';
   document.getElementById('btnPlay').classList.remove('active');
   document.getElementById('progressFill').style.width = '0%';
   document.getElementById('vhsDisplay').textContent = '-- : --';
 }
 
 function stopTape() {
+  if (transitioning) return;
   stopAudio();
   document.getElementById('tapeInsert').classList.remove('inserted');
+  document.getElementById('transitionOverlay').classList.remove('active');
+  document.getElementById('transitionOverlay').innerHTML = '';
   document.getElementById('screenIdle').style.display = 'flex';
   document.getElementById('screenPlaying').style.display = 'none';
   document.getElementById('songInfo').classList.remove('visible');
   document.querySelectorAll('.tape').forEach(t => t.classList.remove('active'));
   currentTrack = null;
+  transitioning = false;
 }
 
 function seekAudio(e) {
@@ -674,19 +896,26 @@ function seekAudio(e) {
   audio.currentTime = pct * audio.duration;
 }
 
-// Tape counter
+/* ─────────────────────────────────────────────────
+   TAPE COUNTER
+───────────────────────────────────────────────── */
 let secs = 0;
 setInterval(() => {
   secs++;
-  const h = String(Math.floor(secs/3600)).padStart(2,'0');
-  const m = String(Math.floor((secs%3600)/60)).padStart(2,'0');
-  const s = String(secs%60).padStart(2,'0');
-  document.getElementById('counter').textContent = h+':'+m+':'+s;
+  const h = String(Math.floor(secs / 3600)).padStart(2, '0');
+  const m = String(Math.floor((secs % 3600) / 60)).padStart(2, '0');
+  const s = String(secs % 60).padStart(2, '0');
+  document.getElementById('counter').textContent = h + ':' + m + ':' + s;
 }, 1000);
 
-setTimeout(() => { const f = document.querySelector('.static-flash'); if(f) f.remove(); }, 500);
+setTimeout(() => {
+  const f = document.querySelector('.static-flash');
+  if (f) f.remove();
+}, 500);
 
-// Random glitch on tracklist
+/* ─────────────────────────────────────────────────
+   TRACKLIST GLITCH
+───────────────────────────────────────────────── */
 const rows = document.querySelectorAll('.track-name-hidden');
 setInterval(() => {
   if (!rows.length) return;
@@ -694,6 +923,66 @@ setInterval(() => {
   r.style.filter = 'blur(0px)'; r.style.color = '#c0392b';
   setTimeout(() => { r.style.filter = 'blur(4px)'; r.style.color = ''; }, 80);
 }, 2200);
+
+/* ─────────────────────────────────────────────────
+   FETCH TRACK DATA (covers + preview)
+───────────────────────────────────────────────── */
+async function fetchTrackData(track, index) {
+  try {
+    const res = await fetch('https://open.spotify.com/oembed?url=' + track.spotifyUrl);
+    const data = await res.json();
+    if (data.thumbnail_url) {
+      track.cover = data.thumbnail_url;
+      const placeholder = document.getElementById('tapeCover' + index);
+      if (placeholder && placeholder.tagName !== 'IMG') {
+        const img = document.createElement('img');
+        img.className = 'tape-cover';
+        img.src = track.cover;
+        img.alt = track.name;
+        placeholder.replaceWith(img);
+      }
+    }
+  } catch(e) {}
+
+  try {
+    const res2 = await fetch('https://api.spotify.com/v1/tracks/' + track.id, {
+      headers: { 'Authorization': 'Bearer ' + await getSpotifyToken() }
+    });
+    const data2 = await res2.json();
+    if (data2.preview_url) track.preview = data2.preview_url;
+    if (data2.album && data2.album.images && data2.album.images[0]) {
+      track.cover = data2.album.images[0].url;
+      const placeholder = document.getElementById('tapeCover' + index);
+      if (placeholder && placeholder.tagName !== 'IMG') {
+        const img = document.createElement('img');
+        img.className = 'tape-cover';
+        img.src = track.cover;
+        img.alt = track.name;
+        placeholder.replaceWith(img);
+      }
+    }
+  } catch(e) {}
+
+  document.getElementById('tapeTitle' + index).textContent = track.name;
+}
+
+async function getSpotifyToken() {
+  try {
+    const r = await fetch('https://accounts.spotify.com/api/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: 'grant_type=client_credentials&client_id=&client_secret='
+    });
+    const d = await r.json();
+    return d.access_token || '';
+  } catch(e) { return ''; }
+}
+
+async function init() {
+  for (let i = 0; i < TRACKS.length; i++) {
+    await fetchTrackData(TRACKS[i], i);
+  }
+}
 
 init();
 </script>
