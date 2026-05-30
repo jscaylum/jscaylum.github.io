@@ -356,8 +356,13 @@
   .release-info { flex: 1; min-width: 220px; }
   .release-desc { font-size: 13px; line-height: 2.1; color: var(--muted); margin-bottom: 20px; }
   .release-tracklist { display: flex; flex-direction: column; margin-bottom: 20px; }
-  .release-track { display: flex; gap: 12px; align-items: center; padding: 7px 0; border-bottom: 1px solid #1a1810; font-family: 'VT323', monospace; font-size: 16px; letter-spacing: 2px; }
+  .release-track { display: flex; gap: 12px; align-items: center; padding: 7px 0; border-bottom: 1px solid #1a1810; font-family: 'VT323', monospace; font-size: 16px; letter-spacing: 2px; justify-content: space-between; }
   .release-track:last-child { border-bottom: none; }
+  .release-track-wip { color: #4a4438; filter: blur(1.5px); user-select: none; letter-spacing: 2px; flex: 1; }
+  .release-track-confirmed { filter: blur(5px) !important; color: var(--muted) !important; user-select: text !important; cursor: text; }
+  .release-track:hover .release-track-confirmed { filter: blur(4px) !important; }
+  .release-track:hover .release-track-wip { filter: blur(0.5px); }
+  .release-track-wip-tag { font-family: 'VT323', monospace; font-size: 11px; color: #3a3530; letter-spacing: 3px; text-transform: uppercase; border: 1px solid #2a2520; padding: 1px 6px; flex-shrink: 0; margin-left: auto; }
   .release-track-num { color: #3a3530; min-width: 22px; }
   .release-track-name { color: var(--text); }
   .release-links { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -389,34 +394,29 @@
   .album-tagline-text { margin-top: 16px; font-size: 12px; color: var(--muted); letter-spacing: 4px; text-transform: uppercase; }
 
   /* TRACKLIST */
-  .secret-tracklist { margin: 36px auto 0; display: inline-flex; flex-direction: column; text-align: left; border: 1px solid #2a2520; min-width: 340px; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+  .secret-tracklist { margin: 36px auto 0; display: inline-flex; flex-direction: column; text-align: left; border: 1px solid #2a2520; min-width: 340px; }
   .track-row {
     display: flex; align-items: center; gap: 16px;
     padding: 10px 18px; border-bottom: 1px solid #1a1810;
     font-family: 'VT323', monospace; font-size: 17px; letter-spacing: 3px;
-    position: relative; overflow: hidden; cursor: default; pointer-events: none;
-    user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
+    position: relative; overflow: hidden;
   }
   .track-row:last-child { border-bottom: none; }
   .track-num { color: #3a3530; min-width: 24px; flex-shrink: 0; }
 
-  /* confirmed tracks — basically unreadable */
+  /* confirmed tracks — heavily blurred */
   .track-name-hidden {
-    color: var(--muted); filter: blur(18px);
-    user-select: none; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none;
-    pointer-events: none; transition: none; letter-spacing: 3px;
-    -webkit-touch-callout: none;
+    color: var(--muted); filter: blur(6px);
+    user-select: none; transition: filter 0.3s; letter-spacing: 3px;
   }
-  .track-row:hover .track-name-hidden { filter: blur(18px); }
+  .track-row:hover .track-name-hidden { filter: blur(5px); animation: textGlitch 0.3s step-end; }
 
-  /* in-the-works tracks — still pretty blurry/unreadable */
+  /* in-the-works tracks — lighter blur + tag */
   .track-name-wip {
-    color: #4a4438; filter: blur(9px);
-    user-select: none; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none;
-    pointer-events: none; letter-spacing: 3px; transition: none;
-    -webkit-touch-callout: none;
+    color: #4a4438; filter: blur(1.5px);
+    user-select: none; letter-spacing: 3px; transition: filter 0.3s;
   }
-  .track-row:hover .track-name-wip { filter: blur(9px); }
+  .track-row:hover .track-name-wip { filter: blur(0.5px); }
   .track-wip-tag {
     font-family: 'VT323', monospace; font-size: 11px;
     color: #3a3530; letter-spacing: 3px; text-transform: uppercase;
@@ -601,7 +601,54 @@
   <section class="eps-section">
     <div class="section-label">// eps</div>
     <div class="release-grid">
-      <p class="no-releases">No EPs yet &nbsp;·&nbsp; something is coming</p>
+      <div class="release-row" id="ep-wilted">
+        <div class="release-header" onclick="toggleRelease('ep-wilted')">
+          <div class="release-cover-thumb-placeholder">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#2a2520"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+          </div>
+          <div class="release-meta">
+            <div class="release-title" style="filter:blur(4px);user-select:none;letter-spacing:8px;">? ? ? ? ? ?</div>
+            <div class="release-sub">EP &nbsp;·&nbsp; coming soon</div>
+          </div>
+          <div class="release-arrow">&#9654;</div>
+        </div>
+        <div class="release-body">
+          <div class="release-body-inner">
+            <div class="release-body-cover-placeholder">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="#2a2520"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+            </div>
+            <div class="release-info">
+              <div class="release-tracklist">
+                <div class="release-track">
+                  <span class="release-track-num">01</span>
+                  <span class="release-track-wip release-track-confirmed">where are you?</span>
+                  <span class="release-track-wip-tag release-track-confirmed-tag">in the works</span>
+                </div>
+                <div class="release-track">
+                  <span class="release-track-num">02</span>
+                  <span class="release-track-wip release-track-confirmed">i should have known</span>
+                  <span class="release-track-wip-tag release-track-confirmed-tag">in the works</span>
+                </div>
+                <div class="release-track">
+                  <span class="release-track-num">03</span>
+                  <span class="release-track-wip release-track-confirmed">fragile</span>
+                  <span class="release-track-wip-tag release-track-confirmed-tag">in the works</span>
+                </div>
+                <div class="release-track">
+                  <span class="release-track-num">04</span>
+                  <span class="release-track-wip release-track-confirmed">im losing all of my energy</span>
+                  <span class="release-track-wip-tag release-track-confirmed-tag">in the works</span>
+                </div>
+                <div class="release-track">
+                  <span class="release-track-num">05</span>
+                  <span class="release-track-wip release-track-confirmed">nothing lasts forever</span>
+                  <span class="release-track-wip-tag release-track-confirmed-tag">in the works</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 </div>
@@ -611,71 +658,34 @@
   <section class="albums-section">
     <div class="section-label">// albums</div>
     <div class="release-grid">
-      <div class="album-secret">
-        <span class="album-mystery">? ? ? ? ? ?</span>
-        <div class="album-coming">coming soon</div>
-        <p class="album-tagline-text">something is being made in the dark &nbsp;·&nbsp; 11 tracks confirmed</p>
-        <div class="secret-tracklist">
-
-          <!-- confirmed — full blur -->
-          <div class="track-row">
-            <span class="track-num">01</span>
-            <span class="track-name-hidden">intro</span>
+      <div class="release-row" id="album-debut">
+        <div class="release-header" onclick="toggleRelease('album-debut')">
+          <div class="release-cover-thumb-placeholder">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#2a2520"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
           </div>
-          <div class="track-row">
-            <span class="track-num">02</span>
-            <span class="track-name-hidden">butterfly</span>
+          <div class="release-meta">
+            <div class="release-title" style="filter:blur(4px);user-select:none;animation:glitch 6s step-end infinite;">? ? ? ? ? ?</div>
+            <div class="release-sub">Album &nbsp;·&nbsp; coming soon</div>
           </div>
-          <div class="track-row">
-            <span class="track-num">03</span>
-            <span class="track-name-hidden">lonely</span>
+          <div class="release-arrow">&#9654;</div>
+        </div>
+        <div class="release-body">
+          <div class="release-body-inner">
+            <div class="release-body-cover-placeholder">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="#2a2520"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+            </div>
+            <div class="release-info">
+              <div class="release-desc">something is being made in the dark &nbsp;·&nbsp; 6 tracks confirmed</div>
+              <div class="release-tracklist">
+                <div class="release-track"><span class="release-track-num">01</span><span class="release-track-wip release-track-confirmed">butterfly</span><span class="release-track-wip-tag release-track-confirmed-tag">confirmed</span></div>
+                <div class="release-track"><span class="release-track-num">02</span><span class="release-track-wip release-track-confirmed">lonely</span><span class="release-track-wip-tag release-track-confirmed-tag">confirmed</span></div>
+                <div class="release-track"><span class="release-track-num">03</span><span class="release-track-wip">???</span><span class="release-track-wip-tag">in the works</span></div>
+                <div class="release-track"><span class="release-track-num">04</span><span class="release-track-wip">???</span><span class="release-track-wip-tag">in the works</span></div>
+                <div class="release-track"><span class="release-track-num">05</span><span class="release-track-wip">???</span><span class="release-track-wip-tag">in the works</span></div>
+                <div class="release-track"><span class="release-track-num">06</span><span class="release-track-wip">???</span><span class="release-track-wip-tag">in the works</span></div>
+              </div>
+            </div>
           </div>
-
-          <!-- in the works — light blur -->
-          <div class="track-row">
-            <span class="track-num">04</span>
-            <span class="track-name-wip">incapable</span>
-            <span class="track-wip-tag">in the works</span>
-          </div>
-          <div class="track-row">
-            <span class="track-num">05</span>
-            <span class="track-name-wip">distancing</span>
-            <span class="track-wip-tag">in the works</span>
-          </div>
-          <div class="track-row">
-            <span class="track-num">06</span>
-            <span class="track-name-wip">realisation</span>
-            <span class="track-wip-tag">in the works</span>
-          </div>
-
-          <!-- confirmed — full blur -->
-          <div class="track-row">
-            <span class="track-num">07</span>
-            <span class="track-name-hidden">separation</span>
-          </div>
-
-          <!-- in the works — light blur -->
-          <div class="track-row">
-            <span class="track-num">08</span>
-            <span class="track-name-wip">healing</span>
-            <span class="track-wip-tag">in the works</span>
-          </div>
-          <div class="track-row">
-            <span class="track-num">09</span>
-            <span class="track-name-wip">end of my story</span>
-            <span class="track-wip-tag">in the works</span>
-          </div>
-          <div class="track-row">
-            <span class="track-num">10</span>
-            <span class="track-name-wip">wish you could help</span>
-            <span class="track-wip-tag">in the works</span>
-          </div>
-          <div class="track-row">
-            <span class="track-num">11</span>
-            <span class="track-name-wip">imagine a good ending</span>
-            <span class="track-wip-tag">in the works</span>
-          </div>
-
         </div>
       </div>
     </div>
@@ -813,17 +823,9 @@ setInterval(()=>{ secs++; const h=String(Math.floor(secs/3600)).padStart(2,'0'),
 
 setTimeout(()=>{ const f=document.querySelector('.static-flash'); if(f)f.remove(); },500);
 
-/* BLOCK COPY/SELECT ON TRACKLIST */
-(function(){
-  const tl = document.querySelector('.secret-tracklist');
-  if (!tl) return;
-  ['copy','cut','contextmenu','selectstart','dragstart'].forEach(evt => {
-    tl.addEventListener(evt, e => { e.preventDefault(); e.stopPropagation(); return false; }, true);
-  });
-  tl.addEventListener('touchstart', e => { e.stopPropagation(); }, { passive: true });
-})();
+/* TRACKLIST GLITCH — only on confirmed hidden tracks */
 const hiddenRows=document.querySelectorAll('.track-name-hidden');
-setInterval(()=>{ if(!hiddenRows.length)return; const r=hiddenRows[Math.floor(Math.random()*hiddenRows.length)]; r.style.filter='blur(14px)'; r.style.color='#c0392b'; setTimeout(()=>{ r.style.filter='blur(18px)'; r.style.color=''; },80); },2200);
+setInterval(()=>{ if(!hiddenRows.length)return; const r=hiddenRows[Math.floor(Math.random()*hiddenRows.length)]; r.style.filter='blur(0px)'; r.style.color='#c0392b'; setTimeout(()=>{ r.style.filter='blur(4px)'; r.style.color=''; },80); },2200);
 
 /* HERO SCROLL FADE + TIMECODE */
 (function(){
