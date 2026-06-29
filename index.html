@@ -447,6 +447,101 @@
   .static-flash { position: fixed; inset: 0; background: var(--cream); z-index: 99999; animation: staticFade 0.4s ease forwards; pointer-events: none; }
   @keyframes staticFade { 0%{opacity:1} 60%{opacity:0.3} 100%{opacity:0} }
 
+  /* ── FLORAL THEME ── */
+  body.floral {
+    --dark: #1a0f1e;
+    --cream: #f5e6f0;
+    --tape: #2d1a2e;
+    --red: #9b4f7a;
+    --red-glow: #d4789e;
+    --muted: #a87d9a;
+    --text: #e8d0e0;
+    background: var(--dark);
+    color: var(--text);
+    transition: background 2s ease, color 2s ease;
+  }
+  body.floral::before {
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(180,120,160,0.04) 2px, rgba(180,120,160,0.04) 4px);
+  }
+  body.floral .hero { border-bottom-color: #3d2040; }
+  body.floral .site-nav { background: rgba(26,15,30,0.97); border-bottom-color: #3d2040; }
+  body.floral .nav-tab { border-right-color: #3d2040; }
+  body.floral .nav-tab.active { color: var(--red-glow); border-bottom-color: var(--red-glow); }
+  body.floral .rec { color: var(--red-glow); }
+  body.floral .rec-dot { background: var(--red-glow); }
+  body.floral .section-label { color: var(--red-glow); }
+  body.floral .release-row { border-color: #3d2040; }
+  body.floral .release-row.open { border-color: var(--red-glow); }
+  body.floral .release-row:hover { border-color: #6b3060; }
+  body.floral .release-header:hover { background: rgba(212,120,158,0.05); }
+  body.floral .release-track { border-bottom-color: #2d1a2e; }
+  body.floral .release-track-num { color: #6b3060; }
+  body.floral .release-track-name { color: var(--text); }
+  body.floral .release-body { border-top-color: #3d2040; }
+  body.floral footer { border-top-color: #3d2040; }
+  body.floral .links-section { border-top-color: #3d2040; }
+  body.floral .link-card { border-color: #3d2040; color: var(--muted); }
+  body.floral .link-card:hover { border-color: var(--muted); color: var(--cream); }
+  body.floral .link-dot { background: var(--red-glow); }
+  body.floral .links-group-label { color: #5a3060; border-bottom-color: #2d1a2e; }
+  body.floral .hero-name { color: var(--cream); }
+  body.floral .hero-name::after { color: var(--red); }
+  body.floral .vhs-player { border-color: #6b3060; background: #120a14; }
+  body.floral .vhs-screen { border-color: #3d2040; }
+  body.floral .tape-body { background: #2d1a2e; border-color: #6b3060; }
+  body.floral .tape.active .tape-body { border-color: var(--red-glow); box-shadow: 0 0 14px rgba(212,120,158,0.4); }
+  body.floral .tape-spine { background: var(--red); }
+  body.floral .tape-reel { border-color: #6b3060; }
+  body.floral .tape-reel::after { background: #3d2040; }
+  body.floral .vhs-btn { background: #120a14; border-color: #6b3060; color: var(--muted); }
+  body.floral .vhs-btn:hover { border-color: var(--muted); color: var(--cream); background: #2d1a2e; }
+  body.floral .vhs-btn.active { border-color: var(--red-glow); color: var(--red-glow); }
+  body.floral .vhs-display { color: var(--red-glow); background: #0a0510; border-color: #2d1a2e; }
+  body.floral .vhs-progress { background: #120a14; border-color: #2d1a2e; }
+  body.floral .vhs-progress-fill { background: linear-gradient(90deg, var(--red) 0%, var(--red-glow) 100%); box-shadow: 0 0 8px rgba(212,120,158,0.6); }
+  body.floral .tape-slot { background: #0a0510; border-color: #3d2040; }
+  body.floral .tape-insert { background: linear-gradient(90deg, transparent, #2d1a2e 30%, #2d1a2e 70%, transparent); }
+  body.floral .spotify-btn { color: var(--muted); border-color: #3d2040; }
+  body.floral .spotify-btn:hover { color: var(--cream); border-color: var(--muted); }
+  body.floral .release-body-cover-placeholder,
+  body.floral .release-cover-thumb-placeholder { background: #120a14; border-color: #3d2040; }
+  body.floral .release-track-wip-tag { color: #6b3060; border-color: #3d2040; }
+  body.floral .album-mystery { color: #3d2040; }
+  body.floral .album-coming { color: var(--red-glow); }
+  body.floral .release-title { color: var(--cream); }
+  body.floral .release-sub { color: var(--muted); }
+  body.floral .release-arrow { color: var(--muted); }
+  body.floral .release-row.open .release-arrow { color: var(--red-glow); }
+  body.floral .tape-shelf-label { color: #5a3060; }
+  body.floral .screen-idle-text { color: #3d2040; }
+  body.floral .song-info-title { color: var(--cream); }
+  body.floral .footer-name { color: var(--muted); }
+  body.floral .footer-info { color: #5a3060; }
+  body.floral .bio-text em { color: var(--cream); }
+
+  /* floating petals */
+  .petal {
+    position: fixed; pointer-events: none; z-index: 9997;
+    font-size: 18px; opacity: 0;
+    animation: petalFall linear forwards;
+    will-change: transform, opacity;
+  }
+  @keyframes petalFall {
+    0%   { transform: translateY(-40px) rotate(0deg) scale(0.8); opacity: 0; }
+    10%  { opacity: 0.7; }
+    85%  { opacity: 0.5; }
+    100% { transform: translateY(110vh) rotate(720deg) scale(1.1); opacity: 0; }
+  }
+
+  /* floral glow overlay */
+  #floralOverlay {
+    position: fixed; inset: 0; pointer-events: none; z-index: 9996;
+    background: radial-gradient(ellipse at 30% 20%, rgba(180,80,140,0.07) 0%, transparent 60%),
+                radial-gradient(ellipse at 70% 80%, rgba(120,60,100,0.06) 0%, transparent 50%);
+    opacity: 0; transition: opacity 2.5s ease;
+  }
+  body.floral #floralOverlay { opacity: 1; }
+
   @media (max-width: 700px) {
     footer { flex-direction: column; gap: 12px; text-align: center; }
     .secret-tracklist { min-width: unset; width: 100%; }
@@ -461,6 +556,7 @@
 <body>
 
 <div class="static-flash"></div>
+<div id="floralOverlay"></div>
 <div class="rec"><div class="rec-dot"></div>REC</div>
 <div class="counter" id="counter">00:00:00</div>
 
@@ -602,13 +698,13 @@
     <div class="section-label">// eps</div>
     <div class="release-grid">
       <div class="release-row" id="ep-hlmn">
-        <div class="release-header" onclick="toggleRelease('ep-hlmn')">
+        <div class="release-header" onclick="toggleRelease('ep-hlmn'); toggleFloral('ep-hlmn')">
           <div class="release-cover-thumb-placeholder">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="#2a2520"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
           </div>
           <div class="release-meta">
             <div class="release-title">he loves me, not</div>
-            <div class="release-sub">EP &nbsp;·&nbsp; coming soon</div>
+            <div class="release-sub">EP &nbsp;·&nbsp; <span id="ep-countdown"></span></div>
           </div>
           <div class="release-arrow">&#9654;</div>
         </div>
@@ -619,11 +715,11 @@
             </div>
             <div class="release-info">
               <div class="release-tracklist">
-                <div class="release-track" style="justify-content:flex-start;"><span class="release-track-num">01</span><span class="release-track-name">before i could bloom</span></div>
-                <div class="release-track"><span class="release-track-num">02</span><span class="release-track-confirmed">fragile</span><span class="release-track-wip-tag release-track-confirmed-tag">in the works</span></div>
-                <div class="release-track"><span class="release-track-num">03</span><span class="release-track-confirmed">i should have known</span><span class="release-track-wip-tag release-track-confirmed-tag">in the works</span></div>
-                <div class="release-track"><span class="release-track-num">04</span><span class="release-track-confirmed">wilting</span><span class="release-track-wip-tag release-track-confirmed-tag">in the works</span></div>
-                <div class="release-track"><span class="release-track-num">05</span><span class="release-track-confirmed">nothing lasts forever</span><span class="release-track-wip-tag release-track-confirmed-tag">in the works</span></div>
+                <div class="release-track" style="justify-content:flex-start;"><span class="release-track-num">01</span><span class="release-track-name">i'm wilting</span></div>
+                <div class="release-track" style="justify-content:flex-start;"><span class="release-track-num">02</span><span class="release-track-name">before i could bloom</span></div>
+                <div class="release-track" style="justify-content:flex-start;"><span class="release-track-num">03</span><span class="release-track-name">fragile</span></div>
+                <div class="release-track" style="justify-content:flex-start;"><span class="release-track-num">04</span><span class="release-track-name">i should have known (feat. SURII)</span></div>
+                <div class="release-track" style="justify-content:flex-start;"><span class="release-track-num">05</span><span class="release-track-name">nothing lasts forever</span></div>
               </div>
             </div>
           </div>
@@ -835,6 +931,83 @@ async function init() {
   }
 }
 init();
+
+/* EP COUNTDOWN to 30 June 2026 midnight UK time */
+(function() {
+  const releaseDate = new Date('2026-06-30T00:00:00+01:00');
+  const el = document.getElementById('ep-countdown');
+  if (!el) return;
+
+  function update() {
+    const now = new Date();
+    const diff = releaseDate - now;
+
+    if (diff <= 0) {
+      el.textContent = 'out now';
+      el.style.color = 'var(--red-glow)';
+      el.style.animation = 'blink 1.2s step-end infinite';
+      setTimeout(() => {
+        el.style.transition = 'opacity 1s';
+        el.style.opacity = '0';
+        setTimeout(() => { el.style.display = 'none'; }, 1000);
+      }, 10000);
+      return;
+    }
+
+    const days    = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours   = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+    const parts = [];
+    if (days > 0)    parts.push(days + 'd');
+    if (hours > 0)   parts.push(hours + 'h');
+    if (minutes > 0) parts.push(minutes + 'm');
+    parts.push(seconds + 's');
+
+    el.textContent = parts.join(' ') + ' remaining';
+    setTimeout(update, 1000);
+  }
+
+  update();
+})();
+/* ── FLORAL THEME ── */
+let floralActive = false;
+let petalInterval = null;
+const PETALS = ['🌸','🌺','🌼','🌷','🌹','✿','❀','⚘'];
+
+function spawnPetal() {
+  const p = document.createElement('div');
+  p.className = 'petal';
+  p.textContent = PETALS[Math.floor(Math.random() * PETALS.length)];
+  p.style.left = (Math.random() * 100) + 'vw';
+  p.style.fontSize = (14 + Math.random() * 16) + 'px';
+  const dur = 5 + Math.random() * 6;
+  p.style.animationDuration = dur + 's';
+  p.style.animationDelay = (Math.random() * 1.5) + 's';
+  document.body.appendChild(p);
+  setTimeout(() => p.remove(), (dur + 2) * 1000);
+}
+
+function toggleFloral(id) {
+  const isOpen = document.getElementById(id).classList.contains('open');
+  // 'open' is toggled by toggleRelease BEFORE this runs, so isOpen reflects new state
+  if (isOpen) {
+    // turning on
+    floralActive = true;
+    document.body.classList.add('floral');
+    // burst of petals on open
+    for (let i = 0; i < 18; i++) setTimeout(spawnPetal, i * 120);
+    // then a gentle trickle
+    petalInterval = setInterval(spawnPetal, 1800);
+  } else {
+    // turning off
+    floralActive = false;
+    document.body.classList.remove('floral');
+    clearInterval(petalInterval);
+    petalInterval = null;
+  }
+}
 </script>
 </body>
 </html>
