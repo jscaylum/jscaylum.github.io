@@ -60,10 +60,10 @@ body::after {
 .f {
   position: absolute;
   font-size: var(--s, 24px);
-  filter: grayscale(1) brightness(0.06) contrast(1.2);
+  filter: grayscale(1) brightness(0.04) contrast(1.2);
   animation: fsway var(--d,10s) ease-in-out infinite;
   animation-delay: var(--delay, 0s);
-  opacity: 0.3;
+  opacity: 0.12;
   transform-origin: bottom center;
 }
 @keyframes fsway {
@@ -127,7 +127,28 @@ body.ep-open .f {
   100% { transform: translateY(110vh) skewX(-7deg); opacity: 0; }
 }
 
-/* ── HERO ── */
+/* ── HERO PFP ── */
+.hero-pfp-wrap {
+  position: absolute; top: 40px; right: 8vw; z-index: 4;
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  animation: up 1s ease 0.6s forwards; opacity: 0;
+}
+.hero-pfp {
+  width: 72px; height: 72px; border-radius: 50%;
+  border: 1px solid rgba(224,64,200,0.35);
+  box-shadow: 0 0 24px rgba(224,64,200,0.2), 0 0 60px rgba(224,64,200,0.08);
+  object-fit: cover;
+  filter: grayscale(0.2) brightness(0.88);
+  display: block;
+}
+.hero-pfp-name {
+  font-size: 9px; letter-spacing: 4px; text-transform: uppercase;
+  color: rgba(224,64,200,0.45); text-align: center;
+}
+@media(max-width:600px){
+  .hero-pfp-wrap { top: 28px; right: 5vw; }
+  .hero-pfp { width: 52px; height: 52px; }
+}
 .hero {
   position: relative;
   min-height: 100vh;
@@ -661,15 +682,15 @@ body.ep-open #grass { opacity: 1; }
 
 <!-- flowers -->
 <div class="flower-layer">
-  <span class="f" style="left:6%;top:12%;--s:26px;--d:11s;--delay:0s;--r0:-3deg;--r1:8deg;--r2:-4deg;--y:-16px;">🌸</span>
-  <span class="f" style="left:87%;top:6%;--s:20px;--d:14s;--delay:2.5s;--r0:5deg;--r1:-6deg;--r2:3deg;--y:-10px;">🌼</span>
-  <span class="f" style="left:73%;top:55%;--s:30px;--d:9s;--delay:1s;--r0:2deg;--r1:10deg;--r2:-5deg;--y:-20px;">🌷</span>
-  <span class="f" style="left:18%;top:70%;--s:22px;--d:13s;--delay:4s;--r0:-6deg;--r1:4deg;--r2:-8deg;--y:-12px;">🌺</span>
-  <span class="f" style="left:48%;top:28%;--s:18px;--d:16s;--delay:7s;--r0:4deg;--r1:-3deg;--r2:6deg;--y:-8px;">❀</span>
-  <span class="f" style="left:91%;top:78%;--s:24px;--d:10s;--delay:3.5s;--r0:-2deg;--r1:7deg;--r2:-3deg;--y:-14px;">🌸</span>
-  <span class="f" style="left:33%;top:88%;--s:20px;--d:12s;--delay:5.5s;--r0:6deg;--r1:-5deg;--r2:4deg;--y:-10px;">🌼</span>
-  <span class="f" style="left:60%;top:82%;--s:16px;--d:8s;--delay:0.5s;--r0:-4deg;--r1:6deg;--r2:-2deg;--y:-6px;">🌷</span>
-  <span class="f" style="left:2%;top:45%;--s:22px;--d:15s;--delay:6s;--r0:3deg;--r1:-7deg;--r2:5deg;--y:-18px;">🌺</span>
+  <span class="f" style="left:6%;top:12%;--s:16px;--d:11s;--delay:0s;--r0:-3deg;--r1:8deg;--r2:-4deg;--y:-16px;">🌸</span>
+  <span class="f" style="left:87%;top:6%;--s:13px;--d:14s;--delay:2.5s;--r0:5deg;--r1:-6deg;--r2:3deg;--y:-10px;">🌼</span>
+  <span class="f" style="left:73%;top:55%;--s:18px;--d:9s;--delay:1s;--r0:2deg;--r1:10deg;--r2:-5deg;--y:-20px;">🌷</span>
+  <span class="f" style="left:18%;top:70%;--s:14px;--d:13s;--delay:4s;--r0:-6deg;--r1:4deg;--r2:-8deg;--y:-12px;">🌺</span>
+  <span class="f" style="left:48%;top:28%;--s:12px;--d:16s;--delay:7s;--r0:4deg;--r1:-3deg;--r2:6deg;--y:-8px;">❀</span>
+  <span class="f" style="left:91%;top:78%;--s:15px;--d:10s;--delay:3.5s;--r0:-2deg;--r1:7deg;--r2:-3deg;--y:-14px;">🌸</span>
+  <span class="f" style="left:33%;top:88%;--s:13px;--d:12s;--delay:5.5s;--r0:6deg;--r1:-5deg;--r2:4deg;--y:-10px;">🌼</span>
+  <span class="f" style="left:60%;top:82%;--s:11px;--d:8s;--delay:0.5s;--r0:-4deg;--r1:6deg;--r2:-2deg;--y:-6px;">🌷</span>
+  <span class="f" style="left:2%;top:45%;--s:14px;--d:15s;--delay:6s;--r0:3deg;--r1:-7deg;--r2:5deg;--y:-18px;">🌺</span>
 </div>
 
 <div id="grass"></div>
@@ -698,6 +719,11 @@ body.ep-open #grass { opacity: 1; }
   <!-- rain falling through the hero -->
   <div class="hero-rain" id="heroRain"></div>
   <div class="hero-beam"></div>
+  <!-- profile picture — auto-fetches from Instagram on load -->
+  <div class="hero-pfp-wrap">
+    <img class="hero-pfp" id="heroPfp" src="https://unavatar.io/instagram/jscaylum" alt="jscaylum" onerror="this.parentElement.style.display='none'">
+    <span class="hero-pfp-name">@jscaylum</span>
+  </div>
   <div class="hero-content">
     <span class="hero-label">Independent Solo Artist</span>
     <h1 class="hero-name" data-text="jscaylum">jscaylum</h1>
