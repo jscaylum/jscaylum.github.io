@@ -672,6 +672,19 @@ a.nav-item { text-decoration: none; }
 .fanmail-status.err { color: #d06868; }
 .fanmail-hp { position: absolute; left: -9999px; opacity: 0; height: 0; width: 0; }
 
+/* ── MERCH TOAST ── */
+.merch-toast {
+  position: fixed; bottom: 32px; left: 50%;
+  transform: translate(-50%, 16px);
+  background: #0e0518; border: 1px solid rgba(224,64,200,0.35);
+  color: var(--cream); font-size: 10px; letter-spacing: 4px; text-transform: uppercase;
+  padding: 14px 26px; z-index: 9999;
+  box-shadow: 0 0 30px rgba(224,64,200,0.15);
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.merch-toast.show { opacity: 1; transform: translate(-50%, 0); }
+
 /* ── FOOTER ── */
 footer {
   padding: 60px 8vw;
@@ -799,7 +812,7 @@ body.ep-open #grass { opacity: 1; }
     <div class="nav-item active" onclick="show('about')">About</div>
     <div class="nav-item" onclick="show('discography')">Discography</div>
     <div class="nav-item" onclick="show('fanmail')">Fanmail</div>
-    <a class="nav-item" href="https://www.redbubble.com/people/jscaylum/shop?anchor=profile&asc=u" target="_blank" rel="noopener">Merch ↗</a>
+    <div class="nav-item" onclick="showMerchToast()">Merch</div>
   </div>
 </nav>
 
@@ -1048,6 +1061,8 @@ body.ep-open #grass { opacity: 1; }
     </form>
   </div>
 </div>
+
+<div class="merch-toast" id="merchToast">Merch — currently unavailable</div>
 
 <footer>
   <span class="footer-name">jscaylum</span>
@@ -1320,6 +1335,15 @@ function toggleNature(id){
 function stopNature(){
   natureOn=false; document.body.classList.remove('ep-open');
   clearInterval(rainInterval); rainInterval=null;
+}
+
+/* ── MERCH TOAST ── */
+let merchToastTimer = null;
+function showMerchToast() {
+  const t = document.getElementById('merchToast');
+  clearTimeout(merchToastTimer);
+  t.classList.add('show');
+  merchToastTimer = setTimeout(() => t.classList.remove('show'), 2200);
 }
 
 /* ── FANMAIL FORM ── */
