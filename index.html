@@ -729,12 +729,13 @@ body.ep-open::after {
 #grass {
   position: fixed; bottom: 0; left: 0; right: 0; height: 100px;
   pointer-events: none; z-index: 9995;
-  display: flex; align-items: flex-end; overflow: hidden;
+  overflow: hidden;
   opacity: 0; transition: opacity 2.5s ease;
 }
 body.ep-open #grass { opacity: 1; }
 .blade {
-  width: 2px; flex-shrink: 0;
+  position: absolute; bottom: 0;
+  width: 2px;
   background: linear-gradient(to top, #1a3020, #3a6040 55%, transparent);
   transform-origin: bottom; animation: sway linear infinite alternate;
 }
@@ -945,14 +946,14 @@ body.ep-open #grass { opacity: 1; }
         </div>
         <div class="release-body">
           <div class="release-inner">
-            <div class="release-art-placeholder">
+            <div class="release-art-placeholder" id="ep-hlmn-art">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="rgba(200,80,180,0.12)"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
             </div>
             <div class="track-list">
               <div class="track"><span class="track-n">01</span><span class="track-name">i'm wilting</span></div>
               <div class="track"><span class="track-n">02</span><span class="track-name">before i could bloom</span></div>
               <div class="track"><span class="track-n">03</span><span class="track-name">fragile</span></div>
-              <div class="track"><span class="track-n">04</span><span class="track-name">i should have known (feat. <a href="https://linktr.ee/urgirlsurii" target="_blank" style="color:var(--glow);text-decoration:none;border-bottom:1px solid currentColor;opacity:0.8;transition:opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.8'">SURII</a>)</span></div>
+              <div class="track"><span class="track-n">04</span><span class="track-name"><a href="https://open.spotify.com/track/07HRKvCbPILDAzjjPVNt41?si=1ea302849e554bcc" target="_blank" style="color:inherit;text-decoration:none;border-bottom:1px solid transparent;transition:border-color 0.2s,color 0.2s;" onmouseover="this.style.color='var(--glow)';this.style.borderColor='var(--glow)'" onmouseout="this.style.color='';this.style.borderColor='transparent'">i should have known</a> (feat. <a href="https://linktr.ee/urgirlsurii" target="_blank" style="color:var(--glow);text-decoration:none;border-bottom:1px solid currentColor;opacity:0.8;transition:opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.8'">SURII</a>)</span></div>
               <div class="track"><span class="track-n">05</span><span class="track-name">nothing lasts forever</span></div>
             </div>
           </div>
@@ -1003,12 +1004,12 @@ body.ep-open #grass { opacity: 1; }
       <div class="collab-tracks">
         <div class="collab-track">
           <span class="collab-role">with</span>
-          <span class="collab-title"><em>i should have known</em></span>
+          <span class="collab-title"><a href="https://open.spotify.com/track/07HRKvCbPILDAzjjPVNt41?si=1ea302849e554bcc" target="_blank"><em>i should have known</em></a></span>
           <span class="collab-release">he loves me, not EP</span>
         </div>
         <div class="collab-track">
           <span class="collab-role">on</span>
-          <span class="collab-title"><a href="https://soundcloud.com/user-37308465/cvnt" target="_blank"><em>CVNT! (feat. jscaylum)</em></a></span>
+          <span class="collab-title"><a href="https://open.spotify.com/track/2gZM181gKcnLdCSsDZx7aT?si=b82fb66e8bde4fcc" target="_blank"><em>CVNT! (feat. jscaylum)</em></a></span>
           <span class="collab-release">SURII</span>
         </div>
       </div>
@@ -1271,6 +1272,30 @@ function seekAudio(e){ if(!audio||!audio.duration)return; audio.currentTime=(e.o
   }
 })();
 
+/* ── EP / RELEASE ART ── */
+(async()=>{
+  const RELEASE_ART = [
+    { id: 'ep-hlmn-art', url: 'https://open.spotify.com/album/4ik04d6cVg91HIXPY01rl1', alt: 'he loves me, not' }
+  ];
+  for (const rel of RELEASE_ART) {
+    try {
+      const r = await fetch('https://open.spotify.com/oembed?url=' + encodeURIComponent(rel.url));
+      if (!r.ok) continue;
+      const d = await r.json();
+      if (d.thumbnail_url) {
+        const ph = document.getElementById(rel.id);
+        if (ph && ph.tagName !== 'IMG') {
+          const img = document.createElement('img');
+          img.className = 'release-art';
+          img.src = d.thumbnail_url;
+          img.alt = rel.alt;
+          ph.replaceWith(img);
+        }
+      }
+    } catch (e) {}
+  }
+})();
+
 /* ── EP RELEASE STATUS ──
    Update RELEASE_DATE below to the real release date/time.
    If the date is in the past, the badge simply reads "out now" (no countdown, no auto-fade). */
@@ -1308,10 +1333,12 @@ function spawnRain(){
 }
 
 function buildGrass(){
-  const g=document.getElementById('grass'); if(!g||g.children.length)return;
-  const n=Math.floor(window.innerWidth/4);
+  const g=document.getElementById('grass'); if(!g)return;
+  g.innerHTML='';
+  const n=Math.ceil(window.innerWidth/3);
   for(let i=0;i<n;i++){
     const b=document.createElement('div'); b.className='blade';
+    b.style.left=((i/n)*100)+'%';
     b.style.height=(18+Math.random()*65)+'px';
     const l=(Math.random()-0.5)*20; b.style.setProperty('--l',l+'deg');
     const dur=1.8+Math.random()*3; b.style.animationDuration=dur+'s';
@@ -1320,6 +1347,11 @@ function buildGrass(){
     g.appendChild(b);
   }
 }
+let grassResizeTimer=null;
+window.addEventListener('resize', ()=>{
+  clearTimeout(grassResizeTimer);
+  grassResizeTimer=setTimeout(()=>{ if(natureOn) buildGrass(); },200);
+});
 
 function toggleNature(id){
   const isOpen=document.getElementById(id).classList.contains('open');
