@@ -270,6 +270,7 @@ nav {
   color: var(--cream);
   border-bottom-color: var(--glow);
 }
+a.nav-item { text-decoration: none; }
 
 /* ── PANELS ── */
 .panel { display: none; }
@@ -326,6 +327,25 @@ nav {
 .link-item:last-child { border-bottom: none; }
 .link-arrow { font-size: 14px; opacity: 0; transition: opacity 0.25s; }
 .link-item:hover .link-arrow { opacity: 1; }
+
+/* ── DISCOGRAPHY WRAPPER + SUBNAV ── */
+#panel-discography { padding-top: 0; }
+.disco-subnav {
+  display: flex; gap: 0;
+  padding: 0 8vw; margin-top: 60px;
+  border-bottom: 1px solid var(--border);
+}
+.disco-subitem {
+  font-size: 10px; letter-spacing: 5px; text-transform: uppercase;
+  color: var(--dim); padding: 0 22px 18px; cursor: pointer;
+  border-bottom: 1px solid transparent; margin-bottom: -1px;
+  transition: color 0.3s, border-color 0.3s; user-select: none;
+}
+.disco-subitem:first-child { padding-left: 0; }
+.disco-subitem:hover { color: var(--text); }
+.disco-subitem.active { color: var(--cream); border-bottom-color: var(--glow); }
+.disco-sub { display: none; }
+.disco-sub.active { display: block; animation: panelIn 0.5s ease forwards; }
 
 /* ── SINGLES ── */
 #panel-singles { padding: 100px 8vw 120px; }
@@ -611,6 +631,47 @@ nav {
 .collab-title a:hover { text-decoration: underline; text-underline-offset: 3px; }
 .collab-release { color: var(--dim); font-size: 11px; letter-spacing: 1px; }
 
+/* ── FANMAIL ── */
+.fanmail-panel { padding: 100px 8vw 140px; max-width: 640px; }
+.fanmail-intro {
+  font-family: 'Cormorant Garamond', serif; font-style: italic; font-weight: 300;
+  font-size: clamp(17px, 2vw, 20px); line-height: 1.9; color: var(--text);
+  margin-bottom: 48px; max-width: 480px;
+}
+.fanmail-form { display: flex; flex-direction: column; gap: 28px; }
+.fanmail-field { display: flex; flex-direction: column; gap: 10px; }
+.fanmail-field label {
+  font-size: 9px; letter-spacing: 5px; text-transform: uppercase; color: var(--glow);
+}
+.fanmail-field input,
+.fanmail-field textarea {
+  background: transparent; border: none; border-bottom: 1px solid var(--border);
+  color: var(--cream); font-family: 'Inter', sans-serif; font-weight: 300;
+  font-size: 14px; letter-spacing: 0.3px; padding: 10px 2px;
+  transition: border-color 0.25s; resize: vertical;
+}
+.fanmail-field input::placeholder,
+.fanmail-field textarea::placeholder { color: var(--dim); }
+.fanmail-field input:focus,
+.fanmail-field textarea:focus { outline: none; border-bottom-color: var(--glow); }
+.fanmail-field textarea { min-height: 120px; line-height: 1.7; }
+.fanmail-submit {
+  align-self: flex-start; margin-top: 8px;
+  background: transparent; border: 1px solid var(--glow);
+  color: var(--glow); font-size: 10px; letter-spacing: 5px; text-transform: uppercase;
+  padding: 14px 30px; cursor: pointer;
+  transition: background 0.25s, color 0.25s, box-shadow 0.25s;
+}
+.fanmail-submit:hover { background: var(--glow); color: var(--void); box-shadow: 0 0 24px rgba(224,64,200,0.35); }
+.fanmail-submit:disabled { opacity: 0.5; cursor: default; }
+.fanmail-status {
+  font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+  color: var(--muted); margin-top: 18px; min-height: 14px;
+}
+.fanmail-status.ok { color: var(--glow); }
+.fanmail-status.err { color: #d06868; }
+.fanmail-hp { position: absolute; left: -9999px; opacity: 0; height: 0; width: 0; }
+
 /* ── FOOTER ── */
 footer {
   padding: 60px 8vw;
@@ -736,10 +797,9 @@ body.ep-open #grass { opacity: 1; }
 <nav>
   <div class="nav-links">
     <div class="nav-item active" onclick="show('about')">About</div>
-    <div class="nav-item" onclick="show('singles')">Singles</div>
-    <div class="nav-item" onclick="show('eps')">EPs</div>
-    <div class="nav-item" onclick="show('albums')">Albums</div>
-    <div class="nav-item" onclick="show('collabs')">Collabs</div>
+    <div class="nav-item" onclick="show('discography')">Discography</div>
+    <div class="nav-item" onclick="show('fanmail')">Fanmail</div>
+    <a class="nav-item" href="https://www.redbubble.com/people/jscaylum/shop?anchor=profile&asc=u" target="_blank" rel="noopener">Merch ↗</a>
   </div>
 </nav>
 
@@ -776,8 +836,17 @@ body.ep-open #grass { opacity: 1; }
   </div>
 </div>
 
-<!-- ══ SINGLES ══ -->
-<div class="panel" id="panel-singles">
+<!-- ══ DISCOGRAPHY ══ -->
+<div class="panel" id="panel-discography">
+  <div class="disco-subnav">
+    <div class="disco-subitem active" onclick="showDisco('singles')">Singles</div>
+    <div class="disco-subitem" onclick="showDisco('eps')">EPs</div>
+    <div class="disco-subitem" onclick="showDisco('albums')">Albums</div>
+    <div class="disco-subitem" onclick="showDisco('collabs')">Collabs</div>
+  </div>
+
+<!-- ── SINGLES ── -->
+<div class="disco-sub active" id="panel-singles">
   <div style="padding:100px 8vw 120px;">
     <span class="section-eyebrow">Singles</span>
     <div class="singles-layout">
@@ -849,8 +918,8 @@ body.ep-open #grass { opacity: 1; }
   </div>
 </div>
 
-<!-- ══ EPs ══ -->
-<div class="panel" id="panel-eps">
+<!-- ── EPs ── -->
+<div class="disco-sub" id="panel-eps">
   <div class="releases-panel">
     <span class="section-eyebrow">EPs</span>
     <div class="release-list">
@@ -880,8 +949,8 @@ body.ep-open #grass { opacity: 1; }
   </div>
 </div>
 
-<!-- ══ ALBUMS ══ -->
-<div class="panel" id="panel-albums">
+<!-- ── ALBUMS ── -->
+<div class="disco-sub" id="panel-albums">
   <div class="releases-panel">
     <span class="section-eyebrow">Albums</span>
     <div class="release-list">
@@ -912,8 +981,8 @@ body.ep-open #grass { opacity: 1; }
   </div>
 </div>
 
-<!-- ══ COLLABS ══ -->
-<div class="panel" id="panel-collabs">
+<!-- ── COLLABS ── -->
+<div class="disco-sub" id="panel-collabs">
   <div class="collabs-panel">
     <span class="section-eyebrow">Collabs</span>
     <div class="collab">
@@ -947,6 +1016,39 @@ body.ep-open #grass { opacity: 1; }
   </div>
 </div>
 
+</div><!-- /panel-discography -->
+
+<!-- ══ FANMAIL ══ -->
+<div class="panel" id="panel-fanmail">
+  <div class="fanmail-panel">
+    <span class="section-eyebrow">Fanmail</span>
+    <p class="fanmail-intro">Say hi, tell him what a song meant to you, ask a question — whatever it is, it goes straight to his inbox.</p>
+    <form class="fanmail-form" id="fanmailForm" action="https://formsubmit.co/jscaylum@gmail.com" method="POST">
+      <!-- honeypot field to cut down on spam bots -->
+      <input type="text" name="_honey" class="fanmail-hp" tabindex="-1" autocomplete="off">
+      <!-- formsubmit config -->
+      <input type="hidden" name="_subject" value="New fanmail from jscaylum.com">
+      <input type="hidden" name="_captcha" value="false">
+      <input type="hidden" name="_template" value="table">
+
+      <div class="fanmail-field">
+        <label for="fmName">Your name</label>
+        <input type="text" id="fmName" name="Name" placeholder="what should he call you?" required>
+      </div>
+      <div class="fanmail-field">
+        <label for="fmEmail">Your email <span style="opacity:0.5;">(optional, if you want a reply)</span></label>
+        <input type="email" id="fmEmail" name="Email address" placeholder="you@example.com">
+      </div>
+      <div class="fanmail-field">
+        <label for="fmMessage">Message</label>
+        <textarea id="fmMessage" name="Message" placeholder="say whatever's on your mind..." required></textarea>
+      </div>
+      <button type="submit" class="fanmail-submit" id="fmSubmit">Send</button>
+      <div class="fanmail-status" id="fmStatus"></div>
+    </form>
+  </div>
+</div>
+
 <footer>
   <span class="footer-name">jscaylum</span>
   <span class="footer-right">England · Independent · © 2026</span>
@@ -972,13 +1074,25 @@ const TRACKS = [
 let currentTrack = null, audio = null, timerInterval = null, isPlaying = false, transitioning = false;
 
 /* ── NAV ── */
-const ORDER = ['about','singles','eps','albums','collabs'];
+const ORDER = ['about','discography','fanmail'];
 function show(id) {
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(t => t.classList.remove('active'));
   document.getElementById('panel-' + id).classList.add('active');
   document.querySelectorAll('.nav-item')[ORDER.indexOf(id)].classList.add('active');
   window.scrollTo({ top: document.querySelector('nav').offsetTop - 1, behavior: 'smooth' });
+  /* stop the nature/rain theme if it's running and we've navigated away from Discography entirely */
+  if (id !== 'discography' && natureOn) stopNature();
+}
+
+const DISCO_ORDER = ['singles','eps','albums','collabs'];
+function showDisco(id) {
+  document.querySelectorAll('.disco-sub').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.disco-subitem').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  document.querySelectorAll('.disco-subitem')[DISCO_ORDER.indexOf(id)].classList.add('active');
+  /* stop the nature/rain theme if it's running and we've switched away from EPs */
+  if (id !== 'eps' && natureOn) stopNature();
 }
 
 /* init about panel as active */
@@ -1142,18 +1256,19 @@ function seekAudio(e){ if(!audio||!audio.duration)return; audio.currentTime=(e.o
   }
 })();
 
-/* ── EP COUNTDOWN ── */
+/* ── EP RELEASE STATUS ──
+   Update RELEASE_DATE below to the real release date/time.
+   If the date is in the past, the badge simply reads "out now" (no countdown, no auto-fade). */
 (()=>{
-  const release=new Date('2026-06-30T00:00:00+01:00');
+  const RELEASE_DATE = new Date('2026-06-30T00:00:00+01:00');
   const el=document.getElementById('ep-countdown');
   if(!el)return;
   function tick(){
-    const diff=release-new Date();
+    const diff=RELEASE_DATE - new Date();
     if(diff<=0){
       el.textContent='out now';
       el.style.color='var(--glow)';
-      setTimeout(()=>{ el.style.transition='opacity 1.5s'; el.style.opacity='0'; setTimeout(()=>el.style.display='none',1500); },10000);
-      return;
+      return; // stays visible — no auto-fade
     }
     const dd=Math.floor(diff/86400000),hh=Math.floor((diff%86400000)/3600000),
           mm=Math.floor((diff%3600000)/60000),ss=Math.floor((diff%60000)/1000);
@@ -1198,10 +1313,42 @@ function toggleNature(id){
     for(let i=0;i<50;i++)setTimeout(spawnRain,i*35);
     rainInterval=setInterval(spawnRain,85);
   } else {
-    natureOn=false; document.body.classList.remove('ep-open');
-    clearInterval(rainInterval); rainInterval=null;
+    stopNature();
   }
 }
+
+function stopNature(){
+  natureOn=false; document.body.classList.remove('ep-open');
+  clearInterval(rainInterval); rainInterval=null;
+}
+
+/* ── FANMAIL FORM ── */
+(()=>{
+  const form=document.getElementById('fanmailForm');
+  if(!form)return;
+  const btn=document.getElementById('fmSubmit');
+  const status=document.getElementById('fmStatus');
+  form.addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    btn.disabled=true; btn.textContent='Sending...';
+    status.textContent=''; status.className='fanmail-status';
+    try{
+      const res=await fetch(form.action,{ method:'POST', body:new FormData(form), headers:{ 'Accept':'application/json' } });
+      if(res.ok){
+        status.textContent='sent — thank you ♡';
+        status.classList.add('ok');
+        form.reset();
+      } else {
+        throw new Error('bad response');
+      }
+    } catch(err){
+      status.textContent='something went wrong — try again in a moment';
+      status.classList.add('err');
+    } finally {
+      btn.disabled=false; btn.textContent='Send';
+    }
+  });
+})();
 </script>
 </body>
 </html>
