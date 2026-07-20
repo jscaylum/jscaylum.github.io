@@ -44,7 +44,7 @@ body {
 }
 
 /* ── PERMANENT MOON ATMOSPHERE ── */
-body::after {
+body::before {
   content: '';
   position: fixed; inset: 0; pointer-events: none; z-index: 0;
   background:
@@ -130,25 +130,25 @@ body.ep-open .f {
 
 /* ── HERO PFP ── */
 .hero-pfp-wrap {
-  position: absolute; top: 40px; right: var(--gutter); z-index: 4;
-  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  position: absolute; top: clamp(40px, 6vh, 80px); left: 50%; transform: translateX(-50%); z-index: 4;
+  display: flex; flex-direction: column; align-items: center; gap: 14px;
   animation: up 1s ease 0.6s forwards; opacity: 0;
 }
 .hero-pfp {
-  width: 72px; height: 72px; border-radius: 50%;
-  border: 1px solid rgba(224,64,200,0.35);
-  box-shadow: 0 0 24px rgba(224,64,200,0.2), 0 0 60px rgba(224,64,200,0.08);
+  width: clamp(120px, 14vw, 200px); height: clamp(120px, 14vw, 200px); border-radius: 50%;
+  border: 2px solid rgba(224,64,200,0.4);
+  box-shadow: 0 0 40px rgba(224,64,200,0.25), 0 0 100px rgba(224,64,200,0.1);
   object-fit: cover;
-  filter: grayscale(0.2) brightness(0.88);
+  filter: grayscale(0.1) brightness(0.94);
   display: block;
 }
 .hero-pfp-name {
-  font-size: 9px; letter-spacing: 4px; text-transform: uppercase;
-  color: rgba(224,64,200,0.45); text-align: center;
+  font-size: 10px; letter-spacing: 5px; text-transform: uppercase;
+  color: rgba(224,64,200,0.55); text-align: center;
 }
 @media(max-width:600px){
-  .hero-pfp-wrap { top: 28px; right: 5vw; }
-  .hero-pfp { width: 52px; height: 52px; }
+  .hero-pfp-wrap { top: 24px; }
+  .hero-pfp { width: 90px; height: 90px; }
 }
 .hero {
   position: relative;
@@ -164,7 +164,7 @@ body.ep-open .f {
 }
 .hero-photo img {
   width: 100%; height: 100%; object-fit: cover; object-position: center 20%;
-  filter: grayscale(1) brightness(0.22) contrast(1.3);
+  filter: grayscale(0.15) brightness(0.5) contrast(1.15) saturate(1.2);
   display: block;
 }
 /* vignette + directional fade */
@@ -206,14 +206,6 @@ body.ep-open .f {
   opacity: 0; animation: up 1.4s ease 0.4s forwards;
   position: relative; display: inline-block;
   overflow-wrap: break-word; word-break: break-word;
-}
-/* pink ghost offset */
-.hero-name::before {
-  content: attr(data-text);
-  position: absolute; left: 5px; top: 3px;
-  color: var(--glow); opacity: 0.2;
-  filter: blur(4px); pointer-events: none;
-  z-index: -1;
 }
 
 .hero-line {
@@ -708,8 +700,8 @@ body.ep-open {
   --petal: #a8d4b0;
   transition: --glow 2s;
 }
-body::after { transition: background 2.5s ease; }
-body.ep-open::after {
+body::before { transition: background 2.5s ease; }
+body.ep-open::before {
   background:
     radial-gradient(ellipse 55% 60% at 82% -8%, rgba(80,160,90,0.2) 0%, rgba(40,100,50,0.08) 35%, transparent 65%),
     radial-gradient(ellipse 70% 35% at 50% 105%, rgba(10,40,15,0.55) 0%, transparent 55%),
@@ -1071,7 +1063,7 @@ body.ep-open #grass { opacity: 1; }
 
 <footer>
   <span class="footer-name">jscaylum</span>
-  <span class="footer-right">England · Independent · © 2026</span>
+  <span class="footer-right">Independent · © 2026</span>
 </footer>
 
 <script>
@@ -1139,7 +1131,7 @@ function runVHSTransition(track, onDone) {
     {t:260,c:'rgba(180,80,160,0.4)',tx:'CH-01  SP  VHS'},
     {t:340,c:'rgba(180,80,160,0.6)',tx:'LOADING...'},
     {t:460,c:'#e040c8',tx:'▶  '+track.name.toUpperCase()},
-    {t:560,c:'rgba(180,80,160,0.5)',tx:'jscaylum · england'},
+    {t:560,c:'rgba(180,80,160,0.5)',tx:'jscaylum · 2026'},
     {t:650,c:'rgba(180,80,160,0.3)',tx:'TRACKING OK'},
   ];
   lines.forEach(({t,c,tx},i)=>{
@@ -1177,7 +1169,7 @@ function loadTape(index) {
     if(track.cover){cv.src=track.cover;cv.style.display='block';}else{cv.style.display='none';}
     currentTrack=track;
     document.getElementById('infoTitle').textContent=track.name;
-    document.getElementById('infoMeta').textContent='jscaylum  ·  england  ·  single';
+    document.getElementById('infoMeta').textContent='jscaylum  ·  2026  ·  single';
     document.getElementById('infoDesc').textContent=track.desc;
     document.getElementById('spotifyBtn').href=track.spotifyUrl;
     const si=document.getElementById('songInfo'); si.classList.remove('active'); void si.offsetWidth; si.classList.add('active');
@@ -1326,7 +1318,7 @@ function applyBannerPalette(img){
   let styleTag=document.getElementById('bannerPaletteOverride');
   if(!styleTag){ styleTag=document.createElement('style'); styleTag.id='bannerPaletteOverride'; document.head.appendChild(styleTag); }
   styleTag.textContent = `
-    body::after {
+    body::before {
       background:
         radial-gradient(ellipse 55% 60% at 82% -8%, hsla(${h},70%,55%,0.32) 0%, hsla(${h},60%,45%,0.12) 35%, transparent 65%),
         radial-gradient(ellipse 70% 35% at 50% 105%, hsla(${h},70%,20%,0.55) 0%, transparent 55%),
