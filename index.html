@@ -130,9 +130,13 @@ body.ep-open .f {
 
 /* ── HERO PFP ── */
 .hero-pfp-wrap {
-  position: absolute; top: clamp(40px, 6vh, 80px); left: 50%; transform: translateX(-50%); z-index: 4;
+  position: absolute; top: clamp(40px, 6vh, 80px); left: 50%; z-index: 4;
   display: flex; flex-direction: column; align-items: center; gap: 14px;
-  animation: up 1s ease 0.6s forwards; opacity: 0;
+  animation: upCentered 1s ease 0.6s forwards; opacity: 0;
+}
+@keyframes upCentered {
+  from { opacity: 0; transform: translate(-50%, 24px); }
+  to   { opacity: 1; transform: translate(-50%, 0); }
 }
 .hero-pfp {
   width: clamp(120px, 14vw, 200px); height: clamp(120px, 14vw, 200px); border-radius: 50%;
