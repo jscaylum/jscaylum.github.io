@@ -744,6 +744,32 @@ body.ep-open #grass { opacity: 1; }
   to   { transform: rotate(calc(var(--l) * -1 + 5deg)) skewX(1deg); }
 }
 
+/* ── ALBUM MOONLIGHT SHIFT ── */
+body.album-open {
+  --glow:  #b076f2;
+  --glow2: #6a34a8;
+  --petal: #dcbdfb;
+}
+#moonlight {
+  position: fixed; inset: 0; z-index: 9994; pointer-events: none;
+  background:
+    radial-gradient(ellipse 75% 55% at 50% -12%, rgba(170,90,245,0.4) 0%, rgba(120,50,200,0.18) 38%, transparent 68%),
+    radial-gradient(ellipse 45% 40% at 82% 8%, rgba(200,140,255,0.22) 0%, transparent 60%),
+    radial-gradient(ellipse 45% 40% at 15% 6%, rgba(150,80,230,0.18) 0%, transparent 60%);
+  opacity: 0; transition: opacity 2.5s ease;
+}
+body.album-open #moonlight { opacity: 1; }
+.moonray {
+  position: absolute; top: -10%; width: 2px; height: 130%;
+  background: linear-gradient(to bottom, rgba(200,150,255,0.5), transparent 70%);
+  filter: blur(1px);
+  animation: raysway 6s ease-in-out infinite alternate;
+}
+@keyframes raysway {
+  from { transform: rotate(var(--rr, -6deg)); opacity: 0.5; }
+  to   { transform: rotate(calc(var(--rr, -6deg) + 4deg)); opacity: 0.9; }
+}
+
 /* ── RESPONSIVE ── */
 @media(max-width:600px){
   footer { flex-direction: column; gap: 16px; text-align: center; }
@@ -769,6 +795,12 @@ body.ep-open #grass { opacity: 1; }
 </div>
 
 <div id="grass"></div>
+
+<div id="moonlight">
+  <div class="moonray" style="left:35%;--rr:-8deg;animation-delay:0s;"></div>
+  <div class="moonray" style="left:50%;--rr:-4deg;animation-delay:1.2s;"></div>
+  <div class="moonray" style="left:65%;--rr:-10deg;animation-delay:0.6s;"></div>
+</div>
 
 <!-- permanent site rain -->
 <div class="site-rain" id="siteRain"></div>
@@ -969,7 +1001,7 @@ body.ep-open #grass { opacity: 1; }
     <span class="section-eyebrow">Albums</span>
     <div class="release-list">
       <div class="release" id="album-debut">
-        <div class="release-trigger" onclick="toggleRelease('album-debut')">
+        <div class="release-trigger" onclick="toggleRelease('album-debut'); toggleMoonlight('album-debut')">
           <span class="release-num">01</span>
           <span class="release-trigger-name">THOUGHTS ARE HELL</span>
           <span class="release-type">Album · coming soon</span>
@@ -981,15 +1013,15 @@ body.ep-open #grass { opacity: 1; }
               <svg width="24" height="24" viewBox="0 0 24 24" fill="rgba(200,80,180,0.12)"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
             </div>
             <div class="track-list">
-              <div class="track"><span class="track-n">01</span><span class="track-name">???</span><span class="track-tag">confirmed</span></div>
-              <div class="track"><span class="track-n">02</span><span class="track-name">???</span><span class="track-tag">confirmed</span></div>
-              <div class="track"><span class="track-n">03</span><span class="track-name">???</span><span class="track-tag">confirmed</span></div>
-              <div class="track"><span class="track-n">04</span><span class="track-name">???</span><span class="track-tag">confirmed</span></div>
-              <div class="track"><span class="track-n">05</span><span class="track-name">???</span><span class="track-tag">confirmed</span></div>
-              <div class="track"><span class="track-n">06</span><span class="track-name">???</span><span class="track-tag">confirmed</span></div>
-              <div class="track"><span class="track-n">07</span><span class="track-name">???</span><span class="track-tag">confirmed</span></div>
-              <div class="track"><span class="track-n">08</span><span class="track-name">???</span><span class="track-tag">confirmed</span></div>
-              <div class="track"><span class="track-n">09</span><span class="track-name">???</span><span class="track-tag">confirmed</span></div>
+              <div class="track"><span class="track-n">01</span><span class="track-name track-wip">???</span><span class="track-tag">confirmed</span></div>
+              <div class="track"><span class="track-n">02</span><span class="track-name track-wip">???</span><span class="track-tag">confirmed</span></div>
+              <div class="track"><span class="track-n">03</span><span class="track-name track-wip">???</span><span class="track-tag">confirmed</span></div>
+              <div class="track"><span class="track-n">04</span><span class="track-name track-wip">???</span><span class="track-tag">confirmed</span></div>
+              <div class="track"><span class="track-n">05</span><span class="track-name track-wip">???</span><span class="track-tag">confirmed</span></div>
+              <div class="track"><span class="track-n">06</span><span class="track-name track-wip">???</span><span class="track-tag">confirmed</span></div>
+              <div class="track"><span class="track-n">07</span><span class="track-name track-wip">???</span><span class="track-tag">confirmed</span></div>
+              <div class="track"><span class="track-n">08</span><span class="track-name track-wip">???</span><span class="track-tag">confirmed</span></div>
+              <div class="track"><span class="track-n">09</span><span class="track-name track-wip">???</span><span class="track-tag">confirmed</span></div>
               <div class="track"><span class="track-n">10</span><span class="track-name track-wip">???</span><span class="track-tag">in the works</span></div>
               <div class="track"><span class="track-n">11</span><span class="track-name track-wip">???</span><span class="track-tag">in the works</span></div>
               <div class="track"><span class="track-n">12</span><span class="track-name track-wip">???</span><span class="track-tag">in the works</span></div>
@@ -1105,6 +1137,7 @@ function show(id) {
   window.scrollTo({ top: document.querySelector('nav').offsetTop - 1, behavior: 'smooth' });
   /* stop the nature/rain theme if it's running and we've navigated away from Discography entirely */
   if (id !== 'discography' && natureOn) stopNature();
+  if (id !== 'discography' && moonlightOn) stopMoonlight();
 }
 
 const DISCO_ORDER = ['singles','eps','albums','collabs'];
@@ -1115,6 +1148,7 @@ function showDisco(id) {
   document.querySelectorAll('.disco-subitem')[DISCO_ORDER.indexOf(id)].classList.add('active');
   /* stop the nature/rain theme if it's running and we've switched away from EPs */
   if (id !== 'eps' && natureOn) stopNature();
+  if (id !== 'albums' && moonlightOn) stopMoonlight();
 }
 
 /* init about panel as active */
@@ -1470,6 +1504,17 @@ function toggleNature(id){
 function stopNature(){
   natureOn=false; document.body.classList.remove('ep-open');
   clearInterval(rainInterval); rainInterval=null;
+}
+
+/* ── ALBUM MOONLIGHT ── */
+let moonlightOn=false;
+function toggleMoonlight(id){
+  const isOpen=document.getElementById(id).classList.contains('open');
+  if(isOpen){ moonlightOn=true; document.body.classList.add('album-open'); }
+  else{ stopMoonlight(); }
+}
+function stopMoonlight(){
+  moonlightOn=false; document.body.classList.remove('album-open');
 }
 
 /* ── MERCH TOAST ── */
