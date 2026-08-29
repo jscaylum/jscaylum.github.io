@@ -570,6 +570,7 @@
   }
   .signup input{
     flex:1;
+    min-width:0;
     background:none;
     border:none;
     outline:none;
@@ -580,6 +581,8 @@
   }
   .signup input::placeholder{ color:var(--ink-faint); }
   .signup button{
+    flex-shrink:0;
+    white-space:nowrap;
     background:var(--rose);
     color:#1a1114;
     border:none;
@@ -591,7 +594,19 @@
     transition:background 0.25s ease;
   }
   .signup button:hover{ background:#d69bab; }
+  .signup button:disabled{ opacity:0.7; cursor:default; }
   .form-note{ margin-top:14px; font-size:0.78rem; color:var(--ink-faint); }
+
+  @media(max-width:420px){
+    .signup{
+      flex-direction:column;
+      border-radius:22px;
+      padding:8px;
+      gap:8px;
+    }
+    .signup input{ padding:12px 14px; }
+    .signup button{ padding:13px 22px; }
+  }
 
   .socials{
     display:flex; gap:22px; justify-content:center; margin-top:38px;
@@ -648,12 +663,14 @@
   /* ---------------- COUNTDOWN ---------------- */
   .countdown-section{
     padding:100px 0;
-    position:relative;
     background:
       radial-gradient(ellipse 60% 70% at 50% 0%, rgba(201,138,156,0.12), transparent 65%),
       var(--bg-alt);
     border-top:1px solid var(--line);
     border-bottom:1px solid var(--line);
+  }
+  .countdown-header{
+    position:relative;
     overflow:hidden;
   }
   .countdown-wing{
@@ -827,28 +844,32 @@
 
   <!-- TEASER: THOUGHTS ARE HELL -->
   <section class="countdown-section" id="next-era">
-    <svg class="countdown-wing" viewBox="0 0 400 300" aria-hidden="true">
-      <path d="M200 150 C160 90 80 70 40 100 C60 150 120 180 200 150Z"/>
-      <path d="M200 150 C240 90 320 70 360 100 C340 150 280 180 200 150Z"/>
-      <path d="M200 150 C170 190 120 210 90 200 C100 230 150 240 200 150Z"/>
-      <path d="M200 150 C230 190 280 210 310 200 C300 230 250 240 200 150Z"/>
-      <line x1="200" y1="150" x2="200" y2="200"/>
-    </svg>
-    <div class="wrap countdown-inner">
-      <div class="eyebrow lc">next up · unannounced</div>
-      <h2 class="display" id="albumTitle">thoughts are <em style="font-style:italic;color:var(--rose)">hell</em></h2>
-      <p class="sub" id="albumSub">an album. 12 songs, for now. no release date yet.</p>
+    <div class="countdown-header">
+      <svg class="countdown-wing" viewBox="0 0 400 300" aria-hidden="true">
+        <path d="M200 150 C160 90 80 70 40 100 C60 150 120 180 200 150Z"/>
+        <path d="M200 150 C240 90 320 70 360 100 C340 150 280 180 200 150Z"/>
+        <path d="M200 150 C170 190 120 210 90 200 C100 230 150 240 200 150Z"/>
+        <path d="M200 150 C230 190 280 210 310 200 C300 230 250 240 200 150Z"/>
+        <line x1="200" y1="150" x2="200" y2="200"/>
+      </svg>
+      <div class="wrap countdown-inner">
+        <div class="eyebrow lc">next up · unannounced</div>
+        <h2 class="display" id="albumTitle">thoughts are <em style="font-style:italic;color:var(--rose)">hell</em></h2>
+        <p class="sub" id="albumSub">an album. 12 songs, for now. no release date yet.</p>
 
-      <div class="countdown-grid" id="countdownGrid">
-        <div class="countdown-unit"><div class="val">??</div><div class="lbl">days</div></div>
-        <div class="countdown-unit"><div class="val">??</div><div class="lbl">hours</div></div>
-        <div class="countdown-unit"><div class="val">??</div><div class="lbl">mins</div></div>
-        <div class="countdown-unit"><div class="val">??</div><div class="lbl">secs</div></div>
+        <div class="countdown-grid" id="countdownGrid">
+          <div class="countdown-unit"><div class="val">??</div><div class="lbl">days</div></div>
+          <div class="countdown-unit"><div class="val">??</div><div class="lbl">hours</div></div>
+          <div class="countdown-unit"><div class="val">??</div><div class="lbl">mins</div></div>
+          <div class="countdown-unit"><div class="val">??</div><div class="lbl">secs</div></div>
+        </div>
       </div>
+    </div>
 
+    <div class="wrap">
       <div class="mystery-tracklist" id="mysteryTracklist" aria-label="thoughts are hell tracklist, mostly unrevealed"></div>
 
-      <div id="countdownCta">
+      <div id="countdownCta" style="text-align:center;">
         <a href="#tour" class="btn btn-primary lc">get notified</a>
       </div>
     </div>
@@ -1145,22 +1166,28 @@
     // - name: fill this in whenever you know it, even weeks early. It
     //   stays hidden until its scheduled reveal time passes, then flips
     //   automatically — you don't need to be online when it happens.
+    //   Leave name: null for tracks that aren't confirmed/placed yet
+    //   ("[new song]" slots) — they'll just show "untitled" once revealed
+    //   until you swap in a real name.
     // - Reveal timing is automatic: tracks reveal one every minute,
     //   working backward from REVEAL_DEADLINE, so the very last
     //   still-hidden track reveals exactly at the deadline.
+    // - Order matters here — if the tracklist order changes, just
+    //   reorder these entries to match. The reveal schedule (and each
+    //   track's position number) will update automatically.
     tracks: [
-      { name: null,        permanentlyRevealed: false },
-      { name: "butterfly", permanentlyRevealed: true  },
-      { name: null,        permanentlyRevealed: false },
-      { name: null,        permanentlyRevealed: false },
-      { name: null,        permanentlyRevealed: false },
-      { name: null,        permanentlyRevealed: false },
-      { name: null,        permanentlyRevealed: false },
-      { name: null,        permanentlyRevealed: false },
-      { name: null,        permanentlyRevealed: false },
-      { name: null,        permanentlyRevealed: false },
-      { name: null,        permanentlyRevealed: false },
-      { name: null,        permanentlyRevealed: false }
+      { name: "<3 (intro)",                permanentlyRevealed: false },
+      { name: "butterfly",                 permanentlyRevealed: true  },
+      { name: "i wanna be",                permanentlyRevealed: false },
+      { name: "keep it going",             permanentlyRevealed: false },
+      { name: "lonely",                    permanentlyRevealed: false },
+      { name: "make me worse (interlude)", permanentlyRevealed: false },
+      { name: "thoughts are hell",         permanentlyRevealed: false },
+      { name: "mask",                      permanentlyRevealed: false },
+      { name: "missing me",                permanentlyRevealed: false },
+      { name: null,                        permanentlyRevealed: false }, // [new song] — unconfirmed
+      { name: null,                        permanentlyRevealed: false }, // [new song] — unconfirmed
+      { name: null,                        permanentlyRevealed: false }  // [end track] — unconfirmed
     ]
   };
 
