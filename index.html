@@ -755,6 +755,16 @@
     filter:none;
     user-select:auto;
   }
+  .mystery-track{ justify-content:space-between; }
+  .mystery-track .track-countdown{
+    margin-left:auto;
+    font-size:0.72rem;
+    letter-spacing:0.02em;
+    color:var(--ink-faint);
+    font-family:'Manrope',sans-serif;
+    font-style:normal;
+    white-space:nowrap;
+  }
 </style>
 </head>
 <body>
@@ -826,8 +836,8 @@
     </svg>
     <div class="wrap countdown-inner">
       <div class="eyebrow lc">next up · unannounced</div>
-      <h2 class="display">thoughts are <em style="font-style:italic;color:var(--rose)">hell</em></h2>
-      <p class="sub">an album. 12 songs, for now. no release date yet.</p>
+      <h2 class="display" id="albumTitle">thoughts are <em style="font-style:italic;color:var(--rose)">hell</em></h2>
+      <p class="sub" id="albumSub">an album. 12 songs, for now. no release date yet.</p>
 
       <div class="countdown-grid" id="countdownGrid">
         <div class="countdown-unit"><div class="val">??</div><div class="lbl">days</div></div>
@@ -836,20 +846,7 @@
         <div class="countdown-unit"><div class="val">??</div><div class="lbl">secs</div></div>
       </div>
 
-      <div class="mystery-tracklist" aria-label="thoughts are hell tracklist, mostly unrevealed">
-        <div class="mystery-track"><span class="track-num">01</span><span class="track-name">???</span></div>
-        <div class="mystery-track"><span class="track-num">02</span><span class="track-name revealed">butterfly</span></div>
-        <div class="mystery-track"><span class="track-num">03</span><span class="track-name">???</span></div>
-        <div class="mystery-track"><span class="track-num">04</span><span class="track-name">???</span></div>
-        <div class="mystery-track"><span class="track-num">05</span><span class="track-name">???</span></div>
-        <div class="mystery-track"><span class="track-num">06</span><span class="track-name">???</span></div>
-        <div class="mystery-track"><span class="track-num">07</span><span class="track-name">???</span></div>
-        <div class="mystery-track"><span class="track-num">08</span><span class="track-name">???</span></div>
-        <div class="mystery-track"><span class="track-num">09</span><span class="track-name">???</span></div>
-        <div class="mystery-track"><span class="track-num">10</span><span class="track-name">???</span></div>
-        <div class="mystery-track"><span class="track-num">11</span><span class="track-name">???</span></div>
-        <div class="mystery-track"><span class="track-num">12</span><span class="track-name">???</span></div>
-      </div>
+      <div class="mystery-tracklist" id="mysteryTracklist" aria-label="thoughts are hell tracklist, mostly unrevealed"></div>
 
       <div id="countdownCta">
         <a href="#tour" class="btn btn-primary lc">get notified</a>
@@ -1067,11 +1064,11 @@
         <h2 class="display">no dates yet — but soon.</h2>
         <p>be first to know when shows, merch drops, and new music go live.</p>
 
-        <form class="signup" onsubmit="event.preventDefault(); this.querySelector('button').textContent='thanks';">
-          <input type="email" placeholder="your email" required aria-label="email address">
+        <form class="signup" id="signupForm">
+          <input type="email" name="email" placeholder="your email" required aria-label="email address">
           <button type="submit" class="lc">sign up</button>
         </form>
-        <div class="form-note">no spam — just the essentials.</div>
+        <div class="form-note" id="formNote">no spam — just the essentials.</div>
 
         <div class="socials">
           <a href="https://music.apple.com/gb/artist/jscaylum/1875719727" target="_blank" rel="noopener" aria-label="apple music">
@@ -1124,11 +1121,183 @@
 </footer>
 
 <script>
+  // ======================================================================
+  // SITE CONFIG — edit this whenever you want to change the album name,
+  // update a track, or change where signups get sent. Nothing else in the
+  // file needs to change.
+  // ======================================================================
+
+  // Where email signups get sent (via FormSubmit — no account needed, see
+  // the "sign up works" section further down for setup notes).
+  const SIGNUP_EMAIL = "you@example.com"; // <-- replace with your real email
+
+  // The exact moment the LAST track reveals — each visitor's own local
+  // midnight on Sept 19, 2026 (a UK fan and a US fan will each see their
+  // own midnight tick over).
+  const REVEAL_DEADLINE = new Date(2026, 8, 19, 0, 0, 0);
+
+  const ALBUM = {
+    name: "THOUGHTS ARE HELL",
+    tagline: "an album. 12 songs. full tracklist out by sept 19.",
+    // One entry per track, in order.
+    // - permanentlyRevealed: true for tracks already out in the world
+    //   (like "butterfly", already a released single) — these never hide.
+    // - name: fill this in whenever you know it, even weeks early. It
+    //   stays hidden until its scheduled reveal time passes, then flips
+    //   automatically — you don't need to be online when it happens.
+    // - Reveal timing is automatic: tracks reveal one every minute,
+    //   working backward from REVEAL_DEADLINE, so the very last
+    //   still-hidden track reveals exactly at the deadline.
+    tracks: [
+      { name: null,        permanentlyRevealed: false },
+      { name: "butterfly", permanentlyRevealed: true  },
+      { name: null,        permanentlyRevealed: false },
+      { name: null,        permanentlyRevealed: false },
+      { name: null,        permanentlyRevealed: false },
+      { name: null,        permanentlyRevealed: false },
+      { name: null,        permanentlyRevealed: false },
+      { name: null,        permanentlyRevealed: false },
+      { name: null,        permanentlyRevealed: false },
+      { name: null,        permanentlyRevealed: false },
+      { name: null,        permanentlyRevealed: false },
+      { name: null,        permanentlyRevealed: false }
+    ]
+  };
+
+  // compute a scheduled reveal Date for each non-permanent track: waterfall
+  // backward from REVEAL_DEADLINE in exact 1-minute steps, so the last
+  // scheduled track lands exactly on REVEAL_DEADLINE.
+  (function scheduleReveals() {
+    const scheduled = ALBUM.tracks.filter(t => !t.permanentlyRevealed);
+    scheduled.forEach((t, i) => {
+      const stepsFromEnd = (scheduled.length - 1) - i;
+      t.revealAt = new Date(REVEAL_DEADLINE.getTime() - stepsFromEnd * 60000);
+    });
+  })();
+
+  function formatCountdown(ms) {
+    if (ms <= 0) return null;
+    const totalSec = Math.floor(ms / 1000);
+    const d = Math.floor(totalSec / 86400);
+    const h = Math.floor((totalSec % 86400) / 3600);
+    const m = Math.floor((totalSec % 3600) / 60);
+    const s = totalSec % 60;
+    if (d > 0) return `${d}d ${h}h`;
+    if (h > 0) return `${h}h ${m}m`;
+    if (m > 0) return `${m}m ${s}s`;
+    return `${s}s`;
+  }
+
+  // render album title + tagline
+  const albumTitleEl = document.getElementById('albumTitle');
+  const albumSubEl = document.getElementById('albumSub');
+  if (albumTitleEl) {
+    const lower = ALBUM.name.toLowerCase();
+    const splitAt = lower.lastIndexOf(' ');
+    const firstPart = splitAt === -1 ? lower : lower.slice(0, splitAt);
+    const lastWord = splitAt === -1 ? '' : lower.slice(splitAt + 1);
+    albumTitleEl.innerHTML = lastWord
+      ? `${firstPart} <em style="font-style:italic;color:var(--rose)">${lastWord}</em>`
+      : `<em style="font-style:italic;color:var(--rose)">${lower}</em>`;
+  }
+  if (albumSubEl) albumSubEl.textContent = ALBUM.tagline;
+
+  // main days/hours/mins/secs countdown grid, ticking down to REVEAL_DEADLINE
+  const countdownGridEl = document.getElementById('countdownGrid');
+  if (countdownGridEl) {
+    const units = countdownGridEl.querySelectorAll('.countdown-unit .val');
+    function renderCountdownGrid() {
+      const ms = REVEAL_DEADLINE.getTime() - Date.now();
+      if (ms <= 0) {
+        units.forEach(u => u.textContent = '00');
+        return;
+      }
+      const totalSec = Math.floor(ms / 1000);
+      const d = Math.floor(totalSec / 86400);
+      const h = Math.floor((totalSec % 86400) / 3600);
+      const m = Math.floor((totalSec % 3600) / 60);
+      const s = totalSec % 60;
+      [d, h, m, s].forEach((v, i) => {
+        if (units[i]) units[i].textContent = String(v).padStart(2, '0');
+      });
+    }
+    renderCountdownGrid();
+    setInterval(renderCountdownGrid, 1000);
+  }
+
+  // render mystery tracklist from ALBUM.tracks — live waterfall reveal
+  const mysteryTracklistEl = document.getElementById('mysteryTracklist');
+  if (mysteryTracklistEl) {
+    mysteryTracklistEl.setAttribute('aria-label', `${ALBUM.name.toLowerCase()} tracklist, revealing gradually`);
+
+    function renderTracklist() {
+      const now = Date.now();
+      mysteryTracklistEl.innerHTML = ALBUM.tracks.map((t, i) => {
+        const num = String(i + 1).padStart(2, '0');
+        const isRevealed = t.permanentlyRevealed || (t.revealAt && now >= t.revealAt.getTime());
+
+        if (isRevealed) {
+          const label = t.name || 'untitled';
+          return `<div class="mystery-track"><span class="track-num">${num}</span><span class="track-name revealed">${label}</span></div>`;
+        }
+
+        const countdown = t.revealAt ? formatCountdown(t.revealAt.getTime() - now) : null;
+        const countdownHtml = countdown
+          ? `<span class="track-countdown">reveals in ${countdown}</span>`
+          : '';
+        return `<div class="mystery-track"><span class="track-num">${num}</span><span class="track-name">???</span>${countdownHtml}</div>`;
+      }).join('');
+    }
+
+    renderTracklist();
+    setInterval(renderTracklist, 1000);
+  }
+
   // nav scroll state
   const header = document.getElementById('siteHeader');
   window.addEventListener('scroll', () => {
     header.classList.toggle('scrolled', window.scrollY > 40);
   });
+
+  // email signup — sends to SIGNUP_EMAIL via FormSubmit (no account needed;
+  // see the note in the SITE CONFIG block above for setup).
+  const signupForm = document.getElementById('signupForm');
+  const formNote = document.getElementById('formNote');
+  if (signupForm) {
+    const defaultNote = formNote ? formNote.textContent : '';
+    signupForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = signupForm.querySelector('button');
+      const input = signupForm.querySelector('input[type="email"]');
+      const email = input.value.trim();
+      if (!email) return;
+
+      btn.disabled = true;
+      btn.textContent = 'sending...';
+      if (formNote) formNote.textContent = defaultNote;
+
+      try {
+        const res = await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(SIGNUP_EMAIL)}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({
+            email,
+            _subject: 'new jscaylum site signup',
+          })
+        });
+        if (!res.ok) throw new Error('request failed');
+
+        btn.textContent = 'thanks!';
+        input.value = '';
+        input.disabled = true;
+        if (formNote) formNote.textContent = "you're on the list — no spam, just the essentials.";
+      } catch (err) {
+        btn.disabled = false;
+        btn.textContent = 'sign up';
+        if (formNote) formNote.textContent = "something went wrong — try again in a moment.";
+      }
+    });
+  }
 
   // mobile menu
   const menuBtn = document.getElementById('menuBtn');
