@@ -334,8 +334,21 @@
     box-shadow:0 30px 60px -20px rgba(0,0,0,0.6);
     background:#0b0a0f;
     position:relative;
+    aspect-ratio:1;
   }
-  .ep-art iframe{ display:block; border-radius:14px; }
+  .cover-img{ display:block; width:100%; height:100%; object-fit:cover; opacity:0; transition:opacity 0.5s ease; }
+  .cover-img.loaded{ opacity:1; }
+  .cover-fallback .cover-img{ display:none; }
+  .cover-fallback{
+    background:
+      radial-gradient(ellipse 90% 70% at 30% 20%, rgba(168,155,217,0.16), transparent 60%),
+      radial-gradient(ellipse 80% 70% at 80% 85%, rgba(201,138,156,0.14), transparent 60%);
+  }
+  .cover-fallback::after{
+    content:'';
+    position:absolute; inset:0;
+    background:center / 30% no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(242,236,230,0.28)' stroke-width='1.3'%3E%3Cpath d='M9 18V5l12-2v13'/%3E%3Ccircle cx='6' cy='18' r='3'/%3E%3Ccircle cx='18' cy='16' r='3'/%3E%3C/svg%3E");
+  }
 
   .release-info .eyebrow{ margin-bottom:14px; }
   .release-info h3{
@@ -414,20 +427,20 @@
   .disco-art{
     position:relative;
     overflow:hidden;
+    aspect-ratio:1;
+    background:#0b0a0f;
   }
-  .disco-art iframe{ display:block; width:100%; }
   .disco-body{ padding:20px 22px 26px; }
   .disco-body .name{ font-family:'Fraunces',serif; font-style:italic; font-weight:500; font-size:1.1rem; margin-bottom:4px; }
   .disco-body .meta{ font-size:0.72rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--rose-dim); }
 
-  /* cover play-button affordance (visual only — the embedded player underneath still handles actual playback) */
+  /* cover play-button — links out to the real track/album on Apple Music */
   .cover-play{
     position:absolute;
     inset:0;
     display:flex;
     align-items:center;
     justify-content:center;
-    pointer-events:none;
     opacity:0;
     transition:opacity 0.3s ease;
     background:linear-gradient(180deg, rgba(14,12,17,0.05), rgba(14,12,17,0.35));
@@ -706,74 +719,41 @@
     text-transform:uppercase;
     color:var(--ink-faint);
   }
-  .countdown-live{
-    display:inline-flex;
-    align-items:center;
-    gap:9px;
-    padding:12px 24px;
-    border-radius:100px;
-    background:rgba(143,160,130,0.14);
-    border:1px solid rgba(143,160,130,0.4);
-    color:var(--sage);
-    font-size:0.85rem;
-    font-weight:600;
-    letter-spacing:0.03em;
-  }
-  .countdown-live .dot{
-    width:8px; height:8px;
-    border-radius:50%;
-    background:var(--sage);
-    animation:dotPulse 1.4s ease-in-out infinite;
-  }
-  @keyframes dotPulse{ 0%,100%{opacity:1;transform:scale(1);} 50%{opacity:0.4;transform:scale(0.7);} }
 
-  /* ---------------- BUTTERFLY RELEASE ---------------- */
-  .countdown-section.live .countdown-inner h2{
-    animation:titleGlow 2.4s ease-in-out infinite;
+  /* ---------------- THOUGHTS ARE HELL TEASER ---------------- */
+  .mystery-tracklist{
+    max-width:420px;
+    margin:0 auto 40px;
+    border-top:1px solid var(--line);
   }
-  @keyframes titleGlow{
-    0%,100%{ text-shadow:0 0 0 transparent; }
-    50%{ text-shadow:0 0 34px rgba(168,155,217,0.55); }
+  .mystery-track{
+    display:flex;
+    align-items:center;
+    gap:16px;
+    padding:11px 0;
+    border-bottom:1px solid var(--line);
   }
-  .release-flutter{
-    position:absolute;
-    inset:0;
-    pointer-events:none;
-    z-index:2;
-    overflow:hidden;
+  .mystery-track .track-num{
+    font-family:'Fraunces',serif;
+    font-style:italic;
+    color:var(--ink-faint);
+    width:22px;
+    font-size:0.9rem;
+    flex-shrink:0;
   }
-  .flutter-butterfly{
-    position:absolute;
-    bottom:-40px;
-    width:34px; height:34px;
-    opacity:0;
-    animation:flutterUp linear forwards;
+  .mystery-track .track-name{
+    font-family:'Fraunces',serif;
+    font-style:italic;
+    font-size:0.98rem;
+    color:var(--ink-faint);
+    filter:blur(2.5px);
+    user-select:none;
+    letter-spacing:0.04em;
   }
-  .flutter-butterfly svg{ width:100%; height:100%; }
-  .flutter-butterfly .wing{
-    fill:var(--rose);
-    transform-origin:50% 50%;
-    animation:wingFlap 0.35s ease-in-out infinite alternate;
-  }
-  .flutter-butterfly .wing.left{ animation-delay:0s; }
-  .flutter-butterfly .wing.right{ animation-delay:0.05s; }
-  @keyframes wingFlap{
-    from{ transform:scaleX(1); }
-    to{ transform:scaleX(0.45); }
-  }
-  @keyframes flutterUp{
-    0%{ opacity:0; transform:translate(0,0) rotate(0deg); }
-    8%{ opacity:0.9; }
-    100%{ opacity:0; transform:translate(var(--drift,60px), -520px) rotate(var(--rot,20deg)); }
-  }
-  .countdown-pop{
-    display:inline-block;
-    animation:popIn 0.6s cubic-bezier(.2,1.4,.4,1) both;
-  }
-  @keyframes popIn{
-    0%{ transform:scale(0.7); opacity:0; }
-    60%{ transform:scale(1.06); opacity:1; }
-    100%{ transform:scale(1); }
+  .mystery-track .track-name.revealed{
+    color:var(--rose);
+    filter:none;
+    user-select:auto;
   }
 </style>
 </head>
@@ -783,7 +763,7 @@
   <nav class="wrap">
     <a href="#top" class="logo">jscaylum</a>
     <ul class="navlinks" id="navLinks">
-      <li><a href="#butterfly">butterfly</a></li>
+      <li><a href="#next-era">next up</a></li>
       <li><a href="#music">music</a></li>
       <li><a href="#merch">merch</a></li>
       <li><a href="#about">about</a></li>
@@ -830,14 +810,13 @@
   <!-- MARQUEE -->
   <div class="marquee" aria-hidden="true">
     <div class="marquee-track">
-      <span>isolation</span><span>fragile</span><span>trust issues</span><span>before i could bloom</span><span>i'm wilting</span><span>nothing lasts forever</span>
-      <span>isolation</span><span>fragile</span><span>trust issues</span><span>before i could bloom</span><span>i'm wilting</span><span>nothing lasts forever</span>
+      <span>butterfly</span><span>isolation</span><span>fragile</span><span>trust issues</span><span>before i could bloom</span><span>i'm wilting</span><span>nothing lasts forever</span>
+      <span>butterfly</span><span>isolation</span><span>fragile</span><span>trust issues</span><span>before i could bloom</span><span>i'm wilting</span><span>nothing lasts forever</span>
     </div>
   </div>
 
-  <!-- COUNTDOWN: BUTTERFLY -->
-  <section class="countdown-section" id="butterfly">
-    <div class="release-flutter" id="flutterLayer" aria-hidden="true"></div>
+  <!-- TEASER: THOUGHTS ARE HELL -->
+  <section class="countdown-section" id="next-era">
     <svg class="countdown-wing" viewBox="0 0 400 300" aria-hidden="true">
       <path d="M200 150 C160 90 80 70 40 100 C60 150 120 180 200 150Z"/>
       <path d="M200 150 C240 90 320 70 360 100 C340 150 280 180 200 150Z"/>
@@ -846,19 +825,34 @@
       <line x1="200" y1="150" x2="200" y2="200"/>
     </svg>
     <div class="wrap countdown-inner">
-      <div class="eyebrow lc">next single</div>
-      <h2 class="display">butt<em>er</em>fly</h2>
-      <p class="sub">out at midnight — the wait's almost over.</p>
+      <div class="eyebrow lc">next up · unannounced</div>
+      <h2 class="display">thoughts are <em style="font-style:italic;color:var(--rose)">hell</em></h2>
+      <p class="sub">an album. 12 songs, for now. no release date yet.</p>
 
       <div class="countdown-grid" id="countdownGrid">
-        <div class="countdown-unit"><div class="val" id="cd-days">00</div><div class="lbl">days</div></div>
-        <div class="countdown-unit"><div class="val" id="cd-hours">00</div><div class="lbl">hours</div></div>
-        <div class="countdown-unit"><div class="val" id="cd-mins">00</div><div class="lbl">mins</div></div>
-        <div class="countdown-unit"><div class="val" id="cd-secs">00</div><div class="lbl">secs</div></div>
+        <div class="countdown-unit"><div class="val">??</div><div class="lbl">days</div></div>
+        <div class="countdown-unit"><div class="val">??</div><div class="lbl">hours</div></div>
+        <div class="countdown-unit"><div class="val">??</div><div class="lbl">mins</div></div>
+        <div class="countdown-unit"><div class="val">??</div><div class="lbl">secs</div></div>
+      </div>
+
+      <div class="mystery-tracklist" aria-label="thoughts are hell tracklist, mostly unrevealed">
+        <div class="mystery-track"><span class="track-num">01</span><span class="track-name">???</span></div>
+        <div class="mystery-track"><span class="track-num">02</span><span class="track-name revealed">butterfly</span></div>
+        <div class="mystery-track"><span class="track-num">03</span><span class="track-name">???</span></div>
+        <div class="mystery-track"><span class="track-num">04</span><span class="track-name">???</span></div>
+        <div class="mystery-track"><span class="track-num">05</span><span class="track-name">???</span></div>
+        <div class="mystery-track"><span class="track-num">06</span><span class="track-name">???</span></div>
+        <div class="mystery-track"><span class="track-num">07</span><span class="track-name">???</span></div>
+        <div class="mystery-track"><span class="track-num">08</span><span class="track-name">???</span></div>
+        <div class="mystery-track"><span class="track-num">09</span><span class="track-name">???</span></div>
+        <div class="mystery-track"><span class="track-num">10</span><span class="track-name">???</span></div>
+        <div class="mystery-track"><span class="track-num">11</span><span class="track-name">???</span></div>
+        <div class="mystery-track"><span class="track-num">12</span><span class="track-name">???</span></div>
       </div>
 
       <div id="countdownCta">
-        <a href="https://open.spotify.com/album/2cNZnYAmlyNH5FB2iyyP2u" target="_blank" rel="noopener" class="btn btn-primary lc">pre-save on spotify</a>
+        <a href="#tour" class="btn btn-primary lc">get notified</a>
       </div>
     </div>
   </section>
@@ -869,53 +863,32 @@
       <div class="section-head">
         <div>
           <div class="eyebrow lc">latest release</div>
-          <h2 class="display">he loves me, <em style="font-style:italic;color:var(--rose)">not</em></h2>
+          <h2 class="display">butt<em style="font-style:italic;color:var(--rose)">er</em>fly</h2>
         </div>
-        <p>five songs about the space between heartbreak and healing. out now.</p>
+        <p>one song about running out of time to say what you meant. out now.</p>
       </div>
 
       <div class="release reveal">
         <div class="ep-art">
-          <iframe src="https://embed.music.apple.com/gb/album/he-loves-me-not-ep/6785071032" width="100%" height="300" frameborder="0" allow="autoplay *; encrypted-media *; fullscreen *; clipboard-write" sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation" loading="lazy" title="he loves me, not on Apple Music"></iframe>
-          <div class="cover-play" aria-hidden="true"><span class="btn-circle"><svg viewBox="0 0 24 24"><path d="M6 4l15 8-15 8V4z"/></svg></span></div>
+          <img class="cover-img" data-spotify-url="https://open.spotify.com/album/2cNZnYAmlyNH5FB2iyyP2u" alt="butterfly cover art" loading="lazy">
+          <a class="cover-play" href="https://open.spotify.com/album/2cNZnYAmlyNH5FB2iyyP2u" target="_blank" rel="noopener" aria-label="listen to butterfly on spotify"><span class="btn-circle"><svg viewBox="0 0 24 24"><path d="M6 4l15 8-15 8V4z"/></svg></span></a>
         </div>
         <div class="release-info">
-          <div class="eyebrow lc">ep · 2026</div>
-          <h3 class="display">he loves me, not</h3>
-          <div class="release-meta">5 tracks · released 30 june 2026</div>
+          <div class="eyebrow lc">single · 2026</div>
+          <h3 class="display">butterfly</h3>
+          <div class="release-meta">1 track · released 29 august 2026</div>
 
           <div class="tracklist" id="tracklist">
             <div class="track" data-track="1">
               <span class="track-num">01</span>
-              <div><div class="track-name">nothing lasts forever</div><div class="track-desc">the opener — letting go before you're ready to</div></div>
-              <button class="track-play" aria-label="play nothing lasts forever" type="button"><svg viewBox="0 0 24 24"><path d="M6 4l15 8-15 8V4z"/></svg></button>
-            </div>
-            <div class="track" data-track="2">
-              <span class="track-num">02</span>
-              <div><div class="track-name">i should have known</div><div class="track-desc">a duet on hindsight and warning signs</div></div>
-              <span class="track-feat">feat. SURII</span>
-              <button class="track-play" aria-label="play i should have known" type="button"><svg viewBox="0 0 24 24"><path d="M6 4l15 8-15 8V4z"/></svg></button>
-            </div>
-            <div class="track" data-track="3">
-              <span class="track-num">03</span>
-              <div><div class="track-name">fragile</div><div class="track-desc">soft production, sharper lyrics</div></div>
-              <button class="track-play" aria-label="play fragile" type="button"><svg viewBox="0 0 24 24"><path d="M6 4l15 8-15 8V4z"/></svg></button>
-            </div>
-            <div class="track" data-track="4">
-              <span class="track-num">04</span>
-              <div><div class="track-name">i'm wilting</div><div class="track-desc">the low point of the record, on purpose</div></div>
-              <button class="track-play" aria-label="play i'm wilting" type="button"><svg viewBox="0 0 24 24"><path d="M6 4l15 8-15 8V4z"/></svg></button>
-            </div>
-            <div class="track" data-track="5">
-              <span class="track-num">05</span>
-              <div><div class="track-name">before i could bloom</div><div class="track-desc">the closer — growth after the fall</div></div>
-              <button class="track-play" aria-label="play before i could bloom" type="button"><svg viewBox="0 0 24 24"><path d="M6 4l15 8-15 8V4z"/></svg></button>
+              <div><div class="track-name">butterfly</div><div class="track-desc">letting something go so it can actually grow</div></div>
+              <button class="track-play" aria-label="play butterfly" type="button"><svg viewBox="0 0 24 24"><path d="M6 4l15 8-15 8V4z"/></svg></button>
             </div>
           </div>
 
           <div class="release-ctas">
             <a href="https://music.apple.com/gb/artist/jscaylum/1875719727" target="_blank" rel="noopener" class="btn btn-primary lc">play on apple music</a>
-            <a href="https://open.spotify.com/album/4ik04d6cVg91HIXPY01rl1" target="_blank" rel="noopener" class="btn btn-outline lc">play on spotify</a>
+            <a href="https://open.spotify.com/album/2cNZnYAmlyNH5FB2iyyP2u" target="_blank" rel="noopener" class="btn btn-outline lc">play on spotify</a>
           </div>
         </div>
       </div>
@@ -936,8 +909,18 @@
       <div class="disco-grid reveal">
         <div class="disco-card">
           <div class="disco-art">
-            <iframe src="https://embed.music.apple.com/gb/album/he-loves-me-not-ep/6785071032" width="100%" height="175" frameborder="0" allow="autoplay *; encrypted-media *; fullscreen *; clipboard-write" sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation" loading="lazy" title="he loves me, not on Apple Music"></iframe>
-            <div class="cover-play" aria-hidden="true"><span class="btn-circle"><svg viewBox="0 0 24 24"><path d="M6 4l15 8-15 8V4z"/></svg></span></div>
+            <img class="cover-img" data-spotify-url="https://open.spotify.com/album/2cNZnYAmlyNH5FB2iyyP2u" alt="butterfly cover art" loading="lazy">
+            <a class="cover-play" href="https://open.spotify.com/album/2cNZnYAmlyNH5FB2iyyP2u" target="_blank" rel="noopener" aria-label="listen to butterfly on spotify"><span class="btn-circle"><svg viewBox="0 0 24 24"><path d="M6 4l15 8-15 8V4z"/></svg></span></a>
+          </div>
+          <div class="disco-body">
+            <div class="name">butterfly</div>
+            <div class="meta">single · 2026</div>
+          </div>
+        </div>
+        <div class="disco-card">
+          <div class="disco-art">
+            <img class="cover-img" src="https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/2f/a3/65/2fa3652a-8473-a337-9811-954e599d1914/artwork.jpg/632x632bb.webp" alt="he loves me, not cover art" onload="this.classList.add('loaded')" onerror="this.closest('.ep-art,.disco-art')?.classList.add('cover-fallback')" loading="lazy">
+            <a class="cover-play" href="https://music.apple.com/gb/album/he-loves-me-not-ep/6785071032" target="_blank" rel="noopener" aria-label="listen to he loves me, not on Apple Music"><span class="btn-circle"><svg viewBox="0 0 24 24"><path d="M6 4l15 8-15 8V4z"/></svg></span></a>
           </div>
           <div class="disco-body">
             <div class="name">he loves me, not</div>
@@ -946,8 +929,8 @@
         </div>
         <div class="disco-card">
           <div class="disco-art">
-            <iframe src="https://embed.music.apple.com/gb/album/before-i-could-bloom-single/6776664081" width="100%" height="175" frameborder="0" allow="autoplay *; encrypted-media *; fullscreen *; clipboard-write" sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation" loading="lazy" title="before i could bloom on Apple Music"></iframe>
-            <div class="cover-play" aria-hidden="true"><span class="btn-circle"><svg viewBox="0 0 24 24"><path d="M6 4l15 8-15 8V4z"/></svg></span></div>
+            <img class="cover-img" src="https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/95/79/18/95791830-1241-aa78-0139-6151b0fabe47/artwork.jpg/632x632bb.webp" alt="before i could bloom cover art" onload="this.classList.add('loaded')" onerror="this.closest('.ep-art,.disco-art')?.classList.add('cover-fallback')" loading="lazy">
+            <a class="cover-play" href="https://music.apple.com/gb/album/before-i-could-bloom-single/6776664081" target="_blank" rel="noopener" aria-label="listen to before i could bloom on Apple Music"><span class="btn-circle"><svg viewBox="0 0 24 24"><path d="M6 4l15 8-15 8V4z"/></svg></span></a>
           </div>
           <div class="disco-body">
             <div class="name">before i could bloom</div>
@@ -956,8 +939,8 @@
         </div>
         <div class="disco-card">
           <div class="disco-art">
-            <iframe src="https://embed.music.apple.com/gb/album/trust-issues-single/6767861629" width="100%" height="175" frameborder="0" allow="autoplay *; encrypted-media *; fullscreen *; clipboard-write" sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation" loading="lazy" title="trust issues on Apple Music"></iframe>
-            <div class="cover-play" aria-hidden="true"><span class="btn-circle"><svg viewBox="0 0 24 24"><path d="M6 4l15 8-15 8V4z"/></svg></span></div>
+            <img class="cover-img" src="https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/0e/39/91/0e3991e2-3205-0f16-958d-c41ea8f9833f/artwork.jpg/632x632bb.webp" alt="trust issues cover art" onload="this.classList.add('loaded')" onerror="this.closest('.ep-art,.disco-art')?.classList.add('cover-fallback')" loading="lazy">
+            <a class="cover-play" href="https://music.apple.com/gb/album/trust-issues-single/6767861629" target="_blank" rel="noopener" aria-label="listen to trust issues on Apple Music"><span class="btn-circle"><svg viewBox="0 0 24 24"><path d="M6 4l15 8-15 8V4z"/></svg></span></a>
           </div>
           <div class="disco-body">
             <div class="name">trust issues</div>
@@ -966,8 +949,8 @@
         </div>
         <div class="disco-card">
           <div class="disco-art">
-            <iframe src="https://embed.music.apple.com/gb/album/isolation-single/1877639389" width="100%" height="175" frameborder="0" allow="autoplay *; encrypted-media *; fullscreen *; clipboard-write" sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation" loading="lazy" title="isolation on Apple Music"></iframe>
-            <div class="cover-play" aria-hidden="true"><span class="btn-circle"><svg viewBox="0 0 24 24"><path d="M6 4l15 8-15 8V4z"/></svg></span></div>
+            <img class="cover-img" src="https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/45/b7/0b/45b70ba1-45e2-b860-0551-9df85aa0e40d/artwork.jpg/632x632bb.webp" alt="isolation cover art" onload="this.classList.add('loaded')" onerror="this.closest('.ep-art,.disco-art')?.classList.add('cover-fallback')" loading="lazy">
+            <a class="cover-play" href="https://music.apple.com/gb/album/isolation-single/1877639389" target="_blank" rel="noopener" aria-label="listen to isolation on Apple Music"><span class="btn-circle"><svg viewBox="0 0 24 24"><path d="M6 4l15 8-15 8V4z"/></svg></span></a>
           </div>
           <div class="disco-body">
             <div class="name">isolation</div>
@@ -1159,7 +1142,25 @@
     menuBtn.setAttribute('aria-expanded', false);
   }));
 
-  // track play buttons — highlight + scroll to the embedded player above
+  // fetch real cover art from Spotify's public (keyless) oEmbed for releases
+  // that only have a Spotify link — Apple artwork is hardcoded directly on
+  // those <img> tags now, since the live Apple lookup fetch wasn't reliable.
+  document.querySelectorAll('.cover-img[data-spotify-url]').forEach(async (img) => {
+    try {
+      const url = img.dataset.spotifyUrl;
+      const r = await fetch(`https://open.spotify.com/oembed?url=${encodeURIComponent(url)}`);
+      if (!r.ok) throw new Error('bad response');
+      const data = await r.json();
+      if (!data.thumbnail_url) throw new Error('no artwork');
+      img.src = data.thumbnail_url;
+      img.addEventListener('load', () => img.classList.add('loaded'), { once: true });
+    } catch (e) {
+      const wrap = img.closest('.ep-art, .disco-art');
+      if (wrap) wrap.classList.add('cover-fallback');
+    }
+  });
+
+  // track play buttons — highlight the track + draw attention to the release above
   const trackPlayBtns = document.querySelectorAll('.track-play');
   const releaseCard = document.querySelector('.release');
   trackPlayBtns.forEach(btn => {
@@ -1180,78 +1181,6 @@
   }, { threshold: 0.15 });
   document.querySelectorAll('.reveal').forEach(el => io.observe(el));
 
-  // countdown to "butterfly" — releases at midnight (local time), 29 aug 2026
-  (function(){
-    const target = new Date(2026, 7, 29, 0, 0, 0); // month is 0-indexed: 7 = august
-
-    const els = {
-      days: document.getElementById('cd-days'),
-      hours: document.getElementById('cd-hours'),
-      mins: document.getElementById('cd-mins'),
-      secs: document.getElementById('cd-secs')
-    };
-    const grid = document.getElementById('countdownGrid');
-    const cta = document.getElementById('countdownCta');
-    const section = document.getElementById('butterfly');
-    const flutterLayer = document.getElementById('flutterLayer');
-
-    function pad(n){ return String(n).padStart(2,'0'); }
-
-    // spawns a single fluttering butterfly that rises up and fades near the top
-    function spawnButterfly(){
-      const b = document.createElement('div');
-      b.className = 'flutter-butterfly';
-      const left = 5 + Math.random() * 90;
-      const drift = (Math.random() * 160 - 80).toFixed(0) + 'px';
-      const rot = (Math.random() * 60 - 30).toFixed(0) + 'deg';
-      const duration = (4 + Math.random() * 3).toFixed(1) + 's';
-      b.style.left = left + '%';
-      b.style.setProperty('--drift', drift);
-      b.style.setProperty('--rot', rot);
-      b.style.animationDuration = duration;
-      b.innerHTML = '<svg viewBox="0 0 34 34"><path class="wing left" d="M17 17 C6 4 -2 8 3 17 C -2 26 6 30 17 17Z"/><path class="wing right" d="M17 17 C28 4 36 8 31 17 C36 26 28 30 17 17Z"/></svg>';
-      flutterLayer.appendChild(b);
-      setTimeout(() => b.remove(), 8000);
-    }
-
-    let flutterTimer = null;
-
-    function goLive(){
-      section.classList.add('live');
-      grid.innerHTML = '<span class="countdown-live countdown-pop"><span class="dot"></span>out now — stream butterfly</span>';
-      cta.innerHTML = '<div class="countdown-pop" style="max-width:420px;margin:0 auto;border-radius:14px;overflow:hidden;box-shadow:0 30px 60px -20px rgba(0,0,0,0.6);"><iframe src="https://open.spotify.com/embed/album/2cNZnYAmlyNH5FB2iyyP2u?utm_source=generator&theme=0" width="100%" height="152" frameborder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy" title="butterfly on Spotify" style="display:block;"></iframe></div>';
-
-      // initial burst, then a slow steady release
-      for (let i = 0; i < 14; i++){ setTimeout(spawnButterfly, i * 120); }
-      flutterTimer = setInterval(spawnButterfly, 900);
-    }
-
-    function tick(){
-      const now = new Date();
-      const diff = target - now;
-
-      if (diff <= 0){
-        clearInterval(timer);
-        goLive();
-        return;
-      }
-
-      const d = Math.floor(diff / 86400000);
-      const h = Math.floor((diff % 86400000) / 3600000);
-      const m = Math.floor((diff % 3600000) / 60000);
-      const s = Math.floor((diff % 60000) / 1000);
-
-      els.days.textContent = pad(d);
-      els.hours.textContent = pad(h);
-      els.mins.textContent = pad(m);
-      els.secs.textContent = pad(s);
-    }
-
-    let timer = null;
-    tick();
-    timer = setInterval(tick, 1000);
-  })();
 </script>
-
 </body>
 </html>
