@@ -487,7 +487,12 @@
     border:1px solid var(--line);
     overflow:hidden;
   }
-  .about-art svg{ position:absolute; inset:0; width:100%; height:100%; }
+  .about-art img{
+    position:absolute; inset:0;
+    width:100%; height:100%;
+    object-fit:cover;
+    object-position:center 30%;
+  }
 
   .about-copy p{
     color:var(--ink-dim);
@@ -976,26 +981,7 @@
     <div class="wrap">
       <div class="about-grid">
         <div class="about-art reveal">
-          <svg viewBox="0 0 400 500" aria-hidden="true">
-            <defs>
-              <radialGradient id="g1" cx="35%" cy="30%" r="60%">
-                <stop offset="0%" stop-color="#a89bd9" stop-opacity="0.35"/>
-                <stop offset="100%" stop-color="#a89bd9" stop-opacity="0"/>
-              </radialGradient>
-              <radialGradient id="g2" cx="70%" cy="75%" r="55%">
-                <stop offset="0%" stop-color="#e8829c" stop-opacity="0.35"/>
-                <stop offset="100%" stop-color="#e8829c" stop-opacity="0"/>
-              </radialGradient>
-            </defs>
-            <rect width="400" height="500" fill="url(#g1)"/>
-            <rect width="400" height="500" fill="url(#g2)"/>
-            <g stroke="rgba(242,236,230,0.28)" stroke-width="1" fill="none">
-              <path d="M200 150 C150 200 150 320 200 380"/>
-              <path d="M200 150 C250 200 250 320 200 380"/>
-              <ellipse cx="200" cy="150" rx="34" ry="50"/>
-              <path d="M200 380 C195 420 205 440 200 470" stroke="rgba(143,160,130,0.4)"/>
-            </g>
-          </svg>
+          <img src="jscaylum-photo.jpg" alt="jscaylum" loading="lazy">
         </div>
         <div class="about-copy reveal">
           <div class="eyebrow lc">about</div>
