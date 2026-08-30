@@ -134,9 +134,15 @@
       transition:max-height 0.35s ease;
     }
     .navlinks.open{ max-height:320px; }
-    .navlinks a{ padding:18px 32px; border-bottom:1px solid var(--line); }
+    .navlinks a{ display:block; padding:18px 32px; border-bottom:1px solid var(--line); }
     .nav-cta{ display:none; }
     .menu-btn{ display:block; }
+    header.menu-open{
+      background:rgba(14,12,17,0.86);
+      backdrop-filter:blur(10px);
+      -webkit-backdrop-filter:blur(10px);
+      border-bottom:1px solid var(--line);
+    }
   }
 
   /* ---------------- HERO ---------------- */
@@ -510,38 +516,24 @@
   .stat .label{ font-size:0.72rem; color:var(--ink-faint); letter-spacing:0.06em; text-transform:uppercase; margin-top:4px; }
 
   /* ---------------- MERCH ---------------- */
-  .merch-grid{
-    display:grid;
-    grid-template-columns:repeat(4, 1fr);
-    gap:20px;
-    margin-bottom:36px;
-  }
-  @media(max-width:900px){ .merch-grid{ grid-template-columns:repeat(2,1fr); } }
-  @media(max-width:480px){ .merch-grid{ grid-template-columns:1fr; } }
-
-  .merch-card{
-    background:var(--bg-card);
+  .merch-empty{
+    text-align:center;
+    max-width:420px;
+    margin:0 auto;
+    padding:64px 32px;
     border:1px solid var(--line);
     border-radius:18px;
-    overflow:hidden;
-    transition:transform 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
-  }
-  .merch-card:hover{ transform:translateY(-6px); border-color:var(--rose-dim); box-shadow:0 20px 40px -18px rgba(232,130,156,0.3); }
-  .merch-thumb{
-    aspect-ratio:1;
-    display:flex; align-items:center; justify-content:center;
     background:
-      radial-gradient(ellipse 90% 70% at 30% 20%, rgba(168,155,217,0.16), transparent 60%),
-      radial-gradient(ellipse 80% 70% at 80% 85%, rgba(201,138,156,0.14), transparent 60%);
+      radial-gradient(ellipse 90% 70% at 30% 20%, rgba(168,155,217,0.10), transparent 60%),
+      radial-gradient(ellipse 80% 70% at 80% 85%, rgba(201,138,156,0.08), transparent 60%);
   }
-  .merch-thumb svg{ width:34%; height:34%; stroke:var(--ink-faint); fill:none; opacity:0.8; transition:opacity 0.3s ease, stroke 0.3s ease; }
-  .merch-card:hover .merch-thumb svg{ stroke:var(--rose); opacity:1; }
-  .merch-body{ padding:16px 18px 20px; }
-  .merch-name{ font-family:'Fraunces',serif; font-style:italic; font-weight:500; font-size:1.05rem; margin-bottom:4px; }
-  .merch-tag{ font-size:0.7rem; letter-spacing:0.08em; color:var(--rose-dim); }
-
-  .merch-note{ text-align:center; }
-  .merch-note p{ color:var(--ink-dim); font-size:0.92rem; max-width:360px; margin:0 auto 22px; font-weight:300; }
+  .merch-empty svg{
+    width:38px; height:38px;
+    stroke:var(--ink-faint);
+    fill:none;
+    margin-bottom:20px;
+  }
+  .merch-empty p{ color:var(--ink-dim); font-size:0.92rem; margin:0 auto 22px; font-weight:300; }
 
   /* ---------------- TOUR / NEWSLETTER ---------------- */
   .tour-panel{
@@ -853,7 +845,7 @@
         <line x1="200" y1="150" x2="200" y2="200"/>
       </svg>
       <div class="wrap countdown-inner">
-        <div class="eyebrow lc">next up · unannounced</div>
+        <div class="eyebrow lc" id="countdownEyebrow">next up · unannounced</div>
         <h2 class="display" id="albumTitle">thoughts are <em style="font-style:italic;color:var(--rose)">hell</em></h2>
         <p class="sub" id="albumSub">an album. 12 songs, for now. no release date yet.</p>
 
@@ -904,9 +896,9 @@
             </div>
           </div>
 
-          <div class="release-ctas">
-            <a href="https://music.apple.com/gb/artist/jscaylum/1875719727" target="_blank" rel="noopener" class="btn btn-primary lc">play on apple music</a>
-            <a href="https://open.spotify.com/album/2cNZnYAmlyNH5FB2iyyP2u" target="_blank" rel="noopener" class="btn btn-outline lc">play on spotify</a>
+          <div class="release-ctas" id="releaseCtas">
+            <a href="https://music.apple.com/gb/artist/jscaylum/1875719727" target="_blank" rel="noopener" class="btn btn-primary lc" id="ctaApple">play on apple music</a>
+            <a href="https://open.spotify.com/album/2cNZnYAmlyNH5FB2iyyP2u" target="_blank" rel="noopener" class="btn btn-outline lc" id="ctaSpotify">play on spotify</a>
           </div>
         </div>
       </div>
@@ -924,7 +916,7 @@
         <p>from the first single to the latest ep — a year of falling apart and putting it back together.</p>
       </div>
 
-      <div class="disco-grid reveal">
+      <div class="disco-grid reveal" id="discoGrid">
         <div class="disco-card">
           <div class="disco-art">
             <img class="cover-img" data-spotify-url="https://open.spotify.com/album/2cNZnYAmlyNH5FB2iyyP2u" alt="butterfly cover art" loading="lazy">
@@ -935,40 +927,40 @@
             <div class="meta">single · 2026</div>
           </div>
         </div>
-        <div class="disco-card">
+        <div class="disco-card" data-track="he loves me, not">
           <div class="disco-art">
             <img class="cover-img" src="https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/2f/a3/65/2fa3652a-8473-a337-9811-954e599d1914/artwork.jpg/632x632bb.webp" alt="he loves me, not cover art" onload="this.classList.add('loaded')" onerror="this.closest('.ep-art,.disco-art')?.classList.add('cover-fallback')" loading="lazy">
-            <a class="cover-play" href="https://music.apple.com/gb/album/he-loves-me-not-ep/6785071032" target="_blank" rel="noopener" aria-label="listen to he loves me, not on Apple Music"><span class="btn-circle"><svg viewBox="0 0 24 24"><path d="M6 4l15 8-15 8V4z"/></svg></span></a>
+            <a class="cover-play" href="#" target="_blank" rel="noopener" aria-label="listen to he loves me, not on spotify"><span class="btn-circle"><svg viewBox="0 0 24 24"><path d="M6 4l15 8-15 8V4z"/></svg></span></a>
           </div>
           <div class="disco-body">
             <div class="name">he loves me, not</div>
             <div class="meta">ep · 2026</div>
           </div>
         </div>
-        <div class="disco-card">
+        <div class="disco-card" data-track="before i could bloom">
           <div class="disco-art">
             <img class="cover-img" src="https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/95/79/18/95791830-1241-aa78-0139-6151b0fabe47/artwork.jpg/632x632bb.webp" alt="before i could bloom cover art" onload="this.classList.add('loaded')" onerror="this.closest('.ep-art,.disco-art')?.classList.add('cover-fallback')" loading="lazy">
-            <a class="cover-play" href="https://music.apple.com/gb/album/before-i-could-bloom-single/6776664081" target="_blank" rel="noopener" aria-label="listen to before i could bloom on Apple Music"><span class="btn-circle"><svg viewBox="0 0 24 24"><path d="M6 4l15 8-15 8V4z"/></svg></span></a>
+            <a class="cover-play" href="#" target="_blank" rel="noopener" aria-label="listen to before i could bloom on spotify"><span class="btn-circle"><svg viewBox="0 0 24 24"><path d="M6 4l15 8-15 8V4z"/></svg></span></a>
           </div>
           <div class="disco-body">
             <div class="name">before i could bloom</div>
             <div class="meta">single · 2026</div>
           </div>
         </div>
-        <div class="disco-card">
+        <div class="disco-card" data-track="trust issues">
           <div class="disco-art">
             <img class="cover-img" src="https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/0e/39/91/0e3991e2-3205-0f16-958d-c41ea8f9833f/artwork.jpg/632x632bb.webp" alt="trust issues cover art" onload="this.classList.add('loaded')" onerror="this.closest('.ep-art,.disco-art')?.classList.add('cover-fallback')" loading="lazy">
-            <a class="cover-play" href="https://music.apple.com/gb/album/trust-issues-single/6767861629" target="_blank" rel="noopener" aria-label="listen to trust issues on Apple Music"><span class="btn-circle"><svg viewBox="0 0 24 24"><path d="M6 4l15 8-15 8V4z"/></svg></span></a>
+            <a class="cover-play" href="#" target="_blank" rel="noopener" aria-label="listen to trust issues on spotify"><span class="btn-circle"><svg viewBox="0 0 24 24"><path d="M6 4l15 8-15 8V4z"/></svg></span></a>
           </div>
           <div class="disco-body">
             <div class="name">trust issues</div>
             <div class="meta">single · 2026</div>
           </div>
         </div>
-        <div class="disco-card">
+        <div class="disco-card" data-track="isolation">
           <div class="disco-art">
             <img class="cover-img" src="https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/45/b7/0b/45b70ba1-45e2-b860-0551-9df85aa0e40d/artwork.jpg/632x632bb.webp" alt="isolation cover art" onload="this.classList.add('loaded')" onerror="this.closest('.ep-art,.disco-art')?.classList.add('cover-fallback')" loading="lazy">
-            <a class="cover-play" href="https://music.apple.com/gb/album/isolation-single/1877639389" target="_blank" rel="noopener" aria-label="listen to isolation on Apple Music"><span class="btn-circle"><svg viewBox="0 0 24 24"><path d="M6 4l15 8-15 8V4z"/></svg></span></a>
+            <a class="cover-play" href="#" target="_blank" rel="noopener" aria-label="listen to isolation on spotify"><span class="btn-circle"><svg viewBox="0 0 24 24"><path d="M6 4l15 8-15 8V4z"/></svg></span></a>
           </div>
           <div class="disco-body">
             <div class="name">isolation</div>
@@ -1031,46 +1023,8 @@
         <p>the shop isn't open yet — first drop is coming.</p>
       </div>
 
-      <div class="merch-grid reveal">
-        <div class="merch-card">
-          <div class="merch-thumb">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10l3 4-4 2v10H8V10L4 8l3-4z" stroke-width="1.3" stroke-linejoin="round"/><path d="M9 4a3 3 0 0 0 6 0" stroke-width="1.3"/></svg>
-          </div>
-          <div class="merch-body">
-            <div class="merch-name lc">tee</div>
-            <div class="merch-tag lc">coming soon</div>
-          </div>
-        </div>
-        <div class="merch-card">
-          <div class="merch-thumb">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 4H5L2 9l3 2 1-2v11h12V9l1 2 3-2-3-5h-3" stroke-width="1.3" stroke-linejoin="round"/><path d="M8 4a4 4 0 0 0 8 0" stroke-width="1.3"/></svg>
-          </div>
-          <div class="merch-body">
-            <div class="merch-name lc">hoodie</div>
-            <div class="merch-tag lc">coming soon</div>
-          </div>
-        </div>
-        <div class="merch-card">
-          <div class="merch-thumb">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8h12v13H6V8z" stroke-width="1.3" stroke-linejoin="round"/><path d="M6 8l-3 2v3l3-1" stroke-width="1.3" stroke-linejoin="round"/><path d="M18 8l3 2v3l-3-1" stroke-width="1.3" stroke-linejoin="round"/><path d="M9 8V6a3 3 0 0 1 6 0v2" stroke-width="1.3"/></svg>
-          </div>
-          <div class="merch-body">
-            <div class="merch-name lc">tote bag</div>
-            <div class="merch-tag lc">coming soon</div>
-          </div>
-        </div>
-        <div class="merch-card">
-          <div class="merch-thumb">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8" stroke-width="1.3"/><circle cx="12" cy="12" r="3.4" stroke-width="1.3"/></svg>
-          </div>
-          <div class="merch-body">
-            <div class="merch-name lc">pin set</div>
-            <div class="merch-tag lc">coming soon</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="merch-note reveal">
+      <div class="merch-empty reveal">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10l3 4-4 2v10H8V10L4 8l3-4z" stroke-width="1.1" stroke-linejoin="round"/><path d="M9 4a3 3 0 0 0 6 0" stroke-width="1.1"/></svg>
         <p>nothing to shop just yet — sign up below and you'll be the first to know when the first drop lands.</p>
         <a href="#tour" class="btn btn-outline lc">get notified</a>
       </div>
@@ -1157,9 +1111,33 @@
   // own midnight tick over).
   const REVEAL_DEADLINE = new Date(2026, 8, 19, 0, 0, 0);
 
+  // The album release date — each visitor's own local midnight on
+  // Oct 10, 2026. Once REVEAL_DEADLINE passes (tracklist fully revealed),
+  // the big countdown automatically switches to count down to this instead.
+  const RELEASE_DATE = new Date(2026, 9, 10, 0, 0, 0);
+
+  // The "everything so far" discography cards are Spotify-only by design
+  // (keeps things simple instead of mixing platforms). Paste each track's
+  // Spotify link here as you get it — the play button appears
+  // automatically once a link is filled in; until then, that card just
+  // shows the artwork with no play button.
+  const SPOTIFY_LINKS = {
+    "he loves me, not": null,
+    "before i could bloom": null,
+    "trust issues": null,
+    "isolation": null
+  };
+
   const ALBUM = {
     name: "THOUGHTS ARE HELL",
     tagline: "an album. 12 songs. full tracklist out by sept 19.",
+    // Once you have a Spotify or Apple Music link for the album, paste it
+    // here — as soon as this is filled in, the album's card in the
+    // "everything so far" discography section (which appears automatically
+    // once the tracklist is fully revealed) becomes clickable/playable.
+    // Until then it just shows as an announced, not-yet-linked release.
+    link: null,
+    year: "2026",
     // One entry per track, in order.
     // - permanentlyRevealed: true for tracks already out in the world
     //   (like "butterfly", already a released single) — these never hide.
@@ -1215,9 +1193,8 @@
     return `${s}s`;
   }
 
-  // render album title + tagline
+  // render album title (always the same — just the styling)
   const albumTitleEl = document.getElementById('albumTitle');
-  const albumSubEl = document.getElementById('albumSub');
   if (albumTitleEl) {
     const lower = ALBUM.name.toLowerCase();
     const splitAt = lower.lastIndexOf(' ');
@@ -1227,30 +1204,111 @@
       ? `${firstPart} <em style="font-style:italic;color:var(--rose)">${lastWord}</em>`
       : `<em style="font-style:italic;color:var(--rose)">${lower}</em>`;
   }
-  if (albumSubEl) albumSubEl.textContent = ALBUM.tagline;
 
-  // main days/hours/mins/secs countdown grid, ticking down to REVEAL_DEADLINE
-  const countdownGridEl = document.getElementById('countdownGrid');
-  if (countdownGridEl) {
-    const units = countdownGridEl.querySelectorAll('.countdown-unit .val');
-    function renderCountdownGrid() {
-      const ms = REVEAL_DEADLINE.getTime() - Date.now();
-      if (ms <= 0) {
-        units.forEach(u => u.textContent = '00');
-        return;
-      }
-      const totalSec = Math.floor(ms / 1000);
-      const d = Math.floor(totalSec / 86400);
-      const h = Math.floor((totalSec % 86400) / 3600);
-      const m = Math.floor((totalSec % 3600) / 60);
-      const s = totalSec % 60;
-      [d, h, m, s].forEach((v, i) => {
-        if (units[i]) units[i].textContent = String(v).padStart(2, '0');
-      });
-    }
-    renderCountdownGrid();
-    setInterval(renderCountdownGrid, 1000);
+  // three phases for the "next up" section:
+  //  1. before REVEAL_DEADLINE  — counting down to the tracklist fully revealing
+  //  2. REVEAL_DEADLINE to RELEASE_DATE — tracklist is out, counting down to release
+  //  3. after RELEASE_DATE — album is out
+  function getPhase(now) {
+    if (now < REVEAL_DEADLINE.getTime()) return 'reveal';
+    if (now < RELEASE_DATE.getTime()) return 'release-countdown';
+    return 'released';
   }
+
+  const albumSubEl = document.getElementById('albumSub');
+  const eyebrowEl = document.getElementById('countdownEyebrow');
+  const countdownGridEl = document.getElementById('countdownGrid');
+  const countdownGridUnits = countdownGridEl ? countdownGridEl.querySelectorAll('.countdown-unit .val') : null;
+  const countdownCtaEl = document.getElementById('countdownCta');
+
+  // once the tracklist is fully revealed, add "THOUGHTS ARE HELL" to the
+  // "everything so far" discography grid — clickable once ALBUM.link is set,
+  // shown as an announced-but-not-yet-linked release until then.
+  const discoGridEl = document.getElementById('discoGrid');
+  function addAlbumToDiscography() {
+    if (!discoGridEl || discoGridEl.querySelector('[data-album-card]')) return;
+
+    const card = document.createElement('div');
+    card.className = 'disco-card';
+    card.setAttribute('data-album-card', '');
+
+    const playLink = ALBUM.link
+      ? `<a class="cover-play" href="${ALBUM.link}" target="_blank" rel="noopener" aria-label="listen to ${ALBUM.name.toLowerCase()}"><span class="btn-circle"><svg viewBox="0 0 24 24"><path d="M6 4l15 8-15 8V4z"/></svg></span></a>`
+      : '';
+
+    card.innerHTML = `
+      <div class="disco-art cover-fallback">${playLink}</div>
+      <div class="disco-body">
+        <div class="name">${ALBUM.name.toLowerCase()}</div>
+        <div class="meta">album · ${ALBUM.year}</div>
+      </div>
+    `;
+
+    discoGridEl.prepend(card);
+  }
+
+  // apply Spotify-only links to the existing discography cards — if a
+  // link is set in SPOTIFY_LINKS, the play button appears and points
+  // there; if not, the play button is left out entirely (no Apple Music
+  // fallback, per the "stay Spotify-focused" preference).
+  if (discoGridEl) {
+    discoGridEl.querySelectorAll('.disco-card[data-track]').forEach(card => {
+      const track = card.getAttribute('data-track');
+      const link = SPOTIFY_LINKS[track];
+      const playEl = card.querySelector('.cover-play');
+      if (!playEl) return;
+      if (link) {
+        playEl.href = link;
+        playEl.setAttribute('aria-label', `listen to ${track} on spotify`);
+      } else {
+        playEl.remove();
+      }
+    });
+  }
+
+  let lastPhase = null;
+  function renderPhase() {
+    const now = Date.now();
+    const phase = getPhase(now);
+
+    // only touch copy/DOM structure when the phase actually changes —
+    // avoids re-triggering things like the discography insert every tick
+    if (phase !== lastPhase) {
+      lastPhase = phase;
+      if (phase === 'reveal') {
+        if (eyebrowEl) eyebrowEl.textContent = 'next up · unannounced';
+        if (albumSubEl) albumSubEl.textContent = ALBUM.tagline;
+      } else if (phase === 'release-countdown') {
+        if (eyebrowEl) eyebrowEl.textContent = 'coming october 10';
+        if (albumSubEl) albumSubEl.textContent = `the full album — out october 10, ${ALBUM.year}.`;
+        addAlbumToDiscography();
+      } else {
+        if (eyebrowEl) eyebrowEl.textContent = 'out now';
+        if (albumSubEl) albumSubEl.textContent = `the full album is out now.`;
+        addAlbumToDiscography();
+      }
+    }
+
+    // countdown grid: target depends on phase
+    const target = phase === 'reveal' ? REVEAL_DEADLINE.getTime() : RELEASE_DATE.getTime();
+    const ms = target - now;
+    if (countdownGridUnits) {
+      if (ms <= 0) {
+        countdownGridUnits.forEach(u => u.textContent = '00');
+      } else {
+        const totalSec = Math.floor(ms / 1000);
+        const d = Math.floor(totalSec / 86400);
+        const h = Math.floor((totalSec % 86400) / 3600);
+        const m = Math.floor((totalSec % 3600) / 60);
+        const s = totalSec % 60;
+        [d, h, m, s].forEach((v, i) => {
+          if (countdownGridUnits[i]) countdownGridUnits[i].textContent = String(v).padStart(2, '0');
+        });
+      }
+    }
+  }
+  renderPhase();
+  setInterval(renderPhase, 1000);
 
   // render mystery tracklist from ALBUM.tracks — live waterfall reveal
   const mysteryTracklistEl = document.getElementById('mysteryTracklist');
@@ -1326,16 +1384,48 @@
     });
   }
 
+  // featured release CTAs — prioritize Apple Music on Apple devices
+  // (iPhone/iPad/Mac) and Spotify on Android, since each is the more
+  // likely default player there. Anything else (Windows, Linux, etc.)
+  // keeps the default order (Apple Music first).
+  (function prioritizePlatformCta() {
+    const ctaApple = document.getElementById('ctaApple');
+    const ctaSpotify = document.getElementById('ctaSpotify');
+    const ctas = document.getElementById('releaseCtas');
+    if (!ctaApple || !ctaSpotify || !ctas) return;
+
+    const ua = navigator.userAgent || navigator.vendor || '';
+    const isAndroid = /android/i.test(ua);
+    // iPadOS 13+ reports as "Macintosh" but is touch-based — treat as Apple too.
+    const isAppleTouch = /iPhone|iPad|iPod/i.test(ua);
+    const isAppleDesktop = /Macintosh|Mac OS X/i.test(ua) && !isAndroid;
+    const isApple = isAppleTouch || isAppleDesktop;
+
+    if (isAndroid) {
+      ctaSpotify.classList.remove('btn-outline');
+      ctaSpotify.classList.add('btn-primary');
+      ctaApple.classList.remove('btn-primary');
+      ctaApple.classList.add('btn-outline');
+      ctas.insertBefore(ctaSpotify, ctaApple);
+    } else if (isApple) {
+      // already the default visual order/styling — nothing to change.
+    }
+  })();
+
   // mobile menu
   const menuBtn = document.getElementById('menuBtn');
   const navLinks = document.getElementById('navLinks');
   menuBtn.addEventListener('click', () => {
     const open = navLinks.classList.toggle('open');
     menuBtn.setAttribute('aria-expanded', open);
+    menuBtn.textContent = open ? '✕' : '☰';
+    header.classList.toggle('menu-open', open);
   });
   navLinks.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
     navLinks.classList.remove('open');
     menuBtn.setAttribute('aria-expanded', false);
+    menuBtn.textContent = '☰';
+    header.classList.remove('menu-open');
   }));
 
   // fetch real cover art from Spotify's public (keyless) oEmbed for releases
