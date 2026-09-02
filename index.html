@@ -763,13 +763,23 @@
     filter:blur(2.5px);
     user-select:none;
     letter-spacing:0.04em;
+    transition:filter 0.9s ease, color 0.9s ease, letter-spacing 0.9s ease;
   }
   .mystery-track .track-name.revealed{
     color:var(--rose);
     filter:none;
+    letter-spacing:0.01em;
     user-select:auto;
   }
-  .mystery-track{ justify-content:space-between; }
+  @keyframes trackRevealGlow{
+    0%   { text-shadow:0 0 0px rgba(168,155,217,0); }
+    35%  { text-shadow:0 0 16px rgba(168,155,217,0.9), 0 0 32px rgba(168,155,217,0.45); }
+    100% { text-shadow:0 0 0px rgba(168,155,217,0); }
+  }
+  .mystery-track .track-name.glow{
+    animation:trackRevealGlow 1.6s ease;
+  }
+  .mystery-track{ justify-content:flex-start; }
   .mystery-track .track-countdown{
     margin-left:auto;
     font-size:0.72rem;
@@ -778,6 +788,11 @@
     font-family:'Manrope',sans-serif;
     font-style:normal;
     white-space:nowrap;
+    transition:opacity 0.6s ease;
+    opacity:1;
+  }
+  .mystery-track .track-countdown.fade-out{
+    opacity:0;
   }
 </style>
 </head>
@@ -1296,28 +1311,52 @@
   renderPhase();
   setInterval(renderPhase, 1000);
 
-  // render mystery tracklist from ALBUM.tracks — live waterfall reveal
+  // render mystery tracklist from ALBUM.tracks — live waterfall reveal.
+  // rows are built ONCE and then updated in place each tick (rather than
+  // wiped and rebuilt) so the reveal moment can actually transition
+  // smoothly instead of snapping instantly.
   const mysteryTracklistEl = document.getElementById('mysteryTracklist');
   if (mysteryTracklistEl) {
     mysteryTracklistEl.setAttribute('aria-label', `${ALBUM.name.toLowerCase()} tracklist, revealing gradually`);
 
+    const rows = ALBUM.tracks.map((t, i) => {
+      const num = String(i + 1).padStart(2, '0');
+      const row = document.createElement('div');
+      row.className = 'mystery-track';
+      row.innerHTML = `<span class="track-num">${num}</span><span class="track-name">???</span><span class="track-countdown"></span>`;
+      mysteryTracklistEl.appendChild(row);
+      return {
+        track: t,
+        nameEl: row.querySelector('.track-name'),
+        countdownEl: row.querySelector('.track-countdown'),
+        revealedShown: false
+      };
+    });
+
     function renderTracklist() {
       const now = Date.now();
-      mysteryTracklistEl.innerHTML = ALBUM.tracks.map((t, i) => {
-        const num = String(i + 1).padStart(2, '0');
+      rows.forEach(r => {
+        const t = r.track;
         const isRevealed = t.permanentlyRevealed || (t.revealAt && now >= t.revealAt.getTime());
 
         if (isRevealed) {
-          const label = t.name || 'untitled';
-          return `<div class="mystery-track"><span class="track-num">${num}</span><span class="track-name revealed">${label}</span></div>`;
+          if (!r.revealedShown) {
+            // first time crossing over — set the real name and trigger
+            // the CSS transition (blur clears, color shifts to rose,
+            // plus a one-time purple glow pulse)
+            r.nameEl.textContent = t.name || 'untitled';
+            r.nameEl.classList.add('revealed', 'glow');
+            r.countdownEl.classList.add('fade-out');
+            r.revealedShown = true;
+            r.nameEl.addEventListener('animationend', () => {
+              r.nameEl.classList.remove('glow');
+            }, { once: true });
+          }
+        } else {
+          const countdown = t.revealAt ? formatCountdown(t.revealAt.getTime() - now) : null;
+          r.countdownEl.textContent = countdown ? `reveals in ${countdown}` : '';
         }
-
-        const countdown = t.revealAt ? formatCountdown(t.revealAt.getTime() - now) : null;
-        const countdownHtml = countdown
-          ? `<span class="track-countdown">reveals in ${countdown}</span>`
-          : '';
-        return `<div class="mystery-track"><span class="track-num">${num}</span><span class="track-name">???</span>${countdownHtml}</div>`;
-      }).join('');
+      });
     }
 
     renderTracklist();
