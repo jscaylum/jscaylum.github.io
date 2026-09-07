@@ -336,7 +336,7 @@
     position:relative;
     aspect-ratio:1;
   }
-  .cover-img{ display:block; width:100%; height:100%; object-fit:cover; opacity:0; transition:opacity 0.5s ease; }
+  .cover-img{ display:block; width:100%; height:100%; object-fit:cover; opacity:0; transition:opacity 0.5s ease, transform 0.4s ease; }
   .cover-img.loaded{ opacity:1; }
   .cover-fallback .cover-img{ display:none; }
   .cover-fallback{
@@ -347,6 +347,7 @@
   .cover-fallback::after{
     content:'';
     position:absolute; inset:0;
+    pointer-events:none;
     background:center / 30% no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(242,236,230,0.28)' stroke-width='1.3'%3E%3Cpath d='M9 18V5l12-2v13'/%3E%3Ccircle cx='6' cy='18' r='3'/%3E%3Ccircle cx='18' cy='16' r='3'/%3E%3C/svg%3E");
   }
 
@@ -430,9 +431,26 @@
     aspect-ratio:1;
     background:#0b0a0f;
   }
+  .disco-art-link{
+    display:block;
+    width:100%;
+    height:100%;
+  }
+  .disco-art-link:hover .cover-img{ transform:scale(1.04); opacity:1; }
   .disco-body{ padding:20px 22px 26px; }
   .disco-body .name{ font-family:'Fraunces',serif; font-style:italic; font-weight:500; font-size:1.1rem; margin-bottom:4px; }
   .disco-body .meta{ font-size:0.72rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--rose-dim); }
+  .disco-alt{
+    display:inline-block;
+    margin-top:10px;
+    font-size:0.74rem;
+    letter-spacing:0.03em;
+    color:var(--ink-faint);
+    text-decoration:none;
+    border-bottom:1px solid var(--line);
+    transition:color 0.25s ease, border-color 0.25s ease;
+  }
+  .disco-alt:hover{ color:var(--rose); border-color:var(--rose-dim); }
 
   /* cover play-button — links out to the real track/album on Apple Music */
   .cover-play{
@@ -904,54 +922,76 @@
       </div>
 
       <div class="disco-grid reveal">
+        <div class="disco-card" id="thoughtsCard" style="display:none;">
+          <div class="disco-art cover-fallback">
+            <a class="disco-art-link" href="#" data-spotify-fallback="#next-era" aria-label="listen to thoughts are hell on spotify">
+              <img class="cover-img" data-spotify-url="" alt="THOUGHTS ARE HELL cover art" loading="lazy">
+            </a>
+          </div>
+          <div class="disco-body">
+            <div class="name">THOUGHTS ARE HELL</div>
+            <div class="meta">album · 2026</div>
+            <a class="disco-alt" href="#" data-spotify-fallback="#next-era">listen on spotify</a>
+          </div>
+        </div>
         <div class="disco-card">
           <div class="disco-art">
+            <a class="disco-art-link" href="https://open.spotify.com/album/2cNZnYAmlyNH5FB2iyyP2u" target="_blank" rel="noopener" aria-label="listen to butterfly on spotify">
             <img class="cover-img" data-spotify-url="https://open.spotify.com/album/2cNZnYAmlyNH5FB2iyyP2u" alt="butterfly cover art" loading="lazy">
-            <a class="cover-play" href="https://open.spotify.com/album/2cNZnYAmlyNH5FB2iyyP2u" target="_blank" rel="noopener" aria-label="listen to butterfly on spotify"><span class="btn-circle"><svg viewBox="0 0 24 24"><path d="M6 4l15 8-15 8V4z"/></svg></span></a>
+          </a>
           </div>
           <div class="disco-body">
             <div class="name">butterfly</div>
             <div class="meta">single · 2026</div>
+            <a class="disco-alt" href="https://open.spotify.com/album/2cNZnYAmlyNH5FB2iyyP2u" target="_blank" rel="noopener">listen on spotify</a>
           </div>
         </div>
         <div class="disco-card">
           <div class="disco-art">
+            <a class="disco-art-link" href="https://music.apple.com/gb/album/he-loves-me-not-ep/6785071032" target="_blank" rel="noopener" aria-label="listen to he loves me, not on Apple Music">
             <img class="cover-img" src="https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/2f/a3/65/2fa3652a-8473-a337-9811-954e599d1914/artwork.jpg/632x632bb.webp" alt="he loves me, not cover art" onload="this.classList.add('loaded')" onerror="this.closest('.ep-art,.disco-art')?.classList.add('cover-fallback')" loading="lazy">
-            <a class="cover-play" href="https://music.apple.com/gb/album/he-loves-me-not-ep/6785071032" target="_blank" rel="noopener" aria-label="listen to he loves me, not on Apple Music"><span class="btn-circle"><svg viewBox="0 0 24 24"><path d="M6 4l15 8-15 8V4z"/></svg></span></a>
+          </a>
           </div>
           <div class="disco-body">
             <div class="name">he loves me, not</div>
             <div class="meta">ep · 2026</div>
+            <a class="disco-alt" href="https://open.spotify.com/album/4ik04d6cVg91HIXPY01rl1?si=9-abHLhZQU-_0E7wcnT3kQ" target="_blank" rel="noopener">listen on spotify</a>
           </div>
         </div>
         <div class="disco-card">
           <div class="disco-art">
+            <a class="disco-art-link" href="https://music.apple.com/gb/album/before-i-could-bloom-single/6776664081" target="_blank" rel="noopener" aria-label="listen to before i could bloom on Apple Music">
             <img class="cover-img" src="https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/95/79/18/95791830-1241-aa78-0139-6151b0fabe47/artwork.jpg/632x632bb.webp" alt="before i could bloom cover art" onload="this.classList.add('loaded')" onerror="this.closest('.ep-art,.disco-art')?.classList.add('cover-fallback')" loading="lazy">
-            <a class="cover-play" href="https://music.apple.com/gb/album/before-i-could-bloom-single/6776664081" target="_blank" rel="noopener" aria-label="listen to before i could bloom on Apple Music"><span class="btn-circle"><svg viewBox="0 0 24 24"><path d="M6 4l15 8-15 8V4z"/></svg></span></a>
+          </a>
           </div>
           <div class="disco-body">
             <div class="name">before i could bloom</div>
             <div class="meta">single · 2026</div>
+            <a class="disco-alt" href="https://open.spotify.com/album/1Xsc24kRCDxOvs9NO1JIyw?si=n5n256xPTgCSnNU7Afbc9Q" target="_blank" rel="noopener">listen on spotify</a>
           </div>
         </div>
         <div class="disco-card">
           <div class="disco-art">
+            <a class="disco-art-link" href="https://music.apple.com/gb/album/trust-issues-single/6767861629" target="_blank" rel="noopener" aria-label="listen to trust issues on Apple Music">
             <img class="cover-img" src="https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/0e/39/91/0e3991e2-3205-0f16-958d-c41ea8f9833f/artwork.jpg/632x632bb.webp" alt="trust issues cover art" onload="this.classList.add('loaded')" onerror="this.closest('.ep-art,.disco-art')?.classList.add('cover-fallback')" loading="lazy">
-            <a class="cover-play" href="https://music.apple.com/gb/album/trust-issues-single/6767861629" target="_blank" rel="noopener" aria-label="listen to trust issues on Apple Music"><span class="btn-circle"><svg viewBox="0 0 24 24"><path d="M6 4l15 8-15 8V4z"/></svg></span></a>
+          </a>
           </div>
           <div class="disco-body">
             <div class="name">trust issues</div>
             <div class="meta">single · 2026</div>
+            <a class="disco-alt" href="https://open.spotify.com/album/7zlpsKHelF4FDvkGYS3vmP?si=NqddLE7wR1Gvo7GGln4FVA" target="_blank" rel="noopener">listen on spotify</a>
           </div>
         </div>
         <div class="disco-card">
           <div class="disco-art">
+            <a class="disco-art-link" href="https://music.apple.com/gb/album/isolation-single/1877639389" target="_blank" rel="noopener" aria-label="listen to isolation on Apple Music">
             <img class="cover-img" src="https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/45/b7/0b/45b70ba1-45e2-b860-0551-9df85aa0e40d/artwork.jpg/632x632bb.webp" alt="isolation cover art" onload="this.classList.add('loaded')" onerror="this.closest('.ep-art,.disco-art')?.classList.add('cover-fallback')" loading="lazy">
-            <a class="cover-play" href="https://music.apple.com/gb/album/isolation-single/1877639389" target="_blank" rel="noopener" aria-label="listen to isolation on Apple Music"><span class="btn-circle"><svg viewBox="0 0 24 24"><path d="M6 4l15 8-15 8V4z"/></svg></span></a>
+          </a>
           </div>
           <div class="disco-body">
             <div class="name">isolation</div>
             <div class="meta">single · 2026</div>
+            <a class="disco-alt" href="https://open.spotify.com/album/5UvJidVCKQMgexoFuEWvAb?si=yLS7NIquT0W1JsV3sV36jw" target="_blank" rel="noopener">listen on spotify</a>
           </div>
         </div>
       </div>
@@ -1115,7 +1155,7 @@
     </div>
     <div class="footer-bottom">
       <span>© 2026 jscaylum</span>
-      <span>built with care, not affiliated with apple music.</span>
+      <span>independent project · jscaylum records</span>
     </div>
   </div>
 </footer>
@@ -1148,6 +1188,28 @@
     }
   })();
 
+  // "thoughts are hell" only appears in the discography grid once every track on
+  // the mystery tracklist has been revealed. To reveal a track: swap its "???" for
+  // the real name and add class="revealed" to the .track-name span.
+  // Once the album has a real Spotify link, set it as data-spotify-url on the
+  // cover-img below (and update the two href="#" links) — cover art will then
+  // fetch automatically via the same Spotify oEmbed used elsewhere on the site.
+  (function(){
+    const card = document.getElementById('thoughtsCard');
+    if (!card) return;
+    const allTracks = document.querySelectorAll('.mystery-tracklist .track-name');
+    const revealedTracks = document.querySelectorAll('.mystery-tracklist .track-name.revealed');
+    if (allTracks.length === 0 || revealedTracks.length !== allTracks.length) return;
+
+    card.style.display = '';
+    const spotifyUrl = card.querySelector('.cover-img').dataset.spotifyUrl;
+    const links = card.querySelectorAll('a[data-spotify-fallback]');
+    links.forEach(a => {
+      a.href = spotifyUrl || a.dataset.spotifyFallback;
+      if (spotifyUrl) { a.target = '_blank'; a.rel = 'noopener'; }
+    });
+  })();
+
   // nav scroll state
   const header = document.getElementById('siteHeader');
   window.addEventListener('scroll', () => {
@@ -1170,8 +1232,9 @@
   // that only have a Spotify link — Apple artwork is hardcoded directly on
   // those <img> tags now, since the live Apple lookup fetch wasn't reliable.
   document.querySelectorAll('.cover-img[data-spotify-url]').forEach(async (img) => {
+    const url = img.dataset.spotifyUrl;
+    if (!url) return; // placeholder — no real link set yet
     try {
-      const url = img.dataset.spotifyUrl;
       const r = await fetch(`https://open.spotify.com/oembed?url=${encodeURIComponent(url)}`);
       if (!r.ok) throw new Error('bad response');
       const data = await r.json();
