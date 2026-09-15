@@ -8,7 +8,7 @@ function setupNewsletter() {
   const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
   PropertiesService.getScriptProperties().setProperty('SPREADSHEET_ID', spreadsheet.getId());
 
-  ensureSheet_(spreadsheet, SHEET_NAMES.subscribers, ['Email', 'Signed up', 'Status']);
+  ensureSheet_(spreadsheet, SHEET_NAMES.subscribers, ['Email', 'Signed up', 'Status', 'Welcome']);
   ensureSheet_(spreadsheet, SHEET_NAMES.campaigns, ['Sent', 'Subject', 'Message', 'Photo URL', 'Recipients']);
   const draft = ensureSheet_(spreadsheet, SHEET_NAMES.draft, ['Subject', 'Message', 'Photo URL']);
 
@@ -46,10 +46,13 @@ function doPost(event) {
 
     const isNewSubscriber = !emails.includes(email);
     if (isNewSubscriber) {
-      sheet.appendRow([email, new Date(), 'active']);
+      sheet.appendRow([email, new Date(), 'active', 'sending']);
+      const rowNumber = sheet.getLastRow();
       try {
         sendWelcomeEmail_(email);
+        sheet.getRange(rowNumber, 4).setValue('sent');
       } catch (welcomeError) {
+        sheet.getRange(rowNumber, 4).setValue(`failed: ${welcomeError.message}`);
         console.warn(`Welcome email failed for ${email}: ${welcomeError.message}`);
       }
     }
