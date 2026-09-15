@@ -21,6 +21,11 @@ The script creates three tabs:
 
 New subscribers automatically receive a welcome email with the subject
 `welcome to the quiet side of things`. It is sent only once per email address.
+Use this list mainly for private teasers, unreleased previews, early news,
+private photos, and announcements before they are shared publicly.
+
+To test the welcome email safely, select `sendTestWelcomeEmail` in Apps Script
+and click **Run**. It sends the welcome message to your own Google account.
 
 ## 2. Publish the signup endpoint
 
@@ -60,7 +65,7 @@ For this provider, the browser cannot reliably read the cross-origin Apps Script
 ## 4. Send a message with a photo
 
 1. Put a subject in `Draft!A2`.
-2. Put the message in `Draft!B2`. Use a blank line between paragraphs.
+2. Put a private teaser, unreleased preview note, or early announcement in `Draft!B2`. Use a blank line between paragraphs.
 3. Put a publicly accessible image URL in `Draft!C2`. A Google Drive sharing link is not always a direct image URL; use an image hosted by your site or another service that allows embedding.
 4. In Apps Script, select `sendDraft` and click **Run**.
 5. The message is sent to every subscriber whose `Status` is `active`.
