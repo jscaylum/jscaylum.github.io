@@ -69,10 +69,12 @@ For this provider, the browser cannot reliably read the cross-origin Apps Script
 
 1. Put a subject in `Draft!A2`.
 2. Put a private teaser, unreleased preview note, or early announcement in `Draft!B2`. Use a blank line between paragraphs.
-3. Put a publicly accessible image URL in `Draft!C2`. A Google Drive sharing link is not always a direct image URL; use an image hosted by your site or another service that allows embedding.
-4. In Apps Script, select `sendDraft` and click **Run**.
-5. The message is sent to every subscriber whose `Status` is `active`.
-6. The campaign is saved in the `Campaigns` tab.
+3. Upload photos to Google Drive.
+4. Open a Drive photo and copy its file ID from the URL. For example, in `drive.google.com/file/d/ABC123/view`, the file ID is `ABC123`.
+5. Paste one or more file IDs into `Draft!C2`, separated by commas or spaces. The script attaches the files directly to the email.
+6. In Apps Script, select `sendDraft` and click **Run**.
+7. The message is sent to every subscriber whose `Status` is `active`.
+8. The campaign is saved in the `Campaigns` tab.
 
 ## Updating the script
 

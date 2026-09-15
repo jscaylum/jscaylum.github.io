@@ -9,8 +9,8 @@ function setupNewsletter() {
   PropertiesService.getScriptProperties().setProperty('SPREADSHEET_ID', spreadsheet.getId());
 
   ensureSheet_(spreadsheet, SHEET_NAMES.subscribers, ['Email', 'Signed up', 'Status', 'Welcome']);
-  ensureSheet_(spreadsheet, SHEET_NAMES.campaigns, ['Sent', 'Subject', 'Message', 'Photo URL', 'Recipients']);
-  const draft = ensureSheet_(spreadsheet, SHEET_NAMES.draft, ['Subject', 'Message', 'Photo URL']);
+  ensureSheet_(spreadsheet, SHEET_NAMES.campaigns, ['Sent', 'Subject', 'Message', 'Attachments', 'Recipients']);
+  const draft = ensureSheet_(spreadsheet, SHEET_NAMES.draft, ['Subject', 'Message', 'Drive file ID(s)']);
 
   if (draft.getLastRow() < 2) {
     draft.getRange(2, 1, 1, 3).setValues([[
@@ -124,13 +124,13 @@ function sendDraft() {
   const values = draft.getRange(2, 1, 1, 3).getValues()[0];
   const subject = String(values[0] || '').trim();
   const message = String(values[1] || '').trim();
-  const photoUrl = String(values[2] || '').trim();
+  const attachmentIds = parseAttachmentIds_(values[2]);
 
   if (!subject || !message) throw new Error('Add a subject and message in the Draft sheet first.');
-  sendCampaign_(subject, message, photoUrl);
+  sendCampaign_(subject, message, attachmentIds);
 }
 
-function sendCampaign_(subject, message, photoUrl) {
+function sendCampaign_(subject, message, attachmentIds) {
   const spreadsheet = getSpreadsheet_();
   const subscribers = spreadsheet.getSheetByName(SHEET_NAMES.subscribers);
   const rows = subscribers.getLastRow() < 2
@@ -143,33 +143,42 @@ function sendCampaign_(subject, message, photoUrl) {
 
   if (!recipients.length) throw new Error('There are no active subscribers yet.');
 
-  const htmlBody = buildEmailHtml_(message, photoUrl);
-  const plainBody = photoUrl ? `${message}\n\nPhoto: ${photoUrl}` : message;
+  const attachments = attachmentIds.map(id => DriveApp.getFileById(id).getBlob());
+  const htmlBody = buildEmailHtml_(message);
+  const plainBody = message;
   const batchSize = 80;
 
   for (let index = 0; index < recipients.length; index += batchSize) {
     const batch = recipients.slice(index, index + batchSize);
     GmailApp.sendEmail(batch.join(','), subject, plainBody, {
       htmlBody,
+      attachments,
       name: 'message from jscaylum'
     });
   }
 
   spreadsheet.getSheetByName(SHEET_NAMES.campaigns).appendRow([
-    new Date(), subject, message, photoUrl, recipients.length
+    new Date(), subject, message, attachmentIds.join(', '), recipients.length
   ]);
 }
 
-function buildEmailHtml_(message, photoUrl) {
+function buildEmailHtml_(message) {
   const paragraphs = escapeHtml_(message)
     .split(/\n{2,}/)
     .map(paragraph => `<p>${paragraph.replace(/\n/g, '<br>')}</p>`)
     .join('');
-  const image = photoUrl
-    ? `<p><img src="${escapeAttribute_(photoUrl)}" alt="" style="display:block;max-width:100%;height:auto;border-radius:8px;"></p>`
-    : '';
+  return `<!doctype html><html><body style="margin:0;background:#f4eee9;color:#211c22;font:16px/1.6 Georgia,serif;"><div style="max-width:620px;margin:0 auto;padding:36px 24px;">${paragraphs}<p style="margin-top:36px;color:#8b7881;font-size:13px;">jscaylum · quiet updates, songs, and photos</p></div></body></html>`;
+}
 
-  return `<!doctype html><html><body style="margin:0;background:#f4eee9;color:#211c22;font:16px/1.6 Georgia,serif;"><div style="max-width:620px;margin:0 auto;padding:36px 24px;">${image}${paragraphs}<p style="margin-top:36px;color:#8b7881;font-size:13px;">jscaylum · quiet updates, songs, and photos</p></div></body></html>`;
+function parseAttachmentIds_(value) {
+  return String(value || '')
+    .split(/[\s,]+/)
+    .map(value => value.trim())
+    .filter(Boolean)
+    .map(value => {
+      const match = value.match(/[-\w]{20,}/);
+      return match ? match[0] : value;
+    });
 }
 
 function parseRequest_(event) {
