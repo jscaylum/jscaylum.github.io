@@ -1164,12 +1164,15 @@
   // file needs to change.
   // ======================================================================
 
-  // Google Drive photo folder for the About section slideshow.
-  // This should stay as the public shared folder ID from the URL you gave me:
-  // https://drive.google.com/drive/folders/1aF_RsV6b-QNM3GOBoxDQlPpk0izMBk2u
+  // About gallery source: we keep a local gallery folder and a generated manifest,
+  // so the site can refresh whenever new images are added without editing this file.
+  const ABOUT_GALLERY_MANIFEST = 'gallery/gallery.json';
+  const ABOUT_PHOTO_REFRESH_MS = 15000;
+
+  // Legacy Google Drive config is kept here as a backup if you want to switch
+  // back to a Drive-hosted gallery later without changing the page logic.
   const GOOGLE_DRIVE_FOLDER_ID = '1aF_RsV6b-QNM3GOBoxDQlPpk0izMBk2u';
   const GOOGLE_DRIVE_API_KEY = 'PASTE_YOUR_GOOGLE_DRIVE_API_KEY_HERE';
-  const ABOUT_PHOTO_REFRESH_MS = 30000;
 
   // Where email signups get sent (via FormSubmit — no account needed, see
   // the "sign up works" section further down for setup notes).
@@ -1562,53 +1565,93 @@
     setInterval(renderTracklist, 1000);
   }
 
-  // About photo slideshow: polls the shared Google Drive folder and swaps in the
-  // current set of images whenever new ones are added or removed. If no API key is
-  // configured yet, it falls back to the static local image.
+  // About photo slideshow: poll the manifest for changes, but do not rebuild the
+  // slideshow interval on every refresh. If a file was deleted, it should disappear
+  // from the manifest and stop appearing in the gallery immediately.
   const aboutSlider = document.getElementById('aboutSlider');
+  let aboutPhotoRotation = null;
+  let aboutGallerySignature = '';
+
+  function normalizeGalleryImages(images) {
+    return Array.from(new Set((Array.isArray(images) ? images : [])
+      .map(item => typeof item === 'string' ? item : item && item.src)
+      .filter(Boolean)
+      .map(src => src.trim())
+      .filter(src => src.length > 0)
+      .map(src => src.startsWith('gallery/') ? src : `gallery/${src}`)));
+  }
+
+  function startAboutGalleryRotation() {
+    if (!aboutSlider) return;
+
+    const slideEls = [...aboutSlider.querySelectorAll('.about-slide')];
+    if (aboutPhotoRotation) {
+      clearInterval(aboutPhotoRotation);
+      aboutPhotoRotation = null;
+    }
+
+    if (slideEls.length <= 1) return;
+
+    let activeIndex = 0;
+    aboutPhotoRotation = setInterval(() => {
+      activeIndex = (activeIndex + 1) % slideEls.length;
+      slideEls.forEach((slide, index) => {
+        slide.classList.toggle('is-active', index === activeIndex);
+      });
+    }, 3000);
+  }
+
+  function setAboutSlides(images) {
+    if (!aboutSlider) return;
+
+    const normalized = normalizeGalleryImages(images);
+    if (!normalized.length) {
+      aboutSlider.innerHTML = '';
+      if (aboutPhotoRotation) {
+        clearInterval(aboutPhotoRotation);
+        aboutPhotoRotation = null;
+      }
+      return;
+    }
+
+    aboutSlider.innerHTML = normalized.map((src, index) => {
+      return `<img class="about-slide ${index === 0 ? 'is-active' : ''}" src="${src}" alt="jscaylum photo ${index + 1}" loading="lazy">`;
+    }).join('');
+
+    startAboutGalleryRotation();
+  }
 
   async function refreshAboutPhotos() {
     if (!aboutSlider) return;
 
-    const fallbackImage = '<img class="about-slide is-active" src="jscaylum-photo.jpg" alt="jscaylum photo" loading="lazy">';
-
-    if (!GOOGLE_DRIVE_API_KEY || GOOGLE_DRIVE_API_KEY === 'PASTE_YOUR_GOOGLE_DRIVE_API_KEY_HERE') {
-      aboutSlider.innerHTML = fallbackImage;
-      return;
-    }
-
-    const listUrl = `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(`'${GOOGLE_DRIVE_FOLDER_ID}' in parents and trashed=false and mimeType contains 'image/'`)}&fields=files(id,name,mimeType)&orderBy=modifiedTime desc&key=${GOOGLE_DRIVE_API_KEY}`;
-
     try {
-      const response = await fetch(listUrl);
-      if (!response.ok) throw new Error('drive fetch failed');
-      const data = await response.json();
-      const files = Array.isArray(data.files) ? data.files.filter(file => file && file.id) : [];
+      const response = await fetch(ABOUT_GALLERY_MANIFEST, { cache: 'no-store' });
+      if (!response.ok) throw new Error('gallery manifest not found');
 
-      if (!files.length) {
-        aboutSlider.innerHTML = fallbackImage;
+      const data = await response.json();
+      const images = normalizeGalleryImages(Array.isArray(data.images) ? data.images : []);
+      const signature = images.join('|');
+
+      if (signature === aboutGallerySignature) {
         return;
       }
 
-      const slides = files.map((file, index) => {
-        const src = `https://drive.google.com/uc?export=view&id=${file.id}`;
-        return `<img class="about-slide ${index === 0 ? 'is-active' : ''}" src="${src}" alt="jscaylum photo ${index + 1}" loading="lazy">`;
-      }).join('');
-
-      aboutSlider.innerHTML = slides;
-
-      const slideEls = [...aboutSlider.querySelectorAll('.about-slide')];
-      if (slideEls.length > 1) {
-        let activeIndex = 0;
-        setInterval(() => {
-          activeIndex = (activeIndex + 1) % slideEls.length;
-          slideEls.forEach((slide, index) => {
-            slide.classList.toggle('is-active', index === activeIndex);
-          });
-        }, 3000);
-      }
+      aboutGallerySignature = signature;
+      setAboutSlides(images);
     } catch (error) {
-      aboutSlider.innerHTML = fallbackImage;
+      const fallbackImages = [
+        'gallery/New Project-1.png',
+        'gallery/New Project-2.png',
+        'gallery/New Project-5.png',
+        'gallery/New Project-6.png',
+        'gallery/New Project-7.png'
+      ];
+
+      const fallbackSignature = fallbackImages.join('|');
+      if (fallbackSignature !== aboutGallerySignature) {
+        aboutGallerySignature = fallbackSignature;
+        setAboutSlides(fallbackImages);
+      }
     }
   }
 
