@@ -95,6 +95,29 @@ function sendTestWelcomeEmail() {
   sendWelcomeEmail_(email);
 }
 
+function retryFailedWelcomeEmails() {
+  const spreadsheet = getSpreadsheet_();
+  const sheet = spreadsheet.getSheetByName(SHEET_NAMES.subscribers);
+  const rows = sheet.getLastRow() < 2
+    ? []
+    : sheet.getRange(2, 1, sheet.getLastRow() - 1, 4).getValues();
+
+  rows.forEach((row, index) => {
+    const email = String(row[0]).trim();
+    const status = String(row[2]).trim().toLowerCase();
+    const welcome = String(row[3]).trim().toLowerCase();
+    if (!email || status !== 'active' || !welcome.startsWith('failed:')) return;
+
+    const rowNumber = index + 2;
+    try {
+      sendWelcomeEmail_(email);
+      sheet.getRange(rowNumber, 4).setValue('sent');
+    } catch (error) {
+      sheet.getRange(rowNumber, 4).setValue(`failed: ${error.message}`);
+    }
+  });
+}
+
 function sendDraft() {
   const spreadsheet = getSpreadsheet_();
   const draft = spreadsheet.getSheetByName(SHEET_NAMES.draft);

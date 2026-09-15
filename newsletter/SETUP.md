@@ -26,6 +26,9 @@ private photos, and announcements before they are shared publicly.
 
 To test the welcome email safely, select `sendTestWelcomeEmail` in Apps Script
 and click **Run**. It sends the welcome message to your own Google account.
+If an iCloud welcome is marked `failed: ...` in `Subscribers`, select
+`retryFailedWelcomeEmails` and click **Run** after checking the error. A retry
+does not create a duplicate subscriber.
 
 ## 2. Publish the signup endpoint
 
