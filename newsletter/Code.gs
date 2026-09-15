@@ -1,7 +1,8 @@
 const SHEET_NAMES = {
   subscribers: 'Subscribers',
   campaigns: 'Campaigns',
-  draft: 'Draft'
+  draft: 'Draft',
+  scheduled: 'Scheduled'
 };
 
 function setupNewsletter() {
@@ -10,21 +11,46 @@ function setupNewsletter() {
 
   ensureSheet_(spreadsheet, SHEET_NAMES.subscribers, ['Email', 'Signed up', 'Status', 'Welcome']);
   ensureSheet_(spreadsheet, SHEET_NAMES.campaigns, ['Sent', 'Subject', 'Message', 'Attachments', 'Recipients']);
-  const draft = ensureSheet_(spreadsheet, SHEET_NAMES.draft, ['Subject', 'Message', 'Drive file ID(s)']);
+  ensureSheet_(spreadsheet, SHEET_NAMES.scheduled, ['Subject', 'Message', 'Attachments', 'Send at', 'Status']);
+  const draft = ensureSheet_(spreadsheet, SHEET_NAMES.draft, ['Subject', 'Message', 'Drive file ID(s)', 'Send at (optional)']);
 
   if (draft.getLastRow() < 2) {
-    draft.getRange(2, 1, 1, 3).setValues([[
+    draft.getRange(2, 1, 1, 4).setValues([[
       'a little note from jscaylum',
       'write your message here',
+      '',
       ''
     ]]);
   }
 }
 
-function doGet() {
+function doGet(event) {
+  const unsubscribeEmail = event && event.parameter && event.parameter.unsubscribe;
+  if (unsubscribeEmail) return handleUnsubscribe_(unsubscribeEmail);
+
   return ContentService
     .createTextOutput(JSON.stringify({ ok: true, service: 'jscaylum newsletter' }))
     .setMimeType(ContentService.MimeType.JSON);
+}
+
+function handleUnsubscribe_(email) {
+  const normalized = String(email).trim().toLowerCase();
+  const spreadsheet = getSpreadsheet_();
+  const sheet = spreadsheet.getSheetByName(SHEET_NAMES.subscribers);
+  const lastRow = sheet.getLastRow();
+
+  if (lastRow >= 2) {
+    const emails = sheet.getRange(2, 1, lastRow - 1, 1).getValues();
+    emails.forEach((row, index) => {
+      if (String(row[0]).trim().toLowerCase() === normalized) {
+        sheet.getRange(index + 2, 3).setValue('unsubscribed');
+      }
+    });
+  }
+
+  return HtmlService.createHtmlOutput(
+    '<p style="font-family:Georgia,serif;padding:40px;">you\'ve been unsubscribed. take care.</p>'
+  );
 }
 
 function doPost(event) {
@@ -118,6 +144,21 @@ function retryFailedWelcomeEmails() {
   });
 }
 
+// permanently deletes rows for anyone who unsubscribed (unsubscribing alone just hides them from sends)
+function deleteUnsubscribedRows() {
+  const spreadsheet = getSpreadsheet_();
+  const sheet = spreadsheet.getSheetByName(SHEET_NAMES.subscribers);
+  const lastRow = sheet.getLastRow();
+  if (lastRow < 2) return;
+
+  const statuses = sheet.getRange(2, 3, lastRow - 1, 1).getValues();
+  for (let i = statuses.length - 1; i >= 0; i--) {
+    if (String(statuses[i][0]).trim().toLowerCase() === 'unsubscribed') {
+      sheet.deleteRow(i + 2);
+    }
+  }
+}
+
 function sendDraft() {
   const spreadsheet = getSpreadsheet_();
   const draft = spreadsheet.getSheetByName(SHEET_NAMES.draft);
@@ -128,6 +169,66 @@ function sendDraft() {
 
   if (!subject || !message) throw new Error('Add a subject and message in the Draft sheet first.');
   sendCampaign_(subject, message, attachmentIds);
+}
+
+function scheduleDraft() {
+  const spreadsheet = getSpreadsheet_();
+  const draft = spreadsheet.getSheetByName(SHEET_NAMES.draft);
+  const values = draft.getRange(2, 1, 1, 4).getValues()[0];
+  const subject = String(values[0] || '').trim();
+  const message = String(values[1] || '').trim();
+  const attachmentIds = parseAttachmentIds_(values[2]);
+  const sendAt = values[3];
+
+  if (!subject || !message) throw new Error('Add a subject and message in the Draft sheet first.');
+  if (!(sendAt instanceof Date) || isNaN(sendAt.getTime())) {
+    throw new Error('Put a future date and time in the "Send at (optional)" cell, or use sendDraft to send immediately.');
+  }
+  if (sendAt.getTime() <= Date.now()) {
+    throw new Error('The scheduled time must be in the future.');
+  }
+
+  spreadsheet.getSheetByName(SHEET_NAMES.scheduled)
+    .appendRow([subject, message, attachmentIds.join(', '), sendAt, 'pending']);
+
+  enableScheduledSending();
+}
+
+// run automatically by a time trigger; sends any due, still-pending campaigns
+function runScheduledCampaigns() {
+  const spreadsheet = getSpreadsheet_();
+  const sheet = spreadsheet.getSheetByName(SHEET_NAMES.scheduled);
+  const lastRow = sheet.getLastRow();
+  if (lastRow < 2) return;
+
+  const rows = sheet.getRange(2, 1, lastRow - 1, 5).getValues();
+  const now = Date.now();
+
+  rows.forEach((row, index) => {
+    const [subject, message, attachmentsText, sendAt, status] = row;
+    if (String(status).trim().toLowerCase() !== 'pending') return;
+    if (!(sendAt instanceof Date) || sendAt.getTime() > now) return;
+
+    const rowNumber = index + 2;
+    const attachmentIds = String(attachmentsText || '').split(',').map(id => id.trim()).filter(Boolean);
+    try {
+      sendCampaign_(String(subject), String(message), attachmentIds);
+      sheet.getRange(rowNumber, 5).setValue('sent');
+    } catch (error) {
+      sheet.getRange(rowNumber, 5).setValue(`failed: ${error.message}`);
+    }
+  });
+}
+
+function enableScheduledSending() {
+  const alreadyRunning = ScriptApp.getProjectTriggers()
+    .some(trigger => trigger.getHandlerFunction() === 'runScheduledCampaigns');
+  if (alreadyRunning) return;
+
+  ScriptApp.newTrigger('runScheduledCampaigns')
+    .timeBased()
+    .everyMinutes(15)
+    .create();
 }
 
 function sendCampaign_(subject, message, attachmentIds) {
@@ -144,30 +245,28 @@ function sendCampaign_(subject, message, attachmentIds) {
   if (!recipients.length) throw new Error('There are no active subscribers yet.');
 
   const attachments = attachmentIds.map(id => DriveApp.getFileById(id).getBlob());
-  const htmlBody = buildEmailHtml_(message);
-  const plainBody = message;
-  const batchSize = 80;
 
-  for (let index = 0; index < recipients.length; index += batchSize) {
-    const batch = recipients.slice(index, index + batchSize);
-    GmailApp.sendEmail(batch.join(','), subject, plainBody, {
-      htmlBody,
+  // sent one at a time (not comma-joined) so subscribers never see each other's addresses
+  recipients.forEach(email => {
+    GmailApp.sendEmail(email, subject, message, {
+      htmlBody: buildEmailHtml_(message, email),
       attachments,
       name: 'message from jscaylum'
     });
-  }
+  });
 
   spreadsheet.getSheetByName(SHEET_NAMES.campaigns).appendRow([
     new Date(), subject, message, attachmentIds.join(', '), recipients.length
   ]);
 }
 
-function buildEmailHtml_(message) {
+function buildEmailHtml_(message, email) {
   const paragraphs = escapeHtml_(message)
     .split(/\n{2,}/)
     .map(paragraph => `<p>${paragraph.replace(/\n/g, '<br>')}</p>`)
     .join('');
-  return `<!doctype html><html><body style="margin:0;background:#f4eee9;color:#211c22;font:16px/1.6 Georgia,serif;"><div style="max-width:620px;margin:0 auto;padding:36px 24px;">${paragraphs}<p style="margin-top:36px;color:#8b7881;font-size:13px;">jscaylum · quiet updates, songs, and photos</p></div></body></html>`;
+  const unsubscribeUrl = `${ScriptApp.getService().getUrl()}?unsubscribe=${encodeURIComponent(email)}`;
+  return `<!doctype html><html><body style="margin:0;background:#f4eee9;color:#211c22;font:16px/1.6 Georgia,serif;"><div style="max-width:620px;margin:0 auto;padding:36px 24px;">${paragraphs}<p style="margin-top:36px;color:#8b7881;font-size:13px;">jscaylum · quiet updates, songs, and photos</p><p style="margin-top:8px;"><a href="${unsubscribeUrl}" style="color:#8b7881;font-size:12px;">unsubscribe</a></p></div></body></html>`;
 }
 
 function parseAttachmentIds_(value) {

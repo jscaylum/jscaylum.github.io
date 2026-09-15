@@ -13,10 +13,11 @@ This uses Google Sheets and Google Apps Script. It does not require Mailchimp or
 7. Select `setupNewsletter` in the function dropdown and click **Run**.
 8. Approve Google’s permission prompts. This gives the script permission to edit this Sheet and send email from your account.
 
-The script creates three tabs:
+The script creates four tabs:
 
 - `Subscribers`: email addresses collected from the website.
 - `Draft`: the message you are preparing to send.
+- `Scheduled`: campaigns queued to send at a future time.
 - `Campaigns`: a record of messages that were sent.
 
 New subscribers automatically receive a welcome email with the subject
@@ -75,6 +76,30 @@ For this provider, the browser cannot reliably read the cross-origin Apps Script
 6. In Apps Script, select `sendDraft` and click **Run**.
 7. The message is sent to every subscriber whose `Status` is `active`.
 8. The campaign is saved in the `Campaigns` tab.
+
+## 5. Schedule a message for later
+
+1. Fill in `Draft!A2`, `Draft!B2`, and (optionally) `Draft!C2` as above.
+2. Put a future date and time in `Draft!D2` (the "Send at (optional)" column).
+3. In Apps Script, select `scheduleDraft` and click **Run**.
+4. This queues the message in the `Scheduled` tab with status `pending` and turns on a
+   15-minute check (only once — it will not create duplicate checks).
+5. When the scheduled time passes, the message sends automatically and its status
+   changes to `sent`. If sending fails, the error is written into the `Status` column.
+
+To cancel a scheduled message before it sends, open the `Scheduled` tab and change
+its `Status` cell to `cancelled`.
+
+## 6. Unsubscribing and deleting subscribers
+
+Every campaign email includes an automatic **unsubscribe** link. When a subscriber
+clicks it, their `Status` in `Subscribers` changes to `unsubscribed` and they stop
+receiving future campaigns and welcome emails.
+
+- To permanently remove everyone who has unsubscribed, select `deleteUnsubscribedRows`
+  in Apps Script and click **Run**.
+- To remove a single subscriber immediately, delete their row directly in the
+  `Subscribers` sheet.
 
 ## Updating the script
 
