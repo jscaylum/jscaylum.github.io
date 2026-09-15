@@ -19,6 +19,9 @@ The script creates three tabs:
 - `Draft`: the message you are preparing to send.
 - `Campaigns`: a record of messages that were sent.
 
+New subscribers automatically receive a welcome email with the subject
+`welcome to the quiet side of things`. It is sent only once per email address.
+
 ## 2. Publish the signup endpoint
 
 1. In Apps Script, click **Deploy > New deployment**.
@@ -62,6 +65,13 @@ For this provider, the browser cannot reliably read the cross-origin Apps Script
 4. In Apps Script, select `sendDraft` and click **Run**.
 5. The message is sent to every subscriber whose `Status` is `active`.
 6. The campaign is saved in the `Campaigns` tab.
+
+## Updating the script
+
+When `newsletter/Code.gs` changes, paste the updated file into Apps Script,
+save it, then use **Deploy > Manage deployments > Edit > New version > Deploy**.
+This is required for the deployed Web App to use new behavior such as the
+automatic welcome message.
 
 ## Free limits
 

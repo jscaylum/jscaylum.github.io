@@ -44,14 +44,46 @@ function doPost(event) {
       .flat()
       .map(value => String(value).trim().toLowerCase());
 
-    if (!emails.includes(email)) {
+    const isNewSubscriber = !emails.includes(email);
+    if (isNewSubscriber) {
       sheet.appendRow([email, new Date(), 'active']);
+      try {
+        sendWelcomeEmail_(email);
+      } catch (welcomeError) {
+        console.warn(`Welcome email failed for ${email}: ${welcomeError.message}`);
+      }
     }
 
     return json_({ ok: true });
   } catch (error) {
     return json_({ ok: false, error: error.message });
   }
+}
+
+function sendWelcomeEmail_(email) {
+  const subject = 'welcome to the quiet side of things';
+  const message = [
+    'hey,',
+    '',
+    'you\'re in.',
+    '',
+    'this is where i\'ll send the songs before they have a name, photos from in between, and little notes i don\'t want to post anywhere else.',
+    '',
+    'no noise. no constant updates. just the good stuff when there\'s something worth sharing.',
+    '',
+    'glad you\'re here.',
+    '',
+    'jscaylum'
+  ].join('\\n');
+
+  GmailApp.sendEmail(email, subject, message, {
+    htmlBody: buildWelcomeHtml_(),
+    name: 'jscaylum'
+  });
+}
+
+function buildWelcomeHtml_() {
+  return `<!doctype html><html><body style="margin:0;background:#f4eee9;color:#211c22;font:16px/1.7 Georgia,serif;"><div style="max-width:620px;margin:0 auto;padding:48px 28px;"><p style="margin:0 0 28px;color:#a3576b;font:11px/1.2 Arial,sans-serif;letter-spacing:.2em;text-transform:uppercase;">jscaylum · welcome</p><h1 style="margin:0 0 28px;font:italic 42px/1 Georgia,serif;color:#211c22;">you're in.</h1><p>this is where i\'ll send the songs before they have a name, photos from in between, and little notes i don\'t want to post anywhere else.</p><p>no noise. no constant updates. just the good stuff when there\'s something worth sharing.</p><p style="margin-top:36px;">glad you\'re here.<br><br>jscaylum</p><div style="height:1px;margin-top:42px;background:#d8c9c4;"></div><p style="margin-top:16px;color:#8b7881;font:12px/1.5 Arial,sans-serif;">quiet updates, new songs, photos from the way there.</p></div></body></html>`;
 }
 
 function sendDraft() {
