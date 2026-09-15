@@ -487,11 +487,27 @@
     border:1px solid var(--line);
     overflow:hidden;
   }
-  .about-art img{
-    position:absolute; inset:0;
-    width:100%; height:100%;
+  .about-slider,
+  .about-slide{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+  }
+  .about-slider{
+    overflow:hidden;
+  }
+  .about-slide{
     object-fit:cover;
     object-position:center 30%;
+    opacity:0;
+    transform:scale(1.04);
+    transition:opacity 0.9s ease, transform 1.4s ease;
+    pointer-events:none;
+  }
+  .about-slide.is-active{
+    opacity:1;
+    transform:scale(1);
   }
 
   .about-copy p{
@@ -709,6 +725,26 @@
     flex-wrap:wrap;
     margin-bottom:40px;
   }
+  .countdown-cta{
+    display:flex;
+    justify-content:center;
+    flex-wrap:wrap;
+    gap:14px;
+    min-height:54px;
+  }
+  .countdown-cta .album-cta-placeholder{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    padding:15px 24px;
+    border-radius:100px;
+    border:1px solid var(--line-strong);
+    color:var(--ink-dim);
+    background:rgba(255,255,255,0.02);
+    font-size:0.8rem;
+    letter-spacing:0.06em;
+    text-transform:lowercase;
+  }
   .countdown-unit{
     width:110px;
     padding:22px 0 16px;
@@ -794,9 +830,85 @@
   .mystery-track .track-countdown.fade-out{
     opacity:0;
   }
+
+  :root{
+    --reveal-purple:#9c4e9e;
+  }
+
+  .track-reveal-overlay{
+    position:fixed;
+    inset:0;
+    display:grid;
+    place-items:center;
+    opacity:0;
+    pointer-events:none;
+    z-index:9999;
+    transition:opacity 0.55s ease;
+  }
+  .track-reveal-overlay::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:radial-gradient(circle at center, rgba(156,78,158,0.46) 0%, rgba(156,78,158,0.18) 16%, rgba(14,12,17,0.72) 40%, rgba(14,12,17,0.92) 100%);
+    backdrop-filter:blur(2px);
+    -webkit-backdrop-filter:blur(2px);
+  }
+  .track-reveal-overlay.is-visible{
+    opacity:1;
+  }
+  .track-reveal-card{
+    position:relative;
+    z-index:1;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:12px;
+    text-align:center;
+    transform:translateY(18px) scale(0.96);
+    transition:transform 0.7s cubic-bezier(0.2,0.8,0.2,1);
+  }
+  .track-reveal-overlay.is-visible .track-reveal-card{
+    transform:translateY(0) scale(1);
+  }
+  .track-reveal-kicker{
+    font-size:0.7rem;
+    letter-spacing:0.22em;
+    text-transform:uppercase;
+    color:rgba(242,236,230,0.8);
+  }
+  .track-reveal-name{
+    font-family:'Fraunces',serif;
+    font-style:italic;
+    font-size:clamp(2.2rem, 8vw, 7rem);
+    line-height:0.9;
+    letter-spacing:-0.04em;
+    color:var(--ink);
+    text-shadow:0 0 20px rgba(156,78,158,0.4), 0 0 55px rgba(156,78,158,0.35);
+    opacity:0;
+    transform:translateY(26px);
+    transition:opacity 0.6s ease, transform 0.8s cubic-bezier(0.2,0.7,0.2,1);
+  }
+  .track-reveal-overlay.is-visible .track-reveal-name{
+    opacity:1;
+    transform:translateY(0);
+    text-shadow:0 0 22px rgba(156,78,158,0.8), 0 0 55px rgba(156,78,158,0.55), 0 0 90px rgba(156,78,158,0.4);
+    animation:trackRevealNamePulse 1.8s ease;
+  }
+  @keyframes trackRevealNamePulse{
+    0%   { filter:brightness(0.8); }
+    35%  { filter:brightness(1.18); }
+    100% { filter:brightness(1); }
+  }
 </style>
 </head>
 <body>
+
+<div class="track-reveal-overlay" id="trackRevealOverlay" aria-live="polite" aria-atomic="true">
+  <div class="track-reveal-card">
+    <div class="track-reveal-kicker">new track</div>
+    <div class="track-reveal-name" id="trackRevealName">butterfly</div>
+  </div>
+</div>
 
 <header id="siteHeader">
   <nav class="wrap">
@@ -849,8 +961,8 @@
   <!-- MARQUEE -->
   <div class="marquee" aria-hidden="true">
     <div class="marquee-track">
-      <span>butterfly</span><span>isolation</span><span>fragile</span><span>trust issues</span><span>before i could bloom</span><span>i'm wilting</span><span>nothing lasts forever</span>
-      <span>butterfly</span><span>isolation</span><span>fragile</span><span>trust issues</span><span>before i could bloom</span><span>i'm wilting</span><span>nothing lasts forever</span>
+      <span>butterfly</span><span>isolation</span><span>fragile</span><span>trust issues</span><span>i'm wilting</span><span>nothing lasts forever</span>
+      <span>butterfly</span><span>isolation</span><span>fragile</span><span>trust issues</span><span>i'm wilting</span><span>nothing lasts forever</span>
     </div>
   </div>
 
@@ -881,9 +993,7 @@
     <div class="wrap">
       <div class="mystery-tracklist" id="mysteryTracklist" aria-label="thoughts are hell tracklist, mostly unrevealed"></div>
 
-      <div id="countdownCta" style="text-align:center;">
-        <a href="#tour" class="btn btn-primary lc">get notified</a>
-      </div>
+      <div id="countdownCta" class="countdown-cta" aria-live="polite"></div>
     </div>
   </section>
 
@@ -911,7 +1021,7 @@
           <div class="tracklist" id="tracklist">
             <div class="track" data-track="1">
               <span class="track-num">01</span>
-              <div><div class="track-name">butterfly</div><div class="track-desc">letting something go so it can actually grow</div></div>
+              <div><div class="track-name">butterfly</div><div class="track-desc">struggling through heartbreak and mental health while trying to rise</div></div>
               <button class="track-play" aria-label="play butterfly" type="button"><svg viewBox="0 0 24 24"><path d="M6 4l15 8-15 8V4z"/></svg></button>
             </div>
           </div>
@@ -936,58 +1046,7 @@
         <p>from the first single to the latest ep — a year of falling apart and putting it back together.</p>
       </div>
 
-      <div class="disco-grid reveal" id="discoGrid">
-        <div class="disco-card">
-          <div class="disco-art">
-            <img class="cover-img" data-spotify-url="https://open.spotify.com/album/2cNZnYAmlyNH5FB2iyyP2u" alt="butterfly cover art" loading="lazy">
-            <a class="cover-play" href="https://open.spotify.com/album/2cNZnYAmlyNH5FB2iyyP2u" target="_blank" rel="noopener" aria-label="listen to butterfly on spotify"><span class="btn-circle"><svg viewBox="0 0 24 24"><path d="M6 4l15 8-15 8V4z"/></svg></span></a>
-          </div>
-          <div class="disco-body">
-            <div class="name">butterfly</div>
-            <div class="meta">single · 2026</div>
-          </div>
-        </div>
-        <div class="disco-card" data-track="he loves me, not">
-          <div class="disco-art">
-            <img class="cover-img" src="https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/2f/a3/65/2fa3652a-8473-a337-9811-954e599d1914/artwork.jpg/632x632bb.webp" alt="he loves me, not cover art" onload="this.classList.add('loaded')" onerror="this.closest('.ep-art,.disco-art')?.classList.add('cover-fallback')" loading="lazy">
-            <a class="cover-play" href="#" target="_blank" rel="noopener" aria-label="listen to he loves me, not on spotify"><span class="btn-circle"><svg viewBox="0 0 24 24"><path d="M6 4l15 8-15 8V4z"/></svg></span></a>
-          </div>
-          <div class="disco-body">
-            <div class="name">he loves me, not</div>
-            <div class="meta">ep · 2026</div>
-          </div>
-        </div>
-        <div class="disco-card" data-track="before i could bloom">
-          <div class="disco-art">
-            <img class="cover-img" src="https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/95/79/18/95791830-1241-aa78-0139-6151b0fabe47/artwork.jpg/632x632bb.webp" alt="before i could bloom cover art" onload="this.classList.add('loaded')" onerror="this.closest('.ep-art,.disco-art')?.classList.add('cover-fallback')" loading="lazy">
-            <a class="cover-play" href="#" target="_blank" rel="noopener" aria-label="listen to before i could bloom on spotify"><span class="btn-circle"><svg viewBox="0 0 24 24"><path d="M6 4l15 8-15 8V4z"/></svg></span></a>
-          </div>
-          <div class="disco-body">
-            <div class="name">before i could bloom</div>
-            <div class="meta">single · 2026</div>
-          </div>
-        </div>
-        <div class="disco-card" data-track="trust issues">
-          <div class="disco-art">
-            <img class="cover-img" src="https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/0e/39/91/0e3991e2-3205-0f16-958d-c41ea8f9833f/artwork.jpg/632x632bb.webp" alt="trust issues cover art" onload="this.classList.add('loaded')" onerror="this.closest('.ep-art,.disco-art')?.classList.add('cover-fallback')" loading="lazy">
-            <a class="cover-play" href="#" target="_blank" rel="noopener" aria-label="listen to trust issues on spotify"><span class="btn-circle"><svg viewBox="0 0 24 24"><path d="M6 4l15 8-15 8V4z"/></svg></span></a>
-          </div>
-          <div class="disco-body">
-            <div class="name">trust issues</div>
-            <div class="meta">single · 2026</div>
-          </div>
-        </div>
-        <div class="disco-card" data-track="isolation">
-          <div class="disco-art">
-            <img class="cover-img" src="https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/45/b7/0b/45b70ba1-45e2-b860-0551-9df85aa0e40d/artwork.jpg/632x632bb.webp" alt="isolation cover art" onload="this.classList.add('loaded')" onerror="this.closest('.ep-art,.disco-art')?.classList.add('cover-fallback')" loading="lazy">
-            <a class="cover-play" href="#" target="_blank" rel="noopener" aria-label="listen to isolation on spotify"><span class="btn-circle"><svg viewBox="0 0 24 24"><path d="M6 4l15 8-15 8V4z"/></svg></span></a>
-          </div>
-          <div class="disco-body">
-            <div class="name">isolation</div>
-            <div class="meta">single · 2026</div>
-          </div>
-        </div>
-      </div>
+      <div class="disco-grid reveal" id="discoGrid"></div>
     </div>
   </section>
 
@@ -996,7 +1055,9 @@
     <div class="wrap">
       <div class="about-grid">
         <div class="about-art reveal">
-          <img src="jscaylum-photo.jpg" alt="jscaylum" loading="lazy">
+          <div class="about-slider" id="aboutSlider" aria-live="polite">
+            <img class="about-slide is-active" src="jscaylum-photo.jpg" alt="jscaylum photo" loading="lazy">
+          </div>
         </div>
         <div class="about-copy reveal">
           <div class="eyebrow lc">about</div>
@@ -1005,7 +1066,7 @@
           <p>his sound sits somewhere between whispered, bedroom-pop confession and glossy, hook-driven pop — the kind of music built for crying in your room one minute and dancing around it the next. his 2026 ep, <em class="display">he loves me, not</em>, traces a single relationship from warning signs to acceptance in five songs.</p>
           <div class="stat-row">
             <div class="stat"><div class="num display">2026</div><div class="label">first single</div></div>
-            <div class="stat"><div class="num display">5</div><div class="label">singles &amp; eps</div></div>
+            <div class="stat"><div class="num display" id="releaseCount">0</div><div class="label">singles &amp; eps</div></div>
             <div class="stat"><div class="num display">16</div><div class="label">years old</div></div>
           </div>
         </div>
@@ -1103,6 +1164,13 @@
   // file needs to change.
   // ======================================================================
 
+  // Google Drive photo folder for the About section slideshow.
+  // This should stay as the public shared folder ID from the URL you gave me:
+  // https://drive.google.com/drive/folders/1aF_RsV6b-QNM3GOBoxDQlPpk0izMBk2u
+  const GOOGLE_DRIVE_FOLDER_ID = '1aF_RsV6b-QNM3GOBoxDQlPpk0izMBk2u';
+  const GOOGLE_DRIVE_API_KEY = 'PASTE_YOUR_GOOGLE_DRIVE_API_KEY_HERE';
+  const ABOUT_PHOTO_REFRESH_MS = 30000;
+
   // Where email signups get sent (via FormSubmit — no account needed, see
   // the "sign up works" section further down for setup notes).
   const SIGNUP_EMAIL = "you@example.com"; // <-- replace with your real email
@@ -1122,21 +1190,46 @@
   // Spotify link here as you get it — the play button appears
   // automatically once a link is filled in; until then, that card just
   // shows the artwork with no play button.
-  const SPOTIFY_LINKS = {
-    "he loves me, not": null,
-    "before i could bloom": null,
-    "trust issues": null,
-    "isolation": null
-  };
+  const DISCOGRAPHY = [
+    {
+      name: 'butterfly',
+      type: 'single',
+      year: '2026',
+      spotifyUrl: 'https://open.spotify.com/album/2cNZnYAmlyNH5FB2iyyP2u',
+      artUrl: null
+    },
+    {
+      name: 'he loves me, not',
+      type: 'ep',
+      year: '2026',
+      spotifyUrl: 'https://open.spotify.com/album/4ik04d6cVg91HIXPY01rl1',
+      artUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/2f/a3/65/2fa3652a-8473-a337-9811-954e599d1914/artwork.jpg/632x632bb.webp'
+    },
+    {
+      name: 'trust issues',
+      type: 'single',
+      year: '2026',
+      spotifyUrl: 'https://open.spotify.com/album/7zlpsKHelF4FDvkGYS3vmP',
+      artUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/0e/39/91/0e3991e2-3205-0f16-958d-c41ea8f9833f/artwork.jpg/632x632bb.webp'
+    },
+    {
+      name: 'isolation',
+      type: 'single',
+      year: '2026',
+      spotifyUrl: 'https://open.spotify.com/album/5UvJidVCKQMgexoFuEWvAb',
+      artUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/45/b7/0b/45b70ba1-45e2-b860-0551-9df85aa0e40d/artwork.jpg/632x632bb.webp'
+    }
+  ];
 
   const ALBUM = {
     name: "THOUGHTS ARE HELL",
     tagline: "an album. 12 songs. full tracklist out by sept 19.",
-    // Once you have a Spotify or Apple Music link for the album, paste it
-    // here — as soon as this is filled in, the album's card in the
-    // "everything so far" discography section (which appears automatically
-    // once the tracklist is fully revealed) becomes clickable/playable.
-    // Until then it just shows as an announced, not-yet-linked release.
+    // Once you have the album links, paste them here. They will appear in the
+    // countdown CTA and the album discography card automatically.
+    appleMusicUrl: null,
+    spotifyUrl: null,
+    // Keep this as the general album link when you have a preferred platform.
+    // It's used by the discography card when present.
     link: null,
     year: "2026",
     // One entry per track, in order.
@@ -1222,6 +1315,24 @@
   const countdownGridUnits = countdownGridEl ? countdownGridEl.querySelectorAll('.countdown-unit .val') : null;
   const countdownCtaEl = document.getElementById('countdownCta');
 
+  function renderAlbumCtas() {
+    if (!countdownCtaEl) return;
+
+    const buttons = [
+      { url: ALBUM.appleMusicUrl, label: 'apple music', className: 'btn btn-primary lc' },
+      { url: ALBUM.spotifyUrl, label: 'spotify', className: 'btn btn-outline lc' }
+    ].filter(item => item.url);
+
+    if (buttons.length) {
+      countdownCtaEl.innerHTML = buttons.map(item => `
+        <a href="${item.url}" target="_blank" rel="noopener" class="${item.className}">${item.label}</a>
+      `).join('');
+      return;
+    }
+
+    countdownCtaEl.innerHTML = '<span class="album-cta-placeholder lc">links coming soon</span>';
+  }
+
   // once the tracklist is fully revealed, add "THOUGHTS ARE HELL" to the
   // "everything so far" discography grid — clickable once ALBUM.link is set,
   // shown as an announced-but-not-yet-linked release until then.
@@ -1248,24 +1359,84 @@
     discoGridEl.prepend(card);
   }
 
-  // apply Spotify-only links to the existing discography cards — if a
-  // link is set in SPOTIFY_LINKS, the play button appears and points
-  // there; if not, the play button is left out entirely (no Apple Music
-  // fallback, per the "stay Spotify-focused" preference).
-  if (discoGridEl) {
-    discoGridEl.querySelectorAll('.disco-card[data-track]').forEach(card => {
-      const track = card.getAttribute('data-track');
-      const link = SPOTIFY_LINKS[track];
-      const playEl = card.querySelector('.cover-play');
-      if (!playEl) return;
-      if (link) {
-        playEl.href = link;
-        playEl.setAttribute('aria-label', `listen to ${track} on spotify`);
+  function renderDiscography() {
+    if (!discoGridEl) return;
+
+    discoGridEl.innerHTML = '';
+
+    DISCOGRAPHY.forEach((release) => {
+      const card = document.createElement('div');
+      card.className = 'disco-card';
+
+      const art = document.createElement('div');
+      art.className = 'disco-art';
+
+      const img = document.createElement('img');
+      img.className = 'cover-img';
+      img.loading = 'lazy';
+      img.alt = `${release.name} cover art`;
+
+      if (release.artUrl) {
+        img.src = release.artUrl;
+        img.onload = () => img.classList.add('loaded');
+        img.onerror = () => art.classList.add('cover-fallback');
+      } else if (release.spotifyUrl) {
+        img.dataset.spotifyUrl = release.spotifyUrl;
       } else {
-        playEl.remove();
+        art.classList.add('cover-fallback');
+      }
+
+      if (release.spotifyUrl) {
+        const playLink = document.createElement('a');
+        playLink.className = 'cover-play';
+        playLink.href = release.spotifyUrl;
+        playLink.target = '_blank';
+        playLink.rel = 'noopener';
+        playLink.setAttribute('aria-label', `listen to ${release.name} on spotify`);
+
+        playLink.innerHTML = '<span class="btn-circle"><svg viewBox="0 0 24 24"><path d="M6 4l15 8-15 8V4z"/></svg></span>';
+        art.appendChild(playLink);
+      }
+
+      art.appendChild(img);
+
+      const body = document.createElement('div');
+      body.className = 'disco-body';
+      body.innerHTML = `
+        <div class="name">${release.name}</div>
+        <div class="meta">${release.type} · ${release.year}</div>
+      `;
+
+      card.appendChild(art);
+      card.appendChild(body);
+      discoGridEl.appendChild(card);
+    });
+
+    document.querySelectorAll('.cover-img[data-spotify-url]').forEach(async (imgEl) => {
+      try {
+        const url = imgEl.dataset.spotifyUrl;
+        const r = await fetch(`https://open.spotify.com/oembed?url=${encodeURIComponent(url)}`);
+        if (!r.ok) throw new Error('bad response');
+        const data = await r.json();
+        if (!data.thumbnail_url) throw new Error('no artwork');
+        imgEl.src = data.thumbnail_url;
+        imgEl.addEventListener('load', () => imgEl.classList.add('loaded'), { once: true });
+      } catch (e) {
+        const wrap = imgEl.closest('.disco-art');
+        if (wrap) wrap.classList.add('cover-fallback');
       }
     });
   }
+
+  const releaseCountEl = document.getElementById('releaseCount');
+  function syncReleaseCount() {
+    if (releaseCountEl) {
+      releaseCountEl.textContent = String(DISCOGRAPHY.length);
+    }
+  }
+
+  renderDiscography();
+  syncReleaseCount();
 
   let lastPhase = null;
   function renderPhase() {
@@ -1279,13 +1450,16 @@
       if (phase === 'reveal') {
         if (eyebrowEl) eyebrowEl.textContent = 'next up · unannounced';
         if (albumSubEl) albumSubEl.textContent = ALBUM.tagline;
+        if (countdownCtaEl) countdownCtaEl.innerHTML = '<a href="#tour" class="btn btn-primary lc">get notified</a>';
       } else if (phase === 'release-countdown') {
         if (eyebrowEl) eyebrowEl.textContent = 'coming october 10';
         if (albumSubEl) albumSubEl.textContent = `the full album — out october 10, ${ALBUM.year}.`;
+        renderAlbumCtas();
         addAlbumToDiscography();
       } else {
         if (eyebrowEl) eyebrowEl.textContent = 'out now';
         if (albumSubEl) albumSubEl.textContent = `the full album is out now.`;
+        renderAlbumCtas();
         addAlbumToDiscography();
       }
     }
@@ -1316,6 +1490,31 @@
   // wiped and rebuilt) so the reveal moment can actually transition
   // smoothly instead of snapping instantly.
   const mysteryTracklistEl = document.getElementById('mysteryTracklist');
+  const trackRevealOverlay = document.getElementById('trackRevealOverlay');
+  const trackRevealNameEl = document.getElementById('trackRevealName');
+
+  function triggerTrackReveal(trackName, rowEl) {
+    if (!trackRevealOverlay || !trackRevealNameEl || !trackName) return;
+
+    trackRevealNameEl.textContent = trackName;
+    trackRevealOverlay.classList.remove('is-visible');
+    void trackRevealOverlay.offsetWidth;
+    trackRevealOverlay.classList.add('is-visible');
+
+    if (rowEl) {
+      rowEl.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
+    }
+
+    if (mysteryTracklistEl) {
+      mysteryTracklistEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    clearTimeout(triggerTrackReveal.timeoutId);
+    triggerTrackReveal.timeoutId = setTimeout(() => {
+      trackRevealOverlay.classList.remove('is-visible');
+    }, 1800);
+  }
+
   if (mysteryTracklistEl) {
     mysteryTracklistEl.setAttribute('aria-label', `${ALBUM.name.toLowerCase()} tracklist, revealing gradually`);
 
@@ -1329,6 +1528,7 @@
         track: t,
         nameEl: row.querySelector('.track-name'),
         countdownEl: row.querySelector('.track-countdown'),
+        rowEl: row,
         revealedShown: false
       };
     });
@@ -1341,13 +1541,12 @@
 
         if (isRevealed) {
           if (!r.revealedShown) {
-            // first time crossing over — set the real name and trigger
-            // the CSS transition (blur clears, color shifts to rose,
-            // plus a one-time purple glow pulse)
-            r.nameEl.textContent = t.name || 'untitled';
+            const trackName = t.name || 'untitled';
+            r.nameEl.textContent = trackName;
             r.nameEl.classList.add('revealed', 'glow');
             r.countdownEl.classList.add('fade-out');
             r.revealedShown = true;
+            triggerTrackReveal(trackName, r.rowEl);
             r.nameEl.addEventListener('animationend', () => {
               r.nameEl.classList.remove('glow');
             }, { once: true });
@@ -1363,14 +1562,95 @@
     setInterval(renderTracklist, 1000);
   }
 
+  // About photo slideshow: polls the shared Google Drive folder and swaps in the
+  // current set of images whenever new ones are added or removed. If no API key is
+  // configured yet, it falls back to the static local image.
+  const aboutSlider = document.getElementById('aboutSlider');
+
+  async function refreshAboutPhotos() {
+    if (!aboutSlider) return;
+
+    const fallbackImage = '<img class="about-slide is-active" src="jscaylum-photo.jpg" alt="jscaylum photo" loading="lazy">';
+
+    if (!GOOGLE_DRIVE_API_KEY || GOOGLE_DRIVE_API_KEY === 'PASTE_YOUR_GOOGLE_DRIVE_API_KEY_HERE') {
+      aboutSlider.innerHTML = fallbackImage;
+      return;
+    }
+
+    const listUrl = `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(`'${GOOGLE_DRIVE_FOLDER_ID}' in parents and trashed=false and mimeType contains 'image/'`)}&fields=files(id,name,mimeType)&orderBy=modifiedTime desc&key=${GOOGLE_DRIVE_API_KEY}`;
+
+    try {
+      const response = await fetch(listUrl);
+      if (!response.ok) throw new Error('drive fetch failed');
+      const data = await response.json();
+      const files = Array.isArray(data.files) ? data.files.filter(file => file && file.id) : [];
+
+      if (!files.length) {
+        aboutSlider.innerHTML = fallbackImage;
+        return;
+      }
+
+      const slides = files.map((file, index) => {
+        const src = `https://drive.google.com/uc?export=view&id=${file.id}`;
+        return `<img class="about-slide ${index === 0 ? 'is-active' : ''}" src="${src}" alt="jscaylum photo ${index + 1}" loading="lazy">`;
+      }).join('');
+
+      aboutSlider.innerHTML = slides;
+
+      const slideEls = [...aboutSlider.querySelectorAll('.about-slide')];
+      if (slideEls.length > 1) {
+        let activeIndex = 0;
+        setInterval(() => {
+          activeIndex = (activeIndex + 1) % slideEls.length;
+          slideEls.forEach((slide, index) => {
+            slide.classList.toggle('is-active', index === activeIndex);
+          });
+        }, 3000);
+      }
+    } catch (error) {
+      aboutSlider.innerHTML = fallbackImage;
+    }
+  }
+
+  refreshAboutPhotos();
+  setInterval(refreshAboutPhotos, ABOUT_PHOTO_REFRESH_MS);
+
   // nav scroll state
   const header = document.getElementById('siteHeader');
   window.addEventListener('scroll', () => {
     header.classList.toggle('scrolled', window.scrollY > 40);
   });
 
-  // email signup — sends to SIGNUP_EMAIL via FormSubmit (no account needed;
-  // see the note in the SITE CONFIG block above for setup).
+  // Email signup — works immediately with FormSubmit, and is set up so you can
+  // swap the provider later for ConvertKit/Mailchimp without changing the site UI.
+  const SIGNUP_PROVIDER = 'formsubmit';
+  const SIGNUP_CONFIG = {
+    formsubmit: {
+      endpoint: `https://formsubmit.co/ajax/${encodeURIComponent(SIGNUP_EMAIL)}`,
+      payload: (email) => ({
+        email,
+        _subject: 'new jscaylum site signup',
+        _captcha: 'false',
+        _template: 'table'
+      })
+    },
+    convertkit: {
+      endpoint: 'https://api.convertkit.com/v3/forms/YOUR_FORM_ID/subscribe',
+      payload: (email) => ({
+        api_key: 'YOUR_CONVERTKIT_API_KEY',
+        email,
+        first_name: ''
+      })
+    },
+    mailchimp: {
+      endpoint: 'https://usX.api.mailchimp.com/3.0/lists/YOUR_AUDIENCE_ID/members',
+      payload: (email) => ({
+        email_address: email,
+        status: 'subscribed'
+      })
+    }
+  };
+
   const signupForm = document.getElementById('signupForm');
   const formNote = document.getElementById('formNote');
   if (signupForm) {
@@ -1387,15 +1667,25 @@
       if (formNote) formNote.textContent = defaultNote;
 
       try {
-        const res = await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(SIGNUP_EMAIL)}`, {
+        const provider = SIGNUP_PROVIDER && SIGNUP_CONFIG[SIGNUP_PROVIDER] ? SIGNUP_PROVIDER : 'formsubmit';
+        const config = SIGNUP_CONFIG[provider];
+        const payload = config.payload(email);
+        const headers = { 'Content-Type': 'application/json', 'Accept': 'application/json' };
+
+        if (provider === 'mailchimp') {
+          headers['Authorization'] = 'Basic ' + btoa(`anystring:${config.apiKey || 'YOUR_MAILCHIMP_API_KEY'}`);
+        }
+
+        const res = await fetch(config.endpoint, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-          body: JSON.stringify({
-            email,
-            _subject: 'new jscaylum site signup',
-          })
+          headers,
+          body: JSON.stringify(payload)
         });
-        if (!res.ok) throw new Error('request failed');
+
+        if (!res.ok) {
+          const message = await res.text();
+          throw new Error(message || 'request failed');
+        }
 
         btn.textContent = 'thanks!';
         input.value = '';
