@@ -1692,7 +1692,7 @@
 
   // Email signup — FormSubmit remains the default until the free Google Sheets
   // endpoint is deployed. Switch SIGNUP_PROVIDER when that URL is ready.
-  const SIGNUP_PROVIDER = 'formsubmit';
+  const SIGNUP_PROVIDER = 'googleSheets';
   const SIGNUP_CONFIG = {
     formsubmit: {
       endpoint: `https://formsubmit.co/ajax/${encodeURIComponent(SIGNUP_EMAIL)}`,
@@ -1704,7 +1704,7 @@
       })
     },
     googleSheets: {
-      endpoint: 'PASTE_YOUR_APPS_SCRIPT_WEB_APP_URL_HERE',
+      endpoint: 'https://script.google.com/macros/s/AKfycbwAsSu0ganyUjdDds5Tj_6ShnCAgozP-2-4ic8Fr2HMbv7l91h1zBekeqM9ua4lA04a/exec',
       payload: (email) => ({ email })
     },
     convertkit: {
