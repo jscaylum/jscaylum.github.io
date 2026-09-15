@@ -813,7 +813,7 @@
     100% { text-shadow:0 0 0px rgba(168,155,217,0); }
   }
   .mystery-track .track-name.glow{
-    animation:trackRevealGlow 1.6s ease;
+    animation:trackRevealGlow 2.4s ease;
   }
   .mystery-track{ justify-content:flex-start; }
   .mystery-track .track-countdown{
@@ -892,7 +892,7 @@
     opacity:1;
     transform:translateY(0);
     text-shadow:0 0 22px rgba(156,78,158,0.8), 0 0 55px rgba(156,78,158,0.55), 0 0 90px rgba(156,78,158,0.4);
-    animation:trackRevealNamePulse 1.8s ease;
+    animation:trackRevealNamePulse 2.4s ease;
   }
   @keyframes trackRevealNamePulse{
     0%   { filter:brightness(0.8); }
@@ -946,7 +946,7 @@
     </svg>
 
     <div class="hero-content">
-      <div class="hero-eyebrow lc">new ep · he loves me, not</div>
+      <div class="hero-eyebrow lc" id="latestReleaseEyebrow">latest release · butterfly</div>
       <h1 class="display">jsc<em>ay</em>lum</h1>
       <p class="hero-tag">soft-spoken songs about everything that's <span class="display">hard</span> to say out loud.</p>
       <div class="hero-ctas">
@@ -1003,9 +1003,9 @@
       <div class="section-head">
         <div>
           <div class="eyebrow lc">latest release</div>
-          <h2 class="display">butt<em style="font-style:italic;color:var(--rose)">er</em>fly</h2>
+          <h2 class="display" id="latestReleaseTitle">butt<em style="font-style:italic;color:var(--rose)">er</em>fly</h2>
         </div>
-        <p>one song about running out of time to say what you meant. out now.</p>
+        <p id="latestReleaseDescription">one song about running out of time to say what you meant. out now.</p>
       </div>
 
       <div class="release reveal">
@@ -1014,9 +1014,9 @@
           <a class="cover-play" href="https://open.spotify.com/album/2cNZnYAmlyNH5FB2iyyP2u" target="_blank" rel="noopener" aria-label="listen to butterfly on spotify"><span class="btn-circle"><svg viewBox="0 0 24 24"><path d="M6 4l15 8-15 8V4z"/></svg></span></a>
         </div>
         <div class="release-info">
-          <div class="eyebrow lc">single · 2026</div>
-          <h3 class="display">butterfly</h3>
-          <div class="release-meta">1 track · released 29 august 2026</div>
+          <div class="eyebrow lc" id="latestReleaseType">single · 2026</div>
+          <h3 class="display" id="latestReleaseName">butterfly</h3>
+          <div class="release-meta" id="latestReleaseMeta">1 track · released 29 august 2026</div>
 
           <div class="tracklist" id="tracklist">
             <div class="track" data-track="1">
@@ -1105,7 +1105,7 @@
           <input type="email" name="email" placeholder="your email" required aria-label="email address">
           <button type="submit" class="lc">sign up</button>
         </form>
-        <div class="form-note" id="formNote">no spam — just the essentials.</div>
+        <div class="form-note" id="formNote">quiet updates, new songs, photos from the way there.</div>
 
         <div class="socials">
           <a href="https://music.apple.com/gb/artist/jscaylum/1875719727" target="_blank" rel="noopener" aria-label="apple music">
@@ -1176,7 +1176,7 @@
 
   // Where email signups get sent (via FormSubmit — no account needed, see
   // the "sign up works" section further down for setup notes).
-  const SIGNUP_EMAIL = "you@example.com"; // <-- replace with your real email
+  const SIGNUP_EMAIL = "jscaylum@gmail.com";
 
   // The exact moment the LAST track reveals — each visitor's own local
   // midnight on Sept 19, 2026 (a UK fan and a US fan will each see their
@@ -1198,6 +1198,9 @@
       name: 'butterfly',
       type: 'single',
       year: '2026',
+      releaseDate: '29 august 2026',
+      description: 'one song about running out of time to say what you meant. out now.',
+      tracks: ['butterfly'],
       spotifyUrl: 'https://open.spotify.com/album/2cNZnYAmlyNH5FB2iyyP2u',
       artUrl: null
     },
@@ -1223,6 +1226,36 @@
       artUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/45/b7/0b/45b70ba1-45e2-b860-0551-9df85aa0e40d/artwork.jpg/632x632bb.webp'
     }
   ];
+
+  const LATEST_RELEASE = DISCOGRAPHY[0];
+
+  function renderLatestRelease() {
+    if (!LATEST_RELEASE) return;
+
+    const titleEl = document.getElementById('latestReleaseTitle');
+    const eyebrowEl = document.getElementById('latestReleaseEyebrow');
+    const descriptionEl = document.getElementById('latestReleaseDescription');
+    const typeEl = document.getElementById('latestReleaseType');
+    const nameEl = document.getElementById('latestReleaseName');
+    const metaEl = document.getElementById('latestReleaseMeta');
+    const tracklistEl = document.getElementById('tracklist');
+
+    if (eyebrowEl) eyebrowEl.textContent = `latest release · ${LATEST_RELEASE.name}`;
+    if (titleEl) titleEl.textContent = LATEST_RELEASE.name;
+    if (descriptionEl) descriptionEl.textContent = LATEST_RELEASE.description || '';
+    if (typeEl) typeEl.textContent = `${LATEST_RELEASE.type} · ${LATEST_RELEASE.year}`;
+    if (nameEl) nameEl.textContent = LATEST_RELEASE.name;
+    if (metaEl) metaEl.textContent = `${LATEST_RELEASE.tracks.length} track${LATEST_RELEASE.tracks.length === 1 ? '' : 's'} · released ${LATEST_RELEASE.releaseDate}`;
+    if (tracklistEl) {
+      tracklistEl.innerHTML = LATEST_RELEASE.tracks.map((track, index) => `
+        <div class="track" data-track="${index + 1}">
+          <span class="track-num">${String(index + 1).padStart(2, '0')}</span>
+          <div><div class="track-name">${track}</div></div>
+          <button class="track-play" aria-label="play ${track}" type="button"><svg viewBox="0 0 24 24"><path d="M6 4l15 8-15 8V4z"/></svg></button>
+        </div>
+      `).join('');
+    }
+  }
 
   const ALBUM = {
     name: "THOUGHTS ARE HELL",
@@ -1438,6 +1471,7 @@
     }
   }
 
+  renderLatestRelease();
   renderDiscography();
   syncReleaseCount();
 
@@ -1504,18 +1538,10 @@
     void trackRevealOverlay.offsetWidth;
     trackRevealOverlay.classList.add('is-visible');
 
-    if (rowEl) {
-      rowEl.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
-    }
-
-    if (mysteryTracklistEl) {
-      mysteryTracklistEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }
-
     clearTimeout(triggerTrackReveal.timeoutId);
     triggerTrackReveal.timeoutId = setTimeout(() => {
       trackRevealOverlay.classList.remove('is-visible');
-    }, 1800);
+    }, 2400);
   }
 
   if (mysteryTracklistEl) {
@@ -1664,8 +1690,8 @@
     header.classList.toggle('scrolled', window.scrollY > 40);
   });
 
-  // Email signup — works immediately with FormSubmit, and is set up so you can
-  // swap the provider later for ConvertKit/Mailchimp without changing the site UI.
+  // Email signup — FormSubmit remains the default until the free Google Sheets
+  // endpoint is deployed. Switch SIGNUP_PROVIDER when that URL is ready.
   const SIGNUP_PROVIDER = 'formsubmit';
   const SIGNUP_CONFIG = {
     formsubmit: {
@@ -1676,6 +1702,10 @@
         _captcha: 'false',
         _template: 'table'
       })
+    },
+    googleSheets: {
+      endpoint: 'PASTE_YOUR_APPS_SCRIPT_WEB_APP_URL_HERE',
+      payload: (email) => ({ email })
     },
     convertkit: {
       endpoint: 'https://api.convertkit.com/v3/forms/YOUR_FORM_ID/subscribe',
@@ -1713,7 +1743,10 @@
         const provider = SIGNUP_PROVIDER && SIGNUP_CONFIG[SIGNUP_PROVIDER] ? SIGNUP_PROVIDER : 'formsubmit';
         const config = SIGNUP_CONFIG[provider];
         const payload = config.payload(email);
-        const headers = { 'Content-Type': 'application/json', 'Accept': 'application/json' };
+        const isGoogleSheets = provider === 'googleSheets';
+        const headers = isGoogleSheets
+          ? { 'Content-Type': 'text/plain;charset=UTF-8' }
+          : { 'Content-Type': 'application/json', 'Accept': 'application/json' };
 
         if (provider === 'mailchimp') {
           headers['Authorization'] = 'Basic ' + btoa(`anystring:${config.apiKey || 'YOUR_MAILCHIMP_API_KEY'}`);
@@ -1722,18 +1755,19 @@
         const res = await fetch(config.endpoint, {
           method: 'POST',
           headers,
-          body: JSON.stringify(payload)
+          body: JSON.stringify(payload),
+          ...(isGoogleSheets ? { mode: 'no-cors' } : {})
         });
 
-        if (!res.ok) {
+        if (!isGoogleSheets && !res.ok) {
           const message = await res.text();
           throw new Error(message || 'request failed');
         }
 
-        btn.textContent = 'thanks!';
+        btn.textContent = "you're in";
         input.value = '';
         input.disabled = true;
-        if (formNote) formNote.textContent = "you're on the list — no spam, just the essentials.";
+        if (formNote) formNote.textContent = "you're on the list — expect songs, photos, and little notes from the road.";
       } catch (err) {
         btn.disabled = false;
         btn.textContent = 'sign up';
