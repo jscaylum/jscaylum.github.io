@@ -168,10 +168,8 @@ function getSpreadsheet_() {
 
 function ensureSheet_(spreadsheet, name, headers) {
   const sheet = spreadsheet.getSheetByName(name) || spreadsheet.insertSheet(name);
-  if (sheet.getLastRow() === 0) {
-    sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
-    sheet.setFrozenRows(1);
-  }
+  sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+  sheet.setFrozenRows(1);
   return sheet;
 }
 
