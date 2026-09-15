@@ -78,7 +78,7 @@ function sendWelcomeEmail_(email) {
 
   GmailApp.sendEmail(email, subject, message, {
     htmlBody: buildWelcomeHtml_(),
-    name: 'jscaylum'
+    name: 'message from jscaylum'
   });
 }
 
@@ -125,7 +125,7 @@ function sendCampaign_(subject, message, photoUrl) {
     const batch = recipients.slice(index, index + batchSize);
     GmailApp.sendEmail(batch.join(','), subject, plainBody, {
       htmlBody,
-      name: 'jscaylum'
+      name: 'message from jscaylum'
     });
   }
 
