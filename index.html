@@ -97,6 +97,11 @@
     font-size:1.35rem;
     letter-spacing:0.01em;
   }
+  .logo img{
+    display:block;
+    width:auto;
+    height:1.5rem;
+  }
   .navlinks{
     display:flex;
     gap:34px;
@@ -203,6 +208,11 @@
     line-height:0.94;
     opacity:0;
     animation:riseIn 1s ease forwards 0.4s;
+  }
+  .hero-logo{
+    display:block;
+    width:min(82vw, 760px);
+    height:auto;
   }
   .hero h1 em{ font-style:italic; font-family:'Fraunces',serif; font-weight:400; text-transform:lowercase; color:var(--rose); letter-spacing:-0.01em; }
 
@@ -912,7 +922,7 @@
 
 <header id="siteHeader">
   <nav class="wrap">
-    <a href="#top" class="logo">jscaylum</a>
+    <a href="#top" class="logo" aria-label="jscaylum home"><img src="jscaylum-logo-transparent.png" alt="jscaylum"></a>
     <ul class="navlinks" id="navLinks">
       <li><a href="#next-era">next up</a></li>
       <li><a href="#music">music</a></li>
@@ -947,7 +957,7 @@
 
     <div class="hero-content">
       <div class="hero-eyebrow lc" id="latestReleaseEyebrow">latest release · butterfly</div>
-      <h1 class="display">jsc<em>ay</em>lum</h1>
+      <h1 class="display"><img class="hero-logo" src="jscaylum-logo-transparent.png" alt="jscaylum"></h1>
       <p class="hero-tag">soft-spoken songs about everything that's <span class="display">hard</span> to say out loud.</p>
       <div class="hero-ctas">
         <a href="#music" class="btn btn-primary lc">listen now</a>
