@@ -905,7 +905,7 @@
 
 <div class="track-reveal-overlay" id="trackRevealOverlay" aria-live="polite" aria-atomic="true">
   <div class="track-reveal-card">
-    <div class="track-reveal-kicker">new track</div>
+    <div class="track-reveal-kicker" id="trackRevealKicker">new track</div>
     <div class="track-reveal-name" id="trackRevealName">butterfly</div>
   </div>
 </div>
@@ -1187,6 +1187,7 @@
   // Oct 10, 2026. Once REVEAL_DEADLINE passes (tracklist fully revealed),
   // the big countdown automatically switches to count down to this instead.
   const RELEASE_DATE = new Date(2026, 9, 10, 0, 0, 0);
+  const IS_LOCAL_PREVIEW = ['localhost', '127.0.0.1', '::1'].includes(location.hostname);
 
   // The "everything so far" discography cards are Spotify-only by design
   // (keeps things simple instead of mixing platforms). Paste each track's
@@ -1229,8 +1230,8 @@
 
   const LATEST_RELEASE = DISCOGRAPHY[0];
 
-  function renderLatestRelease() {
-    if (!LATEST_RELEASE) return;
+  function renderLatestRelease(release = LATEST_RELEASE) {
+    if (!release) return;
 
     const titleEl = document.getElementById('latestReleaseTitle');
     const eyebrowEl = document.getElementById('latestReleaseEyebrow');
@@ -1239,15 +1240,19 @@
     const nameEl = document.getElementById('latestReleaseName');
     const metaEl = document.getElementById('latestReleaseMeta');
     const tracklistEl = document.getElementById('tracklist');
+    const coverEl = document.querySelector('.ep-art');
+    const coverImgEl = coverEl ? coverEl.querySelector('.cover-img') : null;
+    const coverPlayEl = coverEl ? coverEl.querySelector('.cover-play') : null;
+    const releaseCtasEl = document.getElementById('releaseCtas');
 
-    if (eyebrowEl) eyebrowEl.textContent = `latest release · ${LATEST_RELEASE.name}`;
-    if (titleEl) titleEl.textContent = LATEST_RELEASE.name;
-    if (descriptionEl) descriptionEl.textContent = LATEST_RELEASE.description || '';
-    if (typeEl) typeEl.textContent = `${LATEST_RELEASE.type} · ${LATEST_RELEASE.year}`;
-    if (nameEl) nameEl.textContent = LATEST_RELEASE.name;
-    if (metaEl) metaEl.textContent = `${LATEST_RELEASE.tracks.length} track${LATEST_RELEASE.tracks.length === 1 ? '' : 's'} · released ${LATEST_RELEASE.releaseDate}`;
+    if (eyebrowEl) eyebrowEl.textContent = `latest release · ${release.name}`;
+    if (titleEl) titleEl.textContent = release.name;
+    if (descriptionEl) descriptionEl.textContent = release.description || '';
+    if (typeEl) typeEl.textContent = `${release.type} · ${release.year}`;
+    if (nameEl) nameEl.textContent = release.name;
+    if (metaEl) metaEl.textContent = `${release.tracks.length} track${release.tracks.length === 1 ? '' : 's'} · released ${release.releaseDate}`;
     if (tracklistEl) {
-      tracklistEl.innerHTML = LATEST_RELEASE.tracks.map((track, index) => `
+      tracklistEl.innerHTML = release.tracks.map((track, index) => `
         <div class="track" data-track="${index + 1}">
           <span class="track-num">${String(index + 1).padStart(2, '0')}</span>
           <div><div class="track-name">${track}</div></div>
@@ -1255,11 +1260,42 @@
         </div>
       `).join('');
     }
+
+    if (coverImgEl) {
+      coverImgEl.alt = `${release.name} cover art`;
+      if (release.spotifyUrl) {
+        coverImgEl.dataset.spotifyUrl = release.spotifyUrl;
+        coverEl.classList.remove('cover-fallback');
+      } else {
+        delete coverImgEl.dataset.spotifyUrl;
+        coverImgEl.removeAttribute('src');
+        coverImgEl.classList.remove('loaded');
+        coverEl.classList.add('cover-fallback');
+      }
+    }
+    if (coverPlayEl) {
+      if (release.link || release.spotifyUrl) {
+        coverPlayEl.href = release.link || release.spotifyUrl;
+        coverPlayEl.setAttribute('aria-label', `listen to ${release.name.toLowerCase()}`);
+      } else {
+        coverPlayEl.remove();
+      }
+    }
+    if (releaseCtasEl) {
+      const ctas = [
+        { url: release.appleMusicUrl, label: 'play on apple music', className: 'btn btn-primary lc' },
+        { url: release.spotifyUrl, label: 'play on spotify', className: 'btn btn-outline lc' }
+      ].filter(item => item.url);
+      releaseCtasEl.innerHTML = ctas.map(item => `
+        <a href="${item.url}" target="_blank" rel="noopener" class="${item.className}">${item.label}</a>
+      `).join('');
+    }
   }
 
   const ALBUM = {
     name: "THOUGHTS ARE HELL",
     tagline: "an album. 12 songs. full tracklist out by sept 19.",
+    preSaveUrl: "https://distrokid.com/hyperfollow/jscaylum/thoughts-are-hell-2",
     // Once you have the album links, paste them here. They will appear in the
     // countdown CTA and the album discography card automatically.
     appleMusicUrl: null,
@@ -1309,6 +1345,20 @@
       t.revealAt = new Date(REVEAL_DEADLINE.getTime() - stepsFromEnd * 60000);
     });
   })();
+  const albumRevealTrack = ALBUM.tracks.filter(t => !t.permanentlyRevealed).slice(-1)[0];
+  const ALBUM_RELEASE = {
+    name: ALBUM.name.toLowerCase(),
+    type: 'album',
+    year: ALBUM.year,
+    releaseDate: '10 october 2026',
+    description: '12 songs about the things that are hardest to say out loud. out now.',
+    tracks: ALBUM.tracks.map(track => track.name),
+    appleMusicUrl: ALBUM.appleMusicUrl,
+    spotifyUrl: ALBUM.spotifyUrl,
+    link: ALBUM.link
+  };
+
+  renderLatestRelease(Date.now() >= RELEASE_DATE.getTime() ? ALBUM_RELEASE : LATEST_RELEASE);
 
   function formatCountdown(ms) {
     if (ms <= 0) return null;
@@ -1340,6 +1390,7 @@
   //  2. REVEAL_DEADLINE to RELEASE_DATE — tracklist is out, counting down to release
   //  3. after RELEASE_DATE — album is out
   function getPhase(now) {
+    if (IS_LOCAL_PREVIEW) return 'release-countdown';
     if (now < REVEAL_DEADLINE.getTime()) return 'reveal';
     if (now < RELEASE_DATE.getTime()) return 'release-countdown';
     return 'released';
@@ -1350,11 +1401,13 @@
   const countdownGridEl = document.getElementById('countdownGrid');
   const countdownGridUnits = countdownGridEl ? countdownGridEl.querySelectorAll('.countdown-unit .val') : null;
   const countdownCtaEl = document.getElementById('countdownCta');
+  const trackRevealOverlay = document.getElementById('trackRevealOverlay');
 
   function renderAlbumCtas() {
     if (!countdownCtaEl) return;
 
     const buttons = [
+      { url: ALBUM.preSaveUrl, label: 'pre-save now', className: 'btn btn-primary lc' },
       { url: ALBUM.appleMusicUrl, label: 'apple music', className: 'btn btn-primary lc' },
       { url: ALBUM.spotifyUrl, label: 'spotify', className: 'btn btn-outline lc' }
     ].filter(item => item.url);
@@ -1471,7 +1524,6 @@
     }
   }
 
-  renderLatestRelease();
   renderDiscography();
   syncReleaseCount();
 
@@ -1487,16 +1539,30 @@
       if (phase === 'reveal') {
         if (eyebrowEl) eyebrowEl.textContent = 'next up · unannounced';
         if (albumSubEl) albumSubEl.textContent = ALBUM.tagline;
+        if (albumTitleEl) albumTitleEl.innerHTML = 'thoughts are <em style="font-style:italic;color:var(--rose)">hell</em>';
+        if (countdownGridEl) countdownGridEl.hidden = false;
+        const mysteryTracklist = document.getElementById('mysteryTracklist');
+        if (mysteryTracklist) mysteryTracklist.hidden = false;
         if (countdownCtaEl) countdownCtaEl.innerHTML = '<a href="#tour" class="btn btn-primary lc">get notified</a>';
       } else if (phase === 'release-countdown') {
         if (eyebrowEl) eyebrowEl.textContent = 'coming october 10';
         if (albumSubEl) albumSubEl.textContent = `the full album — out october 10, ${ALBUM.year}.`;
+        if (albumTitleEl) albumTitleEl.innerHTML = 'thoughts are <em style="font-style:italic;color:var(--rose)">hell</em>';
+        if (countdownGridEl) countdownGridEl.hidden = false;
+        const mysteryTracklist = document.getElementById('mysteryTracklist');
+        if (mysteryTracklist) mysteryTracklist.hidden = false;
         renderAlbumCtas();
         addAlbumToDiscography();
       } else {
-        if (eyebrowEl) eyebrowEl.textContent = 'out now';
-        if (albumSubEl) albumSubEl.textContent = `the full album is out now.`;
-        renderAlbumCtas();
+        if (eyebrowEl) eyebrowEl.textContent = 'nothing announced currently';
+        if (albumSubEl) albumSubEl.textContent = 'new music coming soon.';
+        if (albumTitleEl) albumTitleEl.textContent = 'coming soon';
+        if (countdownGridEl) countdownGridEl.hidden = true;
+        const mysteryTracklist = document.getElementById('mysteryTracklist');
+        if (mysteryTracklist) mysteryTracklist.hidden = true;
+        if (countdownCtaEl) countdownCtaEl.innerHTML = '';
+        if (trackRevealOverlay) trackRevealOverlay.classList.remove('is-visible');
+        renderLatestRelease(ALBUM_RELEASE);
         addAlbumToDiscography();
       }
     }
@@ -1527,13 +1593,14 @@
   // wiped and rebuilt) so the reveal moment can actually transition
   // smoothly instead of snapping instantly.
   const mysteryTracklistEl = document.getElementById('mysteryTracklist');
-  const trackRevealOverlay = document.getElementById('trackRevealOverlay');
+  const trackRevealKickerEl = document.getElementById('trackRevealKicker');
   const trackRevealNameEl = document.getElementById('trackRevealName');
 
-  function triggerTrackReveal(trackName, rowEl) {
-    if (!trackRevealOverlay || !trackRevealNameEl || !trackName) return;
+  function triggerTrackReveal(trackName, rowEl, isAlbumReveal) {
+    if (!trackRevealOverlay || !trackRevealNameEl || !trackName || Date.now() >= RELEASE_DATE.getTime()) return;
 
-    trackRevealNameEl.textContent = trackName;
+    if (trackRevealKickerEl) trackRevealKickerEl.textContent = isAlbumReveal ? 'album revealed' : 'new track';
+    trackRevealNameEl.textContent = isAlbumReveal ? 'pre-save album' : trackName;
     trackRevealOverlay.classList.remove('is-visible');
     void trackRevealOverlay.offsetWidth;
     trackRevealOverlay.classList.add('is-visible');
@@ -1566,7 +1633,7 @@
       const now = Date.now();
       rows.forEach(r => {
         const t = r.track;
-        const isRevealed = t.permanentlyRevealed || (t.revealAt && now >= t.revealAt.getTime());
+        const isRevealed = IS_LOCAL_PREVIEW || t.permanentlyRevealed || (t.revealAt && now >= t.revealAt.getTime());
 
         if (isRevealed) {
           if (!r.revealedShown) {
@@ -1575,7 +1642,7 @@
             r.nameEl.classList.add('revealed', 'glow');
             r.countdownEl.classList.add('fade-out');
             r.revealedShown = true;
-            triggerTrackReveal(trackName, r.rowEl);
+            triggerTrackReveal(trackName, r.rowEl, t === albumRevealTrack);
             r.nameEl.addEventListener('animationend', () => {
               r.nameEl.classList.remove('glow');
             }, { once: true });
