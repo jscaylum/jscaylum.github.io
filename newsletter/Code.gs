@@ -178,11 +178,11 @@ function scheduleDraft() {
   const subject = String(values[0] || '').trim();
   const message = String(values[1] || '').trim();
   const attachmentIds = parseAttachmentIds_(values[2]);
-  const sendAt = values[3];
+  const sendAt = parseSendAt_(values[3]);
 
   if (!subject || !message) throw new Error('Add a subject and message in the Draft sheet first.');
-  if (!(sendAt instanceof Date) || isNaN(sendAt.getTime())) {
-    throw new Error('Put a future date and time in the "Send at (optional)" cell, or use sendDraft to send immediately.');
+  if (!sendAt) {
+    throw new Error(`Couldn't read a date/time from "Send at (optional)" (got: ${JSON.stringify(values[3])}). Reformat that cell as Date time (Format > Number > Date time) and retype it.`);
   }
   if (sendAt.getTime() <= Date.now()) {
     throw new Error('The scheduled time must be in the future.');
@@ -278,6 +278,16 @@ function parseAttachmentIds_(value) {
       const match = value.match(/[-\w]{20,}/);
       return match ? match[0] : value;
     });
+}
+
+// accepts a real Date (from a properly formatted cell) or a typed string
+function parseSendAt_(value) {
+  if (value instanceof Date && !isNaN(value.getTime())) return value;
+  if (typeof value === 'string' && value.trim()) {
+    const parsed = new Date(value.trim());
+    if (!isNaN(parsed.getTime())) return parsed;
+  }
+  return null;
 }
 
 function parseRequest_(event) {
