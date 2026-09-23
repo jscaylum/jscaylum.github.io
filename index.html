@@ -164,27 +164,29 @@
   .hero-flower{
     position:absolute;
     top:50%; left:50%;
-    transform:translate(-50%,-50%);
-    width:min(72vw, 620px);
-    opacity:0.55;
+    transform:translate(-50%,-50%) scale(.96);
+    width:min(86vw, 850px);
+    height:min(86vw, 850px);
+    opacity:0;
     z-index:0;
     pointer-events:none;
+    animation:heroFlowerReveal 4s ease forwards;
   }
-  .hero-flower path, .hero-flower ellipse, .hero-flower line{
-    fill:none;
-    stroke:var(--rose-dim);
-    stroke-width:1;
+  .hero-flower path{
+    fill:rgba(232,130,156,.05);
+    stroke:var(--rose);
+    stroke-width:1.1;
+    stroke-linecap:round;
+    stroke-linejoin:round;
     stroke-dasharray:1400;
     stroke-dashoffset:1400;
-    animation:draw 3.2s ease forwards 0.3s;
+    animation:heroFlowerDraw 4s ease forwards;
   }
-  .hero-flower .petal-fill{
-    fill:var(--rose);
-    opacity:0;
-    animation:bloomFill 2s ease forwards 2.1s;
+  @keyframes heroFlowerDraw{ to{ stroke-dashoffset:0; } }
+  @keyframes heroFlowerReveal{
+    from{ opacity:0; transform:translate(-50%,-50%) scale(.96); }
+    to{ opacity:.3; transform:translate(-50%,-50%) scale(1); }
   }
-  @keyframes draw{ to{ stroke-dashoffset:0; } }
-  @keyframes bloomFill{ to{ opacity:0.16; } }
 
   .hero-content{ position:relative; z-index:1; }
 
@@ -556,6 +558,87 @@
   }
   .merch-empty p{ color:var(--ink-dim); font-size:0.92rem; margin:0 auto 22px; font-weight:300; }
 
+  /* merch shop CTA — same shell as merch-empty, used once the store link is live */
+  .merch-live{
+    text-align:center;
+    max-width:420px;
+    margin:0 auto;
+    padding:64px 32px;
+    border:1px solid var(--line);
+    border-radius:18px;
+    background:
+      radial-gradient(ellipse 90% 70% at 30% 20%, rgba(168,155,217,0.10), transparent 60%),
+      radial-gradient(ellipse 80% 70% at 80% 85%, rgba(201,138,156,0.08), transparent 60%);
+  }
+  .merch-live svg{
+    width:38px; height:38px;
+    stroke:var(--ink-faint);
+    fill:none;
+    margin-bottom:20px;
+  }
+  .merch-live p{ color:var(--ink-dim); font-size:0.92rem; margin:0 auto 22px; font-weight:300; }
+
+  /* merch password modal */
+  .merch-password-overlay{
+    position:fixed;
+    inset:0;
+    z-index:9998;
+    display:grid;
+    place-items:center;
+    padding:24px;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity 0.35s ease;
+  }
+  .merch-password-overlay::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:rgba(14,12,17,0.82);
+    backdrop-filter:blur(4px);
+    -webkit-backdrop-filter:blur(4px);
+  }
+  .merch-password-overlay.is-visible{
+    opacity:1;
+    pointer-events:auto;
+  }
+  .merch-password-card{
+    position:relative;
+    z-index:1;
+    max-width:380px;
+    width:100%;
+    text-align:center;
+    background:var(--bg-card);
+    border:1px solid var(--line-strong);
+    border-radius:20px;
+    padding:44px 36px;
+    transform:translateY(14px) scale(0.98);
+    transition:transform 0.4s cubic-bezier(0.2,0.8,0.2,1);
+  }
+  .merch-password-overlay.is-visible .merch-password-card{
+    transform:translateY(0) scale(1);
+  }
+  .merch-password-card .eyebrow{ margin-bottom:14px; }
+  .merch-password-value{
+    font-size:2.2rem;
+    font-style:italic;
+    color:var(--rose);
+    margin-bottom:14px;
+    letter-spacing:0.01em;
+  }
+  .merch-password-card p{
+    color:var(--ink-dim);
+    font-size:0.9rem;
+    font-weight:300;
+    margin-bottom:28px;
+  }
+  .merch-password-actions{
+    display:flex;
+    gap:12px;
+    justify-content:center;
+    flex-wrap:wrap;
+  }
+
   /* ---------------- TOUR / NEWSLETTER ---------------- */
   .tour-panel{
     background:linear-gradient(155deg, rgba(168,155,217,0.10), rgba(201,138,156,0.08));
@@ -918,7 +1001,7 @@
       <li><a href="#music">music</a></li>
       <li><a href="#merch">merch</a></li>
       <li><a href="#about">about</a></li>
-      <li><a href="#tour">tour</a></li>
+      <li><a href="#newsletter">updates</a></li>
     </ul>
     <div style="display:flex; align-items:center; gap:14px;">
       <a href="#music" class="nav-cta lc">stream now</a>
@@ -931,18 +1014,12 @@
 
   <!-- HERO -->
   <section class="hero" style="padding-top:0;">
-    <svg class="hero-flower" viewBox="0 0 400 400" aria-hidden="true">
-      <ellipse class="petal-fill" cx="200" cy="130" rx="46" ry="70"/>
-      <ellipse class="petal-fill" cx="200" cy="270" rx="46" ry="70"/>
-      <ellipse class="petal-fill" cx="130" cy="200" rx="70" ry="46"/>
-      <ellipse class="petal-fill" cx="270" cy="200" rx="70" ry="46"/>
-      <path d="M200 130 C160 160 160 240 200 270"/>
-      <path d="M200 130 C240 160 240 240 200 270"/>
-      <path d="M130 200 C160 160 240 160 270 200"/>
-      <path d="M130 200 C160 240 240 240 270 200"/>
-      <circle cx="200" cy="200" r="18" style="stroke:var(--rose);"/>
-      <path d="M200 280 C195 320 210 340 200 380" style="stroke:var(--sage);"/>
-      <path d="M200 330 C180 335 170 350 165 360" style="stroke:var(--sage);"/>
+    <svg class="hero-flower" viewBox="0 0 800 800" aria-hidden="true">
+      <g transform="translate(400 400)">
+        <path d="M0 0 C-34-72-145-88-178-12 C-204 48-120 89 0 0 C-68 34-110 151-37 174 C22 193 54 102 0 0 C-7 79 61 170 122 132 C170 101 110 16 0 0 C70 15 184-43 155-112 C132-167 42-107 0 0 C22-72 9-188-65-183 C-125-178-111-75 0 0 Z"/>
+        <path d="M0 0 C-48-20-103-2-109 39 C-113 72-53 82 0 0 C-12 54 12 106 52 100 C87 95 73 38 0 0 C53 17 105-9 101-50 C97-84 42-70 0 0 Z"/>
+        <circle cx="0" cy="0" r="18" fill="var(--rose)" stroke="none"/>
+      </g>
     </svg>
 
     <div class="hero-content">
@@ -1083,24 +1160,36 @@
           <div class="eyebrow lc">merch</div>
           <h2 class="display">shop the era</h2>
         </div>
-        <p>the shop isn't open yet — first drop is coming.</p>
+        <p>the shop is live — just still being finished, so it's under a password for now.</p>
       </div>
 
-      <div class="merch-empty reveal">
+      <div class="merch-live reveal">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10l3 4-4 2v10H8V10L4 8l3-4z" stroke-width="1.1" stroke-linejoin="round"/><path d="M9 4a3 3 0 0 0 6 0" stroke-width="1.1"/></svg>
-        <p>nothing to shop just yet — sign up below and you'll be the first to know when the first drop lands.</p>
-        <a href="#tour" class="btn btn-outline lc">get notified</a>
+        <p>the store's up on shopify while we finish setting it up — you'll need the password to peek in.</p>
+        <button type="button" class="btn btn-primary lc" id="merchShopBtn">shop merch</button>
       </div>
     </div>
   </section>
 
-  <!-- TOUR / NEWSLETTER -->
-  <section id="tour">
+  <div class="merch-password-overlay" id="merchPasswordOverlay" aria-hidden="true">
+    <div class="merch-password-card">
+      <div class="eyebrow lc">site password</div>
+      <div class="merch-password-value display">jscaylum</div>
+      <p>the shop's still in development — use that password to get in.</p>
+      <div class="merch-password-actions">
+        <button type="button" class="btn btn-outline lc" id="merchPasswordClose">cancel</button>
+        <a href="https://jscaylum.myshopify.com" target="_blank" rel="noopener" class="btn btn-primary lc" id="merchPasswordContinue">continue to shop</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- NEWSLETTER -->
+  <section id="newsletter">
     <div class="wrap">
       <div class="tour-panel reveal">
-        <div class="eyebrow lc" style="margin-bottom:14px;">tour</div>
-        <h2 class="display">no dates yet — but soon.</h2>
-        <p>be first to know when shows, merch drops, and new music go live.</p>
+        <div class="eyebrow lc" style="margin-bottom:14px;">stay updated</div>
+        <h2 class="display">get it before anyone else.</h2>
+        <p>sign up for early access to new music, merch drops, and updates — straight to your inbox.</p>
 
         <form class="signup" id="signupForm">
           <input type="email" name="email" placeholder="your email" required aria-label="email address">
@@ -1135,7 +1224,7 @@
           <a href="#music">music</a>
           <a href="#merch">merch</a>
           <a href="#about">about</a>
-          <a href="#tour">tour</a>
+          <a href="#newsletter">updates</a>
         </div>
         <div class="footer-col">
           <h4>listen</h4>
@@ -1544,7 +1633,7 @@
         if (countdownGridEl) countdownGridEl.hidden = false;
         const mysteryTracklist = document.getElementById('mysteryTracklist');
         if (mysteryTracklist) mysteryTracklist.hidden = false;
-        if (countdownCtaEl) countdownCtaEl.innerHTML = '<a href="#tour" class="btn btn-primary lc">get notified</a>';
+        if (countdownCtaEl) countdownCtaEl.innerHTML = '<a href="#newsletter" class="btn btn-primary lc">get notified</a>';
       } else if (phase === 'release-countdown') {
         if (eyebrowEl) eyebrowEl.textContent = 'coming october 10';
         if (albumSubEl) albumSubEl.textContent = `the full album — out october 10, ${ALBUM.year}.`;
@@ -1920,6 +2009,30 @@
       setTimeout(() => releaseCard.classList.remove('pulse'), 900);
     });
   });
+
+  // merch shop button — show the site password before sending people to the
+  // (still-in-development, password-protected) shopify store
+  const merchShopBtn = document.getElementById('merchShopBtn');
+  const merchPasswordOverlay = document.getElementById('merchPasswordOverlay');
+  const merchPasswordClose = document.getElementById('merchPasswordClose');
+  if (merchShopBtn && merchPasswordOverlay) {
+    const openMerchPassword = () => {
+      merchPasswordOverlay.classList.add('is-visible');
+      merchPasswordOverlay.setAttribute('aria-hidden', 'false');
+    };
+    const closeMerchPassword = () => {
+      merchPasswordOverlay.classList.remove('is-visible');
+      merchPasswordOverlay.setAttribute('aria-hidden', 'true');
+    };
+    merchShopBtn.addEventListener('click', openMerchPassword);
+    if (merchPasswordClose) merchPasswordClose.addEventListener('click', closeMerchPassword);
+    merchPasswordOverlay.addEventListener('click', (e) => {
+      if (e.target === merchPasswordOverlay) closeMerchPassword();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeMerchPassword();
+    });
+  }
 
   // scroll reveal
   const io = new IntersectionObserver((entries) => {
