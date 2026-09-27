@@ -1404,7 +1404,7 @@
     // Once you have the album links, paste them here. They will appear in the
     // countdown CTA and the album discography card automatically.
     appleMusicUrl: null,
-    spotifyUrl: null,
+    spotifyUrl: "https://open.spotify.com/album/3KdB7DvQPcRqq89t8AJk0p",
     // Keep this as the general album link when you have a preferred platform.
     // It's used by the discography card when present.
     link: null,
@@ -1513,8 +1513,7 @@
 
     const buttons = [
       { url: ALBUM.preSaveUrl, label: 'pre-save now', className: 'btn btn-primary lc' },
-      { url: ALBUM.appleMusicUrl, label: 'apple music', className: 'btn btn-primary lc' },
-      { url: ALBUM.spotifyUrl, label: 'spotify', className: 'btn btn-outline lc' }
+      { url: ALBUM.appleMusicUrl, label: 'apple music', className: 'btn btn-primary lc' }
     ].filter(item => item.url);
 
     if (buttons.length) {
