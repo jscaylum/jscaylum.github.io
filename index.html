@@ -639,6 +639,73 @@
     flex-wrap:wrap;
   }
 
+  /* release promo popup */
+  .promo-overlay{
+    position:fixed;
+    inset:0;
+    z-index:9997;
+    display:grid;
+    place-items:center;
+    padding:24px;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity 0.4s ease;
+  }
+  .promo-overlay::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:radial-gradient(circle at 50% 40%, rgba(156,78,158,0.30), rgba(14,12,17,0.92) 65%);
+    backdrop-filter:blur(4px);
+    -webkit-backdrop-filter:blur(4px);
+  }
+  .promo-overlay.is-visible{ opacity:1; pointer-events:auto; }
+  .promo-card{
+    position:relative;
+    z-index:1;
+    max-width:420px;
+    width:100%;
+    text-align:center;
+    background:var(--bg-card);
+    border:1px solid var(--line-strong);
+    border-radius:22px;
+    padding:48px 36px 34px;
+    box-shadow:0 30px 80px -20px rgba(232,130,156,0.30);
+    transform:translateY(16px) scale(0.97);
+    transition:transform 0.5s cubic-bezier(0.2,0.8,0.2,1);
+  }
+  .promo-overlay.is-visible .promo-card{ transform:translateY(0) scale(1); }
+  .promo-card .eyebrow{ margin-bottom:14px; color:var(--lavender); }
+  .promo-card h3{
+    font-size:clamp(1.7rem, 5vw, 2.2rem);
+    font-style:italic;
+    line-height:1.1;
+    margin-bottom:14px;
+  }
+  .promo-card h3 em{ color:var(--rose); font-style:italic; }
+  .promo-card p{
+    color:var(--ink-dim);
+    font-size:0.95rem;
+    font-weight:300;
+    margin-bottom:28px;
+  }
+  .promo-actions{ display:flex; flex-direction:column; gap:12px; }
+  .promo-actions .btn{ justify-content:center; width:100%; }
+  .promo-thanks{ display:none; }
+  .promo-card.is-yes .promo-ask{ display:none; }
+  .promo-card.is-yes .promo-thanks{ display:block; }
+  .promo-close-link{
+    display:inline-block;
+    margin-top:16px;
+    background:none;
+    border:none;
+    color:var(--ink-faint);
+    font-size:0.78rem;
+    cursor:pointer;
+    font-family:'Manrope',sans-serif;
+  }
+  .promo-close-link:hover{ color:var(--ink); }
+
   /* ---------------- TOUR / NEWSLETTER ---------------- */
   .tour-panel{
     background:linear-gradient(155deg, rgba(168,155,217,0.10), rgba(201,138,156,0.08));
@@ -1261,6 +1328,30 @@
   </div>
 </footer>
 
+<div class="promo-overlay" id="promoOverlay" role="dialog" aria-modal="true" aria-labelledby="promoTitle" aria-hidden="true">
+  <div class="promo-card" id="promoCard">
+    <div class="promo-ask">
+      <div class="eyebrow lc">it's out now</div>
+      <h3 class="display" id="promoTitle">thoughts are <em>hell</em> is finally here.</h3>
+      <p>every post, story and repost helps more than you'd think. would you share it with your people?</p>
+      <div class="promo-actions">
+        <button type="button" class="btn btn-primary lc" id="promoYes">i will</button>
+        <button type="button" class="btn btn-outline lc" id="promoNo">no, but i'll listen</button>
+      </div>
+    </div>
+    <div class="promo-thanks">
+      <div class="eyebrow lc">thank you</div>
+      <h3 class="display">you're the <em>best</em>.</h3>
+      <p>tag <strong>@jscaylum</strong> so it can get reposted. here's a caption to paste in.</p>
+      <div class="promo-actions">
+        <button type="button" class="btn btn-primary lc" id="promoCopy">copy caption</button>
+        <a href="https://www.tiktok.com/@jscaylum" target="_blank" rel="noopener" class="btn btn-outline lc">open tiktok</a>
+      </div>
+      <button type="button" class="promo-close-link lc" id="promoDone">close</button>
+    </div>
+  </div>
+</div>
+
 <script>
   // ======================================================================
   // SITE CONFIG — edit this whenever you want to change the album name,
@@ -1630,6 +1721,69 @@
   renderDiscography();
   syncReleaseCount();
 
+  // release promo popup — once the album is out, ask visitors to post about it.
+  // shows once per visitor (remembered in localStorage). add ?promo=1 to the
+  // url to force it for testing.
+  const promoOverlay = document.getElementById('promoOverlay');
+  const promoCard = document.getElementById('promoCard');
+  const PROMO_KEY = 'jsc_release_promo_seen';
+  let promoScheduled = false;
+
+  function markPromoSeen() {
+    try { localStorage.setItem(PROMO_KEY, '1'); } catch (e) {}
+  }
+  function openPromo() {
+    if (!promoOverlay) return;
+    promoOverlay.classList.add('is-visible');
+    promoOverlay.setAttribute('aria-hidden', 'false');
+  }
+  function closePromo() {
+    if (!promoOverlay) return;
+    promoOverlay.classList.remove('is-visible');
+    promoOverlay.setAttribute('aria-hidden', 'true');
+    markPromoSeen();
+  }
+  function schedulePromoPopup(force) {
+    if (promoScheduled || !promoOverlay) return;
+    let seen = false;
+    try { seen = localStorage.getItem(PROMO_KEY) === '1'; } catch (e) {}
+    if (seen && !force) return;
+    promoScheduled = true;
+    setTimeout(openPromo, 2500);
+  }
+
+  if (promoOverlay) {
+    const promoYes = document.getElementById('promoYes');
+    const promoNo = document.getElementById('promoNo');
+    const promoCopy = document.getElementById('promoCopy');
+    const promoDone = document.getElementById('promoDone');
+
+    if (promoYes) promoYes.addEventListener('click', () => {
+      markPromoSeen();
+      if (promoCard) promoCard.classList.add('is-yes');
+    });
+    if (promoNo) promoNo.addEventListener('click', () => {
+      closePromo();
+      const listenUrl = ALBUM.spotifyUrl || ALBUM.appleMusicUrl || ALBUM.link;
+      if (listenUrl) window.open(listenUrl, '_blank', 'noopener');
+    });
+    if (promoCopy) promoCopy.addEventListener('click', async () => {
+      const link = ALBUM.spotifyUrl || location.href;
+      const caption = `thoughts are hell by @jscaylum is out now — ${link} #jscaylum #thoughtsarehell`;
+      try {
+        await navigator.clipboard.writeText(caption);
+        promoCopy.textContent = 'copied';
+      } catch (e) {
+        promoCopy.textContent = 'copy failed — try again';
+      }
+    });
+    if (promoDone) promoDone.addEventListener('click', closePromo);
+    promoOverlay.addEventListener('click', (e) => { if (e.target === promoOverlay) closePromo(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closePromo(); });
+
+    if (new URLSearchParams(location.search).get('promo') === '1') schedulePromoPopup(true);
+  }
+
   let lastPhase = null;
   function renderPhase() {
     const now = Date.now();
@@ -1667,6 +1821,7 @@
         if (trackRevealOverlay) trackRevealOverlay.classList.remove('is-visible');
         renderLatestRelease(ALBUM_RELEASE);
         addAlbumToDiscography();
+        schedulePromoPopup(false);
       }
     }
 
